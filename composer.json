@@ -1,7 +1,6 @@
 {
     "name": "game-worker/http-server",
     "description": "http-server",
-    "type": "composer-plugin",
     "license": "MIT",
     "authors": [
         {
