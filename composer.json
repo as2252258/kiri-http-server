@@ -19,6 +19,8 @@
         "game-worker/kiri-http-message": "dev-master"
     },
     "autoload": {
-        "Server\\": "./"
+        "psr-4": {
+            "Server\\": "./"
+        }
     }
 }
