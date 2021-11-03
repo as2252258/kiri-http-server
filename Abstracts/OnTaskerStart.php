@@ -18,7 +18,6 @@ class OnTaskerStart extends WorkerStart implements EventDispatcherInterface
 
     /**
      * @throws ConfigException
-     * @throws ReflectionException
      */
     public function dispatch(object $event)
     {

@@ -10,14 +10,13 @@ use Kiri\Di\ContainerInterface;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
 use ReflectionException;
-
+use Server\Abstracts\BaseProcess;
 use Server\Handler\OnPipeMessage;
 use Server\Handler\OnServer;
 use Server\Handler\OnServerManager;
 use Server\Handler\OnServerReload;
-use Server\Handler\OnServerWorker;
 use Server\Handler\OnServerTask;
-
+use Server\Handler\OnServerWorker;
 use Server\SInterface\OnCloseInterface;
 use Server\SInterface\OnConnectInterface;
 use Server\SInterface\OnDisconnectInterface;
@@ -155,56 +154,29 @@ class ServerManager
 
 
 	/**
-	 * @param string|OnProcessInterface $customProcess
-	 * @param null $redirect_stdin_and_stdout
-	 * @param int|null $pipe_type
-	 * @param bool $enable_coroutine
+	 * @param string|OnProcessInterface|BaseProcess $customProcess
 	 * @throws Exception
 	 */
-	public function addProcess(string|OnProcessInterface $customProcess, $redirect_stdin_and_stdout = null, ?int $pipe_type = SOCK_DGRAM, bool $enable_coroutine = true)
+	public function addProcess(string|OnProcessInterface|BaseProcess $customProcess)
 	{
-		$process = $this->initProcess($customProcess, $redirect_stdin_and_stdout, $pipe_type, $enable_coroutine);
-		$this->server->addProcess($process);
-		if ($customProcess instanceof OnProcessInterface) {
-			Kiri::app()->addProcess($customProcess::class, $process);
-		} else {
-			Kiri::app()->addProcess($customProcess, $process);
+		if (is_string($customProcess)) {
+			$customProcess = Kiri::getDi()->get($customProcess);
 		}
-	}
-
-
-	/**
-	 * @param $customProcess
-	 * @param $redirect_stdin_and_stdout
-	 * @param $pipe_type
-	 * @param $enable_coroutine
-	 * @return Process
-	 */
-	private function initProcess($customProcess, $redirect_stdin_and_stdout, $pipe_type, $enable_coroutine): Process
-	{
-		$server = $this->server;
-		return new Process(function (Process $soloProcess) use ($customProcess, $server) {
-			$time = microtime(true);
-			if (is_string($customProcess)) {
-				$customProcess = Kiri::createObject($customProcess, [$server]);
-			}
-
-			$name = $customProcess->getProcessName($soloProcess);
-
+		$process = new Process(function (Process $soloProcess) use ($customProcess) {
 			$system = sprintf('%s.process[%d]', Config::get('id', 'system-service'), $soloProcess->pid);
 			if (Kiri::getPlatform()->isLinux()) {
-				$soloProcess->name($system . '.' . $name . ' start.');
+				$soloProcess->name($system . '.' . $customProcess->getName() . ' start.');
 			}
-			$name = Config::get('id', 'system-service');
-			echo sprintf("\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m [%s]Builder %s[%d].%d use time %s.", $name, 'Process ' . $name,
-					$server->master_pid, $soloProcess->pid, round(microtime(true) - $time, 6) . 's') . PHP_EOL;
+			echo $system . '.' . $customProcess->getName() . ' start.';
 			$customProcess->signListen($soloProcess);
 			$customProcess->onHandler($soloProcess);
 		},
-			$redirect_stdin_and_stdout,
-			$pipe_type,
-			$enable_coroutine
+			$customProcess->getRedirectStdinAndStdout(),
+			$customProcess->getPipeType(),
+			$customProcess->isEnableCoroutine()
 		);
+		$this->container->setBindings($customProcess::class, $process);
+		$this->server->addProcess($process);
 	}
 
 

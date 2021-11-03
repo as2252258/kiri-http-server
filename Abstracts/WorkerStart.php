@@ -60,7 +60,7 @@ class WorkerStart
      * @param $event
      * @param $isWorker
      * @param $time
-     * @throws \Kiri\Exception\ConfigException
+     * @throws ConfigException
      */
     protected function mixed($event, $isWorker, $time)
     {

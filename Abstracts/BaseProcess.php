@@ -4,7 +4,6 @@ namespace Server\Abstracts;
 
 
 use JetBrains\PhpStorm\Pure;
-use Kiri\Kiri;
 use Server\SInterface\OnProcessInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
@@ -15,11 +14,61 @@ use Swoole\Process;
 abstract class BaseProcess implements OnProcessInterface
 {
 
-	/** @var bool */
-	protected bool $enableSwooleCoroutine = true;
-
-
 	protected bool $isStop = false;
+
+
+	protected mixed $redirect_stdin_and_stdout = null;
+
+
+	protected int $pipe_type = SOCK_DGRAM;
+
+
+	protected bool $enable_coroutine = true;
+
+
+	protected string $name = 'swoole process.';
+
+
+	/**
+	 * @return string
+	 */
+	public function getName(): string
+	{
+		return $this->name;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isStop(): bool
+	{
+		return $this->isStop;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getRedirectStdinAndStdout(): mixed
+	{
+		return $this->redirect_stdin_and_stdout;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getPipeType(): int
+	{
+		return $this->pipe_type;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isEnableCoroutine(): bool
+	{
+		return $this->enable_coroutine;
+	}
 
 
 	/**
@@ -40,43 +89,11 @@ abstract class BaseProcess implements OnProcessInterface
 	}
 
 
-
 	/**
 	 * @param Process $process
 	 */
 	public function signListen(Process $process): void
 	{
-//		if (Coroutine::getCid() === -1) {
-//			Process::signal(SIGTERM | SIGKILL, function ($signo) use ($process) {
-//				if ($signo) {
-//					$lists = Kiri::app()->getProcess();
-//					foreach ($lists as $process) {
-//						$process->exit(0);
-//					}
-//				}
-//			});
-//		} else {
-//			Coroutine::create(function () use ($process) {
-//				/** @var Coroutine\Socket $message */
-//				$message = $process->exportSocket();
-//				if ($message->recv() == 0x03455343213212) {
-//					$this->waiteExit($process);
-//				}
-//			});
-//			Coroutine::create(function () use ($process) {
-//				$data = Coroutine::waitSignal(SIGTERM | SIGKILL, -1);
-//				if ($data) {
-//					$lists = Kiri::app()->getProcess();
-//					foreach ($lists as $name => $process) {
-//						foreach ($process as $item) {
-//							/** @var Coroutine\Socket $export */
-//							$export = $item->exportSocket();
-//							$export->send(0x03455343213212);
-//						}
-//					}
-//				}
-//			});
-//		}
 	}
 
 
@@ -116,7 +133,7 @@ abstract class BaseProcess implements OnProcessInterface
 	 */
 	private function sleep(): void
 	{
-		if ($this->enableSwooleCoroutine) {
+		if ($this->enable_coroutine) {
 			Coroutine::sleep(0.1);
 		} else {
 			usleep(100);
