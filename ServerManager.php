@@ -167,7 +167,7 @@ class ServerManager
 			if (Kiri::getPlatform()->isLinux()) {
 				$soloProcess->name($system . '.' . $customProcess->getName() . ' start.');
 			}
-			echo "\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m " . $system . '.' . $customProcess->getName() . ' start.' . PHP_EOL;
+			echo "\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m [" . $system . ']' . $customProcess->getName() . ' start.' . PHP_EOL;
 			$customProcess->signListen($soloProcess);
 			$customProcess->onHandler($soloProcess);
 		},
