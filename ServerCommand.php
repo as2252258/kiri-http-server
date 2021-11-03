@@ -115,7 +115,7 @@ class ServerCommand extends Command
 	{
 		$this->configure_set();
 
-		exec(PHP_BINARY . ' ' . APP_PATH . 'kiri.php runtime:builder');
+//		exec(PHP_BINARY . ' ' . APP_PATH . 'kiri.php runtime:builder');
 
 		$this->eventProvider->on(OnBeforeWorkerStart::class, [di(OnServerWorker::class), 'setConfigure']);
 		$this->eventProvider->on(OnWorkerStart::class, [di(WorkerDispatch::class), 'dispatch']);
