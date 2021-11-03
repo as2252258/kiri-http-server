@@ -17,5 +17,8 @@
         "psr/http-message": "^1.0",
         "psr/event-dispatcher": "^1.0",
         "game-worker/kiri-http-message": "dev-master"
+    },
+    "autoload": {
+        "Server\\": "./"
     }
 }
