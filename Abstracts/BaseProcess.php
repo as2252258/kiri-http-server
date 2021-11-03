@@ -26,7 +26,7 @@ abstract class BaseProcess implements OnProcessInterface
 	protected bool $enable_coroutine = true;
 
 
-	protected string $name = 'swoole process.';
+	public string $name = 'swoole process.';
 
 
 	/**
