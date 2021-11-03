@@ -163,7 +163,7 @@ class ServerManager
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
 		$process = new Process(function (Process $soloProcess) use ($customProcess) {
-			$system = sprintf('[%s].process[%d]', Config::get('id', 'system-service'), $soloProcess->pid);
+			$system = sprintf('[%s]process[%d]', Config::get('id', 'system-service'), $soloProcess->pid);
 			if (Kiri::getPlatform()->isLinux()) {
 				$soloProcess->name($system . '.' . $customProcess->getName() . ' start.');
 			}
