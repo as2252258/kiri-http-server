@@ -251,9 +251,7 @@ class ServerManager
 	private function mergeConfig($config, $daemon): array
 	{
 		$config['settings'] = $config['settings'] ?? [];
-		if (!isset($config['settings']['daemonize']) || !$config['settings']['daemonize'] != $daemon) {
-			$config['settings']['daemonize'] = $daemon;
-		}
+		$config['settings']['daemonize'] = $daemon;
 		if (!isset($config['settings']['log_file'])) {
 			$config['settings']['log_file'] = storage('system.log');
 		}
