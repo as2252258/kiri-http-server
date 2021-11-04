@@ -75,9 +75,8 @@ class OnServerWorker extends \Server\Abstracts\Server
 	 */
 	public function onWorkerStop(Server $server, int $workerId)
 	{
-		$this->eventDispatch->dispatch(new OnWorkerStop($server, $workerId));
-
-		Timer::clearAll();
+        Timer::clearAll();
+        $this->eventDispatch->dispatch(new OnWorkerStop($server, $workerId));
 	}
 
 
@@ -88,10 +87,10 @@ class OnServerWorker extends \Server\Abstracts\Server
 	 */
 	public function onWorkerExit(Server $server, int $workerId)
 	{
-		$this->eventDispatch->dispatch(new OnWorkerExit($server, $workerId));
-
 		ServerManager::setEnv('state', 'exit');
-	}
+
+        $this->eventDispatch->dispatch(new OnWorkerExit($server, $workerId));
+    }
 
 
 	/**
@@ -112,7 +111,7 @@ class OnServerWorker extends \Server\Abstracts\Server
 
 		$this->logger->error($message);
 
-		$this->system_mail($message);
+//		$this->system_mail($message);
 	}
 
 
