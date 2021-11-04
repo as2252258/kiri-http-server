@@ -36,7 +36,7 @@ abstract class Server
 		if (Kiri::getPlatform()->isMac()) {
 			return;
 		}
-		$name = Config::get('id', 'system-service');
+		$name = '[' . Config::get('id', 'system-service') . ']';
 		if (!empty($prefix)) {
 			$name .= '.' . $prefix;
 		}
