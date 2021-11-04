@@ -49,7 +49,7 @@ class ServerCommand extends Command
 		$this->setName('sw:server')
 			->setDescription('server start|stop|reload|restart')
 			->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
-			->addOption('daemon', 'd', InputOption::VALUE_OPTIONAL, 'is run daemonize', -1);
+			->addOption('daemon', 'd', InputOption::VALUE_OPTIONAL, 'is run daemonize');
 	}
 
 
