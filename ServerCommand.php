@@ -6,7 +6,6 @@ namespace Server;
 
 use Annotation\Inject;
 use Exception;
-use Http\Handler\Router;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventProvider;
 use Kiri\Exception\ConfigException;
@@ -49,7 +48,7 @@ class ServerCommand extends Command
 	{
 		$this->setName('sw:server')
 			->setDescription('server start|stop|reload|restart')
-			->addArgument('action', InputArgument::REQUIRED)
+			->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
 			->addOption('daemon', 'd', InputOption::VALUE_OPTIONAL, 'is run daemonize', -1);
 	}
 
