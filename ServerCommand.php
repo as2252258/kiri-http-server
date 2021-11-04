@@ -63,7 +63,7 @@ class ServerCommand extends Command
 	{
 		try {
 			$manager = Kiri::app()->getServer();
-			$manager->setDaemon((int)is_null($input->getOption('daemon')));
+			$manager->setDaemon((int)!is_null($input->getOption('daemon')));
 			if (is_null($input->getArgument('action'))) {
 				$input->setArgument('action', 'restart');
 			}
