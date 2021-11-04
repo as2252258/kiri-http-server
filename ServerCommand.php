@@ -6,12 +6,8 @@ namespace Server;
 
 use Annotation\Inject;
 use Exception;
-use Http\Constrict\Request;
-use Http\Constrict\RequestInterface;
-use Http\Constrict\Response;
-use Http\Constrict\ResponseInterface;
+use Http\Handler\Router;
 use Kiri\Abstracts\Config;
-use Kiri\Di\ContainerInterface;
 use Kiri\Events\EventProvider;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
@@ -54,7 +50,7 @@ class ServerCommand extends Command
 		$this->setName('sw:server')
 			->setDescription('server start|stop|reload|restart')
 			->addArgument('action', InputArgument::REQUIRED)
-			->addOption('daemon', 'd', InputOption::VALUE_OPTIONAL,'is run daemonize',-1);
+			->addOption('daemon', 'd', InputOption::VALUE_OPTIONAL, 'is run daemonize', -1);
 	}
 
 
@@ -110,12 +106,13 @@ class ServerCommand extends Command
 	/**
 	 * @param $manager
 	 * @throws ConfigException
+	 * @throws Exception
 	 */
 	private function generate_runtime_builder($manager): void
 	{
 		$this->configure_set();
 
-//		exec(PHP_BINARY . ' ' . APP_PATH . 'kiri.php runtime:builder');
+		Kiri::getDi()->get(Router::class)->read_files();
 
 		$this->eventProvider->on(OnBeforeWorkerStart::class, [di(OnServerWorker::class), 'setConfigure']);
 		$this->eventProvider->on(OnWorkerStart::class, [di(WorkerDispatch::class), 'dispatch']);
