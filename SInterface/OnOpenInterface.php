@@ -10,8 +10,8 @@ interface OnOpenInterface
 
 
     /**
-     * @param \Swoole\WebSocket\Server $server
-     * @param \Swoole\Http\Request $request
+     * @param Server $server
+     * @param Request $request
      */
     public function onOpen(Server $server, Request $request): void;
 
