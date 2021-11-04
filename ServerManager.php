@@ -175,7 +175,7 @@ class ServerManager
 			$customProcess->getPipeType(),
 			$customProcess->isEnableCoroutine()
 		);
-		$this->container->setBindings($customProcess::class, $process);
+//		$this->container->setBindings($customProcess::class, $process);
 		$this->server->addProcess($process);
 	}
 
