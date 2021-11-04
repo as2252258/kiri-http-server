@@ -112,7 +112,7 @@ class ServerCommand extends Command
 	{
 		$this->configure_set();
 
-		Kiri::getDi()->get(Router::class)->read_files();
+		Kiri::app()->getRouter()->read_files();
 
 		$this->eventProvider->on(OnBeforeWorkerStart::class, [di(OnServerWorker::class), 'setConfigure']);
 		$this->eventProvider->on(OnWorkerStart::class, [di(WorkerDispatch::class), 'dispatch']);
