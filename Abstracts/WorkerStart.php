@@ -29,47 +29,6 @@ class WorkerStart
 
 
     /**
-     * @throws \ReflectionException
-     * @throws \Exception
-     */
-    protected function interpretDirectory()
-    {
-        $di = Kiri::getDi();
-
-        $this->annotation->read(APP_PATH . 'app', 'App');
-
-        $fileLists = $this->annotation->read(APP_PATH . 'app');
-        foreach ($fileLists->runtime(APP_PATH . 'app') as $class) {
-            foreach (NoteManager::getTargetNote($class) as $value) {
-                $value->execute($class);
-            }
-            $methods = $di->getMethodAttribute($class);
-            foreach ($methods as $method => $attribute) {
-                if (empty($attribute)) {
-                    continue;
-                }
-                foreach ($attribute as $item) {
-                    $item->execute($class, $method);
-                }
-            }
-        }
-    }
-
-
-    /**
-     * @param $event
-     * @param $isWorker
-     * @param $time
-     * @throws ConfigException
-     */
-    protected function mixed($event, $isWorker, $time)
-    {
-        $name = Config::get('id', 'system-service');
-        echo sprintf("\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m [%s]Builder %s[%d].%d use time %s.", $name, $isWorker ? 'Worker' : 'Taker',
-                $event->server->worker_pid, $event->workerId, round(microtime(true) - $time, 6) . 's') . PHP_EOL;
-    }
-
-    /**
      * @param $prefix
      * @throws ConfigException
      */
