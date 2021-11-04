@@ -24,7 +24,6 @@ class Server extends HttpService
 {
 
 	private array $process = [
-		LoggerProcess::class
 	];
 
 
