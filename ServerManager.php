@@ -163,9 +163,9 @@ class ServerManager
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
 		$process = new Process(function (Process $soloProcess) use ($customProcess) {
-			$system = sprintf('[%s].process[%d]', Config::get('id', 'system-service'), $soloProcess->pid);
+			$system = sprintf('[%s].process', Config::get('id', 'system-service'));
 			if (Kiri::getPlatform()->isLinux()) {
-				$soloProcess->name($system . '.' . $customProcess->getName() . ' start.');
+				$soloProcess->name($system . '(' . $customProcess->getName() . ')');
 			}
 			echo "\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m " . $system . $customProcess->getName() . ' start.' . PHP_EOL;
 			$customProcess->signListen($soloProcess);
