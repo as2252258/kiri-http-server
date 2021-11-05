@@ -1,5 +1,5 @@
 {
-    "name": "game-worker/http-server",
+    "name": "game-worker/kiri-http-server",
     "description": "http-server",
     "license": "MIT",
     "authors": [
