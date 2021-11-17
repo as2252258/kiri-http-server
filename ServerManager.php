@@ -7,6 +7,7 @@ use Closure;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Di\ContainerInterface;
+use Kiri\Error\Logger;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
 use ReflectionException;
@@ -40,10 +41,17 @@ use Swoole\WebSocket\Server as WServer;
 class ServerManager
 {
 
+
+	use TraitServer;
+
 	/** @var string */
 	public string $host = '';
 
 	public int $port = 0;
+
+
+	#[Inject(Logger::class)]
+	public Logger $logger;
 
 
 	/** @var array<string,Port> */
@@ -109,7 +117,6 @@ class ServerManager
 	 */
 	public function addListener(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
-		if ($this->checkPortIsAlready($port)) $this->stopServer($port);
 		if (!$this->server) {
 			$this->createBaseServer($type, $host, $port, $mode, $settings);
 		} else {
@@ -131,8 +138,7 @@ class ServerManager
 		foreach ($this->sortService($configs['ports']) as $config) {
 			$this->startListenerHandler($context, $config, $daemon);
 		}
-		$this->bindCallback($this->server, [Constant::PIPE_MESSAGE => [OnPipeMessage::class, 'onPipeMessage']]);
-//		$this->bindCallback($this->server, $this->getSystemEvents($configs));
+		$this->bindCallback([Constant::PIPE_MESSAGE => [OnPipeMessage::class, 'onPipeMessage']]);
 	}
 
 
@@ -145,7 +151,7 @@ class ServerManager
 	{
 		$configs = Config::get('server', [], true);
 		foreach ($this->sortService($configs['ports']) as $config) {
-			if ($this->checkPortIsAlready($config['port'])) {
+			if (checkPortIsAlready($config['port'])) {
 				return true;
 			}
 		}
@@ -167,7 +173,7 @@ class ServerManager
 			if (Kiri::getPlatform()->isLinux()) {
 				$soloProcess->name($system . '(' . $customProcess->getName() . ')');
 			}
-			echo "\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m " . $system . $customProcess->getName() . ' start.' . PHP_EOL;
+			$this->logger->debug($system . $customProcess->getName() . ' start.');
 			$customProcess->signListen($soloProcess);
 			$customProcess->onHandler($soloProcess);
 		},
@@ -175,7 +181,7 @@ class ServerManager
 			$customProcess->getPipeType(),
 			$customProcess->isEnableCoroutine()
 		);
-//		$this->container->setBindings($customProcess::class, $process);
+		$this->container->setBindings($customProcess->getName(), $process);
 		$this->server->addProcess($process);
 	}
 
@@ -186,30 +192,6 @@ class ServerManager
 	public function getSetting(): array
 	{
 		return $this->server->setting;
-	}
-
-
-	/**
-	 * @param array $ports
-	 * @return array
-	 */
-	public function sortService(array $ports): array
-	{
-		$array = [];
-		foreach ($ports as $port) {
-			if ($port['type'] == Constant::SERVER_TYPE_WEBSOCKET) {
-				array_unshift($array, $port);
-			} else if ($port['type'] == Constant::SERVER_TYPE_HTTP) {
-				if (!empty($array) && $array[0]['type'] == Constant::SERVER_TYPE_WEBSOCKET) {
-					$array[] = $port;
-				} else {
-					array_unshift($array, $port);
-				}
-			} else {
-				$array[] = $port;
-			}
-		}
-		return $array;
 	}
 
 
@@ -273,7 +255,8 @@ class ServerManager
 	{
 		$id = Config::get('id', 'system-service');
 
-		echo sprintf("\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m [%s]$type service %s::%d start.", $id, $host, $port) . PHP_EOL;
+		$this->logger->debug(sprintf('[%s]' . $type . ' service %s::%d start', $id, $host, $port));
+
 		/** @var Server\Port $service */
 		$this->ports[$port] = $this->server->addlistener($host, $port, $mode);
 		if ($this->ports[$port] === false) {
@@ -294,22 +277,6 @@ class ServerManager
 
 
 	/**
-	 * @param int $port
-	 * @param string $event
-	 * @return Closure|array|null
-	 */
-	public function getPortCallback(int $port, string $event): Closure|array|null
-	{
-		/** @var Server\Port $_port */
-		$_port = $this->ports[$port] ?? null;
-		if (is_null($_port)) {
-			return null;
-		}
-		return $_port->getCallback($event);
-	}
-
-
-	/**
 	 * @param string $type
 	 * @param string $host
 	 * @param int $port
@@ -317,6 +284,7 @@ class ServerManager
 	 * @param array $settings
 	 * @throws ReflectionException
 	 * @throws ConfigException
+	 * @throws Exception
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
@@ -331,7 +299,7 @@ class ServerManager
 
 		$id = Config::get('id', 'system-service');
 
-		echo sprintf("\033[36m[" . date('Y-m-d H:i:s') . "]\033[0m [%s]$type service %s::%d start.", $id, $host, $port) . PHP_EOL;
+		$this->logger->debug(sprintf('[%s]' . $type . ' service %s::%d start', $id, $host, $port));
 
 		$this->addDefaultListener($settings);
 	}
@@ -343,40 +311,13 @@ class ServerManager
 	 */
 	public function stopServer(int $port)
 	{
-		if (!($pid = $this->checkPortIsAlready($port))) {
+		if (!($pid = checkPortIsAlready($port))) {
 			return;
 		}
-		while ($this->checkPortIsAlready($port)) {
+		while (checkPortIsAlready($port)) {
 			Process::kill($pid, SIGTERM);
 			usleep(300);
 		}
-	}
-
-
-	/**
-	 * @param $port
-	 * @return bool|string
-	 * @throws Exception
-	 */
-	private function checkPortIsAlready($port): bool|string
-	{
-		if (!Kiri::getPlatform()->isLinux()) {
-			exec("lsof -i :" . $port . " | grep -i 'LISTEN' | awk '{print $2}'", $output);
-			if (empty($output)) return false;
-			$output = explode(PHP_EOL, $output[0]);
-			return $output[0];
-		}
-
-		$serverPid = file_get_contents(storage('.swoole.pid'));
-		if (!empty($serverPid) && shell_exec('ps -ef | grep ' . $serverPid . ' | grep -v grep')) {
-			Process::kill($serverPid, SIGTERM);
-		}
-
-		exec('netstat -lnp | grep ' . $port . ' | grep "LISTEN" | awk \'{print $7}\'', $output);
-		if (empty($output)) {
-			return false;
-		}
-		return explode('/', $output[0])[0];
 	}
 
 
@@ -475,20 +416,19 @@ class ServerManager
 	{
 		$task_use_object = $this->server->setting['task_object'] ?? $this->server->setting['task_use_object'] ?? false;
 		$reflect = $this->container->getReflect(OnServerTask::class)?->newInstance();
+		$this->server->on('finish', $events[Constant::FINISH] ?? [$reflect, 'onFinish']);
 		if ($task_use_object || $this->server->setting['task_enable_coroutine']) {
 			$this->server->on('task', $events[Constant::TASK] ?? [$reflect, 'onCoroutineTask']);
 		} else {
 			$this->server->on('task', $events[Constant::TASK] ?? [$reflect, 'onTask']);
 		}
-		$this->server->on('finish', $events[Constant::FINISH] ?? [$reflect, 'onFinish']);
 	}
 
 
 	/**
-	 * @param Port|Server $server
 	 * @param array|null $settings
 	 */
-	public function bindCallback(Port|Server $server, ?array $settings = [])
+	public function bindCallback(?array $settings = [])
 	{
 		// TODO: Implement bindCallback() method.
 		if (count($settings) < 1) {

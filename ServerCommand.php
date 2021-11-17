@@ -10,12 +10,6 @@ use Kiri\Abstracts\Config;
 use Kiri\Events\EventProvider;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
-use Server\Abstracts\OnTaskerStart as TaskerDispatch;
-use Server\Abstracts\OnWorkerStart as WorkerDispatch;
-use Server\Events\OnBeforeWorkerStart;
-use Server\Events\OnTaskerStart;
-use Server\Events\OnWorkerStart;
-use Server\Handler\OnServerWorker;
 use Swoole\Coroutine;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -61,28 +55,22 @@ class ServerCommand extends Command
 	 */
 	public function execute(InputInterface $input, OutputInterface $output): int
 	{
-		try {
-			$manager = Kiri::app()->getServer();
-			$manager->setDaemon((int)!is_null($input->getOption('daemon')));
-			if (is_null($input->getArgument('action'))) {
-				$input->setArgument('action', 'restart');
-			}
-			if (!in_array($input->getArgument('action'), self::ACTIONS)) {
-				throw new Exception('I don\'t know what I want to do.');
-			}
-			if ($manager->isRunner() && $input->getArgument('action') == 'start') {
-				throw new Exception('Service is running. Please use restart.');
-			}
-			$manager->shutdown();
-			if ($input->getArgument('action') == 'stop') {
-				throw new Exception('shutdown success');
-			}
-			$this->generate_runtime_builder($manager);
-		} catch (\Throwable $throwable) {
-			$output->write(jTraceEx($throwable));
-		} finally {
-			return 1;
+		$manager = Kiri::app()->getServer();
+		$manager->setDaemon((int)!is_null($input->getOption('daemon')));
+		if (is_null($input->getArgument('action'))) {
+			$input->setArgument('action', 'restart');
 		}
+		if (!in_array($input->getArgument('action'), self::ACTIONS)) {
+			throw new Exception('I don\'t know what I want to do.');
+		}
+		if ($manager->isRunner() && $input->getArgument('action') == 'start') {
+			throw new Exception('Service is running. Please use restart.');
+		}
+		$manager->shutdown();
+		if ($input->getArgument('action') == 'stop') {
+			throw new Exception('shutdown success');
+		}
+		return $this->generate_runtime_builder($manager);
 	}
 
 
@@ -107,19 +95,19 @@ class ServerCommand extends Command
 
 	/**
 	 * @param $manager
+	 * @return int
 	 * @throws ConfigException
 	 * @throws Exception
 	 */
-	private function generate_runtime_builder($manager): void
+	private function generate_runtime_builder($manager): int
 	{
 		$this->configure_set();
 
 		Kiri::app()->getRouter()->read_files();
 
-		$this->eventProvider->on(OnBeforeWorkerStart::class, [di(OnServerWorker::class), 'setConfigure']);
-		$this->eventProvider->on(OnWorkerStart::class, [di(WorkerDispatch::class), 'dispatch']);
-		$this->eventProvider->on(OnTaskerStart::class, [di(TaskerDispatch::class), 'dispatch']);
 		$manager->start();
+
+		return 1;
 	}
 
 }

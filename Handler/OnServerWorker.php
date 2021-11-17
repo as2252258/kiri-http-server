@@ -7,6 +7,7 @@ use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
+use Kiri\Kiri;
 use Kiri\Runtime;
 use Server\Events\OnAfterWorkerStart;
 use Server\Events\OnBeforeWorkerStart;
@@ -46,25 +47,13 @@ class OnServerWorker extends \Server\Abstracts\Server
 		if ($workerId < $server->setting['worker_num']) {
 			$this->eventDispatch->dispatch(new OnWorkerStart($server, $workerId));
 			$this->setProcessName(sprintf('Worker[%d].%d', $server->worker_pid, $workerId));
+			set_env('environmental', Kiri::WORKER);
 		} else {
 			$this->eventDispatch->dispatch(new OnTaskStart($server, $workerId));
 			$this->setProcessName(sprintf('Tasker[%d].%d', $server->worker_pid, $workerId));
+			set_env('environmental', Kiri::TASK);
 		}
 		$this->eventDispatch->dispatch(new OnAfterWorkerStart());
-	}
-
-
-	/**
-	 * @param OnBeforeWorkerStart $worker
-	 * @throws Exception
-	 */
-	public function setConfigure(OnBeforeWorkerStart $worker)
-	{
-		ServerManager::setEnv('worker', $worker->workerId);
-		$serialize = file_get_contents(storage(Runtime::CONFIG_NAME));
-		if (!empty($serialize)) {
-			Config::sets(unserialize($serialize));
-		}
 	}
 
 
@@ -87,7 +76,7 @@ class OnServerWorker extends \Server\Abstracts\Server
 	 */
 	public function onWorkerExit(Server $server, int $workerId)
 	{
-		ServerManager::setEnv('state', 'exit');
+		set_env('state', 'exit');
 
         $this->eventDispatch->dispatch(new OnWorkerExit($server, $workerId));
     }
