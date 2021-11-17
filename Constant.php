@@ -19,6 +19,7 @@ class Constant
 	const WORKER_EXIT = 'WorkerExit';
 	const CONNECT = 'Connect';
 	const HANDSHAKE = 'handshake';
+	const OPEN = 'open';
 	const DISCONNECT = 'disconnect';
 	const MESSAGE = 'message';
 	const RECEIVE = 'Receive';
