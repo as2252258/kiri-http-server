@@ -63,18 +63,11 @@ class ServerCommand extends Command
 		if (!in_array($input->getArgument('action'), self::ACTIONS)) {
 			throw new Exception('I don\'t know what I want to do.');
 		}
-
-		$reusePort = Config::get('server.settings')[Constant::OPTION_ENABLE_REUSE_PORT] ?? false;
-		if (!$reusePort) {
-			if ($manager->isRunner() && $input->getArgument('action') == 'start') {
-				throw new Exception('Service is running. Please use restart.');
-			}
-			$manager->shutdown();
+		if ($manager->isRunner() && $input->getArgument('action') == 'start') {
+			throw new Exception('Service is running. Please use restart.');
 		}
+		$manager->shutdown();
 		if ($input->getArgument('action') == 'stop') {
-			if ($manager->isRunner()) {
-				$manager->shutdown();
-			}
 			return 0;
 		}
 		return $this->generate_runtime_builder($manager);
