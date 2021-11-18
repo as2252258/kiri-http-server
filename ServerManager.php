@@ -169,7 +169,9 @@ class ServerManager
 		}
 		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
 		$process = new Process(function (Process $process) use ($customProcess, $system) {
-			$process->name($system . '(' . $customProcess->getName() . ')');
+			if (Kiri::getPlatform()->isLinux()) {
+				$process->name($system . '(' . $customProcess->getName() . ')');
+			}
 			$customProcess->process($process);
 		}, $customProcess->getRedirectStdinAndStdout(), $customProcess->getPipeType(), $customProcess->isEnableCoroutine());
 		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
