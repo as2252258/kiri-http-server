@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Server\SInterface;
+namespace Server\Contract;
 
 
 use Swoole\Server;

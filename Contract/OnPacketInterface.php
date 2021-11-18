@@ -1,6 +1,6 @@
 <?php
 
-namespace Server\SInterface;
+namespace Server\Contract;
 
 use Server\Abstracts\Server;
 

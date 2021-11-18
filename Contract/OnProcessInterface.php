@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Server\SInterface;
+namespace Server\Contract;
 
 
 use Swoole\Process;
@@ -9,7 +9,7 @@ use Swoole\Process;
 
 /**
  * Interface BaseProcess
- * @package SInterface
+ * @package Contract
  */
 interface OnProcessInterface
 {

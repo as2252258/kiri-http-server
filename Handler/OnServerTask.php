@@ -9,7 +9,7 @@ use Kiri\Abstracts\Logger;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
 use ReflectionException;
-use Server\SInterface\OnTaskInterface;
+use Server\Contract\OnTaskInterface;
 use Swoole\Server;
 
 

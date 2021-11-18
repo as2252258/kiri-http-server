@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Server\SInterface;
+namespace Server\Contract;
 
 
 /**
  * Interface OnPipeMessageInterface
- * @package Server\SInterface
+ * @package Server\Contract
  */
 interface OnPipeMessageInterface
 {

@@ -4,7 +4,7 @@ namespace Server\Abstracts;
 
 
 use JetBrains\PhpStorm\Pure;
-use Server\SInterface\OnProcessInterface;
+use Server\Contract\OnProcessInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
 

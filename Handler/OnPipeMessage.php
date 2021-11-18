@@ -5,7 +5,7 @@ namespace Server\Handler;
 use Annotation\Inject;
 use Server\Abstracts\Server;
 use Exception;
-use Server\SInterface\OnPipeMessageInterface;
+use Server\Contract\OnPipeMessageInterface;
 use Kiri\Events\EventDispatch;
 
 /**
