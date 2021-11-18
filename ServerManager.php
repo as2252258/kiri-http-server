@@ -167,13 +167,8 @@ class ServerManager
 		if (is_string($customProcess)) {
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
-		$process = new Process(function (Process $soloProcess) use ($customProcess) {
-			$customProcess->onProcessExec($soloProcess);
-		},
-			$customProcess->getRedirectStdinAndStdout(),
-			$customProcess->getPipeType(),
-			$customProcess->isEnableCoroutine()
-		);
+		$process = new Process([$customProcess, 'process'], $customProcess->getRedirectStdinAndStdout(),
+			$customProcess->getPipeType(), $customProcess->isEnableCoroutine());
 		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
 		if (Kiri::getPlatform()->isLinux()) {
 			$process->name($system . '(' . $customProcess->getName() . ')');
