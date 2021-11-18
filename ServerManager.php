@@ -3,7 +3,6 @@
 namespace Server;
 
 use Annotation\Inject;
-use Closure;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Di\ContainerInterface;
@@ -12,12 +11,6 @@ use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
 use ReflectionException;
 use Server\Abstracts\BaseProcess;
-use Server\Handler\OnPipeMessage;
-use Server\Handler\OnServer;
-use Server\Handler\OnServerManager;
-use Server\Handler\OnServerReload;
-use Server\Handler\OnServerTask;
-use Server\Handler\OnServerWorker;
 use Server\Contract\OnCloseInterface;
 use Server\Contract\OnConnectInterface;
 use Server\Contract\OnDisconnectInterface;
@@ -27,6 +20,12 @@ use Server\Contract\OnPacketInterface;
 use Server\Contract\OnProcessInterface;
 use Server\Contract\OnReceiveInterface;
 use Server\Contract\OnTaskInterface;
+use Server\Handler\OnPipeMessage;
+use Server\Handler\OnServer;
+use Server\Handler\OnServerManager;
+use Server\Handler\OnServerReload;
+use Server\Handler\OnServerTask;
+use Server\Handler\OnServerWorker;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;
@@ -169,18 +168,17 @@ class ServerManager
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
 		$process = new Process(function (Process $soloProcess) use ($customProcess) {
-			$system = sprintf('[%s].process', Config::get('id', 'system-service'));
-			if (Kiri::getPlatform()->isLinux()) {
-				$soloProcess->name($system . '(' . $customProcess->getName() . ')');
-			}
-			$this->logger->debug($system . $customProcess->getName() . ' start.');
-			$customProcess->signListen($soloProcess);
-			$customProcess->onHandler($soloProcess);
+			$customProcess->onProcessExec($soloProcess);
 		},
 			$customProcess->getRedirectStdinAndStdout(),
 			$customProcess->getPipeType(),
 			$customProcess->isEnableCoroutine()
 		);
+		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
+		if (Kiri::getPlatform()->isLinux()) {
+			$process->name($system . '(' . $customProcess->getName() . ')');
+		}
+		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
 		$this->container->setBindings($customProcess->getName(), $process);
 		$this->server->addProcess($process);
 	}

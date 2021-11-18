@@ -8,7 +8,6 @@ use Exception;
 use Http\Handler\Abstracts\HttpService;
 use JetBrains\PhpStorm\Pure;
 use Kiri\Abstracts\Config;
-use Kiri\Error\LoggerProcess;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Server\Events\OnShutdown;
