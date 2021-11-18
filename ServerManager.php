@@ -231,6 +231,7 @@ class ServerManager
 			$config['settings']['log_file'] = storage('system.log');
 		}
 		$config['settings']['pid_file'] = storage('.swoole.pid');
+		$config['settings'][Constant::OPTION_ENABLE_REUSE_PORT] = true;
 		$config['events'] = $config['events'] ?? [];
 		return $config;
 	}
