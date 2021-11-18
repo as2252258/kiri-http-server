@@ -18,13 +18,8 @@ interface OnProcessInterface
 	/**
 	 * @param Process $process
 	 */
-	public function onProcessExec(Process $process): void;
+	public function process(Process $process): void;
 
-
-	/**
-	 *
-	 */
-	public function onProcessStop(): void;
 
 
 }
