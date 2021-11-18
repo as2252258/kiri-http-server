@@ -65,14 +65,20 @@ class ServerCommand extends Command
 		}
 
 		$reusePort = Config::get('server.settings')[Constant::OPTION_ENABLE_REUSE_PORT] ?? false;
+		var_dump($reusePort);
 		if (!$reusePort) {
 			if ($manager->isRunner() && $input->getArgument('action') == 'start') {
 				throw new Exception('Service is running. Please use restart.');
 			}
 			$manager->shutdown();
+
+			var_dump('is shutdown.');
 		}
 		if ($input->getArgument('action') == 'stop') {
-			throw new Exception('shutdown success');
+			if ($manager->isRunner()) {
+				$manager->shutdown();
+			}
+			return 0;
 		}
 		return $this->generate_runtime_builder($manager);
 	}
