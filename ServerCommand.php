@@ -7,9 +7,10 @@ namespace Server;
 use Annotation\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
-use Kiri\Events\EventProvider;
+use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
+use Server\Events\OnServerBeforeStart;
 use Swoole\Coroutine;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,10 +30,10 @@ class ServerCommand extends Command
 
 
 	/**
-	 * @var EventProvider
+	 * @var EventDispatch
 	 */
-	#[Inject(EventProvider::class)]
-	public EventProvider $eventProvider;
+	#[Inject(EventDispatch::class)]
+	public EventDispatch $eventProvider;
 
 
 	/**
@@ -104,6 +105,8 @@ class ServerCommand extends Command
 		$this->configure_set();
 
 		Kiri::app()->getRouter()->read_files();
+
+		$this->eventProvider->dispatch(new OnServerBeforeStart());
 
 		$manager->start();
 
