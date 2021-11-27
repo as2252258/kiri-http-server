@@ -5,10 +5,12 @@ namespace Server;
 use Annotation\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
-use Kiri\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Kiri\Error\Logger;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Server\Abstracts\BaseProcess;
 use Server\Contract\OnCloseInterface;
@@ -334,10 +336,12 @@ class ServerManager
 	}
 
 
-	/**
-	 * @param array $events
-	 * @param Server|Port $server
-	 */
+    /**
+     * @param array $events
+     * @param Server|Port $server
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
 	private function addServiceEvents(array $events, Server|Port $server)
 	{
 		foreach ($events as $name => $event) {
