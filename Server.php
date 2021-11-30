@@ -3,7 +3,7 @@
 
 namespace Server;
 
-use Annotation\Inject;
+use Note\Inject;
 use Exception;
 use Http\Handler\Abstracts\HttpService;
 use JetBrains\PhpStorm\Pure;

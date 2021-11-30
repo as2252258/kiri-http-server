@@ -2,7 +2,7 @@
 
 namespace Server;
 
-use Annotation\Inject;
+use Note\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Di\Container;

@@ -2,7 +2,7 @@
 
 namespace Server\Tasker;
 
-use Annotation\Inject;
+use Note\Inject;
 use Exception;
 use Kiri\Abstracts\BaseObject;
 use Kiri\Core\HashMap;

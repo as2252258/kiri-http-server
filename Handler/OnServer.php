@@ -2,7 +2,7 @@
 
 namespace Server\Handler;
 
-use Annotation\Inject;
+use Note\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Server\Abstracts\Server;
