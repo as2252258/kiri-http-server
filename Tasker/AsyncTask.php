@@ -1,12 +1,13 @@
 <?php
 
-namespace Server;
+namespace Server\Tasker;
 
 use Annotation\Inject;
 use Exception;
 use Kiri\Di\Container;
 use Psr\Container\ContainerInterface;
 use Server\Contract\OnTaskInterface;
+use Server\SwooleServerInterface;
 
 class AsyncTask
 {
