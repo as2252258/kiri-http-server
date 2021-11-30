@@ -36,8 +36,7 @@ class AsyncTask
 	public function execute(OnTaskInterface|string $handler, array $params = [], int $workerId = null)
 	{
 		if ($workerId === null || $workerId <= $this->server->setting['worker_num']) {
-			$workerId = random_int($this->server->setting['worker_num'] + 1,
-				$this->server->setting['worker_num'] + 1 + $this->server->setting['task_worker_num']);
+			$workerId = random_int($this->server->setting['worker_num'] + 1, $this->server->setting['task_worker_num']);
 		}
 		if (is_string($handler)) {
 			$handler = $this->handle($handler, $params);
