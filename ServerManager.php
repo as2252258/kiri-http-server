@@ -5,6 +5,7 @@ namespace Server;
 use Annotation\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
+use Kiri\Di\Container;
 use Psr\Container\ContainerInterface;
 use Kiri\Error\Logger;
 use Kiri\Exception\ConfigException;
@@ -26,7 +27,7 @@ use Server\Handler\OnPipeMessage;
 use Server\Handler\OnServer;
 use Server\Handler\OnServerManager;
 use Server\Handler\OnServerReload;
-use Server\Handler\OnServerTask;
+use Server\Tasker\OnServerTask;
 use Server\Handler\OnServerWorker;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
@@ -65,7 +66,7 @@ class ServerManager
 
 
 	/**
-	 * @var ContainerInterface
+	 * @var Container
 	 */
 	#[Inject(ContainerInterface::class)]
 	public ContainerInterface $container;
@@ -246,6 +247,9 @@ class ServerManager
 	 * @param int $port
 	 * @param int $mode
 	 * @param array $settings
+	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
 	 */
 	private function addNewListener(string $type, string $host, int $port, int $mode, array $settings = [])
@@ -279,8 +283,10 @@ class ServerManager
 	 * @param int $port
 	 * @param int $mode
 	 * @param array $settings
-	 * @throws ReflectionException
 	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
@@ -320,8 +326,9 @@ class ServerManager
 
 	/**
 	 * @param array $settings
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
-	 * @throws Exception
 	 */
 	private function addDefaultListener(array $settings): void
 	{
@@ -336,12 +343,13 @@ class ServerManager
 	}
 
 
-    /**
-     * @param array $events
-     * @param Server|Port $server
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
+	/**
+	 * @param array $events
+	 * @param Server|Port $server
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
+	 */
 	private function addServiceEvents(array $events, Server|Port $server)
 	{
 		foreach ($events as $name => $event) {
@@ -426,10 +434,12 @@ class ServerManager
 
 	/**
 	 * @param array|null $settings
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	public function bindCallback(?array $settings = [])
 	{
-		// TODO: Implement bindCallback() method.
 		if (count($settings) < 1) {
 			return;
 		}

@@ -1,13 +1,12 @@
 <?php
 
 
-namespace Server\Handler;
+namespace Server\Tasker;
 
 
 use Annotation\Inject;
 use Kiri\Abstracts\Logger;
 use Kiri\Exception\ConfigException;
-use Kiri\Kiri;
 use ReflectionException;
 use Server\Contract\OnTaskInterface;
 use Swoole\Server;
@@ -68,19 +67,14 @@ class OnServerTask
 	/**
 	 * @param $data
 	 * @return null
-	 * @throws ReflectionException
 	 */
 	private function resolve($data)
 	{
-		[$class, $params] = json_encode($data, true);
-
-		$reflect = Kiri::getDi()->getReflect($class);
-
-		if (!$reflect->isInstantiable()) {
-			return null;
+		$execute = unserialize($data);
+		if ($execute instanceof OnTaskInterface) {
+			return $execute->execute();
 		}
-		$class = $reflect->newInstanceArgs($params);
-		return $class->execute();
+		return null;
 	}
 
 
