@@ -113,9 +113,10 @@ class ServerManager
 	 * @param int $port
 	 * @param int $mode
 	 * @param array $settings
-	 * @throws ReflectionException
 	 * @throws ConfigException
-	 * @throws Exception
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	public function addListener(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
@@ -131,8 +132,12 @@ class ServerManager
 
 
 	/**
-	 * @throws ReflectionException
+	 * @param $configs
+	 * @param int $daemon
 	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	public function initBaseServer($configs, int $daemon = 0): void
 	{
@@ -207,6 +212,8 @@ class ServerManager
 	 * @param array $config
 	 * @param int $daemon
 	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 * @throws Exception
 	 */
@@ -256,7 +263,7 @@ class ServerManager
 	{
 		$id = Config::get('id', 'system-service');
 
-		$this->logger->debug(sprintf('[%s]' . $type . ' service %s::%d start', $id, $host, $port));
+		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
 
 		/** @var Server\Port $service */
 		$this->ports[$port] = $this->server->addlistener($host, $port, $mode);
@@ -371,40 +378,6 @@ class ServerManager
 
 
 	/**
-	 * @param string $class
-	 * @return object
-	 */
-	private function getNewInstance(string $class): object
-	{
-		return $this->container->create($class);
-	}
-
-
-	/**
-	 * @param OnTaskInterface|string $handler
-	 * @param array $params
-	 * @param int|null $workerId
-	 * @throws ReflectionException
-	 * @throws Exception
-	 */
-	public function task(OnTaskInterface|string $handler, array $params = [], int $workerId = null)
-	{
-		if ($workerId === null || $workerId <= $this->server->setting['worker_num']) {
-			$workerId = random_int($this->server->setting['worker_num'] + 1,
-				$this->server->setting['worker_num'] + 1 + $this->server->setting['task_worker_num']);
-		}
-		if (is_string($handler)) {
-			$implements = $this->container->getReflect($handler);
-			if (!in_array(OnTaskInterface::class, $implements->getInterfaceNames())) {
-				throw new Exception('Task must instance ' . OnTaskInterface::class);
-			}
-			$handler = $implements->newInstanceArgs($params);
-		}
-		$this->server->task(serialize($handler), $workerId);
-	}
-
-
-	/**
 	 * @param mixed $message
 	 * @param int $workerId
 	 * @return mixed
@@ -417,12 +390,14 @@ class ServerManager
 
 	/**
 	 * @param array $events
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 */
 	private function addTaskListener(array $events = []): void
 	{
 		$task_use_object = $this->server->setting['task_object'] ?? $this->server->setting['task_use_object'] ?? false;
-		$reflect = $this->container->getReflect(OnServerTask::class)?->newInstance();
+		$reflect = $this->container->get(OnServerTask::class);
 		$this->server->on('finish', $events[Constant::FINISH] ?? [$reflect, 'onFinish']);
 		if ($task_use_object || $this->server->setting['task_enable_coroutine']) {
 			$this->server->on('task', $events[Constant::TASK] ?? [$reflect, 'onCoroutineTask']);
