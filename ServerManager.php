@@ -192,16 +192,6 @@ class ServerManager
 
 
 	/**
-	 * @param string $key
-	 * @param string|int $value
-	 */
-	public static function setEnv(string $key, string|int $value): void
-	{
-		putenv(sprintf('%s=%s', $key, (string)$value));
-	}
-
-
-	/**
 	 * @param ServerManager $context
 	 * @param array $config
 	 * @param int $daemon
