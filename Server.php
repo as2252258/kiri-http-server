@@ -3,13 +3,15 @@
 
 namespace Server;
 
-use Note\Inject;
 use Exception;
 use Http\Handler\Abstracts\HttpService;
 use JetBrains\PhpStorm\Pure;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
+use Note\Inject;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Server\Events\OnShutdown;
 
 
@@ -42,6 +44,13 @@ class Server extends HttpService
 
 
 	/**
+	 * @var State
+	 */
+	#[Inject(State::class)]
+	public State $state;
+
+
+	/**
 	 *
 	 */
 	public function init()
@@ -59,10 +68,11 @@ class Server extends HttpService
 
 
 	/**
-	 * @return string start server
-	 *
-	 * start server
+	 * @return string
 	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws \ReflectionException
 	 * @throws Exception
 	 */
 	public function start(): string
@@ -94,7 +104,7 @@ class Server extends HttpService
 	{
 		$configs = Config::get('server', [], true);
 		foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
-			$this->manager->stopServer($config['port']);
+			$this->state->exit($config['port']);
 		}
 		$this->eventDispatch->dispatch(new OnShutdown());
 	}
@@ -103,10 +113,11 @@ class Server extends HttpService
 	/**
 	 * @return bool
 	 * @throws ConfigException
+	 * @throws Exception
 	 */
 	public function isRunner(): bool
 	{
-		return $this->manager->isRunner();
+		return $this->state->isRunner();
 	}
 
 

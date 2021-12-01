@@ -52,8 +52,19 @@ class ServerManager
 	public int $port = 0;
 
 
+	/**
+	 * @var Logger
+	 */
 	#[Inject(Logger::class)]
 	public Logger $logger;
+
+
+	/**
+	 * @var State
+	 */
+	#[Inject(State::class)]
+	public State $state;
+
 
 
 	/** @var array<string,Port> */
@@ -146,23 +157,6 @@ class ServerManager
 			$this->startListenerHandler($context, $config, $daemon);
 		}
 		$this->bindCallback([Constant::PIPE_MESSAGE => [OnPipeMessage::class, 'onPipeMessage']]);
-	}
-
-
-	/**
-	 * @return bool
-	 * @throws ConfigException
-	 * @throws Exception
-	 */
-	public function isRunner(): bool
-	{
-		$configs = Config::get('server', [], true);
-		foreach ($this->sortService($configs['ports']) as $config) {
-			if (checkPortIsAlready($config['port'])) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 
@@ -312,22 +306,6 @@ class ServerManager
 		$this->logger->debug(sprintf('[%s]' . $type . ' service %s::%d start', $id, $host, $port));
 
 		$this->addDefaultListener($settings);
-	}
-
-
-	/**
-	 * @param int $port
-	 * @throws Exception
-	 */
-	public function stopServer(int $port)
-	{
-		if (!($pid = checkPortIsAlready($port))) {
-			return;
-		}
-		while (checkPortIsAlready($port)) {
-			Process::kill($pid, SIGTERM);
-			usleep(300);
-		}
 	}
 
 
