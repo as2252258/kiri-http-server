@@ -68,9 +68,9 @@ class AsyncTaskExecute extends BaseObject
 			$this->server = Kiri::getDi()->get(SwooleServerInterface::class);
 		}
 		if ($workerId === null || $workerId <= $this->server->setting['worker_num']) {
-			$workerNum = $this->server->setting['worker_num'] + 1;
+			$workerNum = $this->server->setting['worker_num'];
 			$taskerNum = $workerNum + $this->server->setting['task_worker_num'];
-			$workerId = random_int($workerNum, $taskerNum);
+			$workerId = random_int($workerNum, $taskerNum - 1);
 		}
 		if (is_string($handler)) {
 			$handler = $this->handle($handler, $params);
