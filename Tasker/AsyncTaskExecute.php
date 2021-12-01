@@ -2,12 +2,12 @@
 
 namespace Server\Tasker;
 
-use Kiri\Kiri;
-use Note\Inject;
 use Exception;
 use Kiri\Abstracts\BaseObject;
 use Kiri\Core\HashMap;
 use Kiri\Di\Container;
+use Kiri\Kiri;
+use Note\Inject;
 use Psr\Container\ContainerInterface;
 use ReflectionException;
 use Server\Contract\OnTaskInterface;
@@ -68,7 +68,9 @@ class AsyncTaskExecute extends BaseObject
 			$this->server = Kiri::getDi()->get(SwooleServerInterface::class);
 		}
 		if ($workerId === null || $workerId <= $this->server->setting['worker_num']) {
-			$workerId = random_int($this->server->setting['worker_num'] + 1, $this->server->setting['task_worker_num']);
+			$workerNum = $this->server->setting['worker_num'] + 1;
+			$taskerNum = $workerNum + $this->server->setting['task_worker_num'];
+			$workerId = random_int($workerNum, $taskerNum);
 		}
 		if (is_string($handler)) {
 			$handler = $this->handle($handler, $params);
