@@ -18,7 +18,7 @@ class State extends BaseObject
 
 	public function init()
 	{
-		$this->servers = Config::get('servers.ports');
+		$this->servers = Config::get('server.ports');
 	}
 
 
