@@ -61,13 +61,6 @@ class ServerManager
 
 
 	/**
-	 * @var EventDispatch
-	 */
-	#[Inject(EventDispatch::class)]
-	public EventDispatch $eventProvider;
-
-
-	/**
 	 * @var State
 	 */
 	#[Inject(State::class)]
@@ -118,10 +111,11 @@ class ServerManager
 
 	/**
 	 * @return Server|WServer|HServer|null
+	 * @throws ReflectionException
 	 */
 	public function getServer(): Server|WServer|HServer|null
 	{
-		$this->eventProvider->dispatch(new OnServerBeforeStart());
+		di(EventDispatch::class)->dispatch(new OnServerBeforeStart());
 		return $this->server;
 	}
 
