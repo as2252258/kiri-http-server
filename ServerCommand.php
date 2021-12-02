@@ -105,9 +105,7 @@ class ServerCommand extends Command
 		$this->configure_set();
 
 		Kiri::app()->getRouter()->read_files();
-
-		$this->eventProvider->dispatch(new OnServerBeforeStart());
-
+		
 		$manager->start();
 
 		return 1;

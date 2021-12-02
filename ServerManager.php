@@ -2,15 +2,16 @@
 
 namespace Server;
 
-use Note\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Di\Container;
-use Psr\Container\ContainerInterface;
 use Kiri\Error\Logger;
+use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
+use Note\Inject;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Server\Abstracts\BaseProcess;
@@ -22,13 +23,13 @@ use Server\Contract\OnMessageInterface;
 use Server\Contract\OnPacketInterface;
 use Server\Contract\OnProcessInterface;
 use Server\Contract\OnReceiveInterface;
-use Server\Contract\OnTaskInterface;
+use Server\Events\OnServerBeforeStart;
 use Server\Handler\OnPipeMessage;
 use Server\Handler\OnServer;
 use Server\Handler\OnServerManager;
 use Server\Handler\OnServerReload;
-use Server\Tasker\OnServerTask;
 use Server\Handler\OnServerWorker;
+use Server\Tasker\OnServerTask;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;
@@ -60,11 +61,17 @@ class ServerManager
 
 
 	/**
+	 * @var EventDispatch
+	 */
+	#[Inject(EventDispatch::class)]
+	public EventDispatch $eventProvider;
+
+
+	/**
 	 * @var State
 	 */
 	#[Inject(State::class)]
 	public State $state;
-
 
 
 	/** @var array<string,Port> */
@@ -114,6 +121,7 @@ class ServerManager
 	 */
 	public function getServer(): Server|WServer|HServer|null
 	{
+		$this->eventProvider->dispatch(new OnServerBeforeStart());
 		return $this->server;
 	}
 
