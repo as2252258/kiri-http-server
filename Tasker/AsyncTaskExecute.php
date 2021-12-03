@@ -27,13 +27,6 @@ class AsyncTaskExecute extends BaseObject
 	public ?SwooleServerInterface $server = null;
 
 
-	/**
-	 * @var Container
-	 */
-	#[Inject(ContainerInterface::class)]
-	public ContainerInterface $container;
-
-
 	private HashMap $hashMap;
 
 

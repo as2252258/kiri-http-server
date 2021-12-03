@@ -3,6 +3,7 @@
 namespace Server;
 
 use Exception;
+use Kiri\Abstracts\BaseObject;
 use Kiri\Abstracts\Config;
 use Kiri\Di\Container;
 use Kiri\Error\Logger;
@@ -41,7 +42,7 @@ use Swoole\WebSocket\Server as WServer;
  * Class OnServerManager
  * @package Http\Service
  */
-class ServerManager
+class ServerManager extends BaseObject
 {
 
 
@@ -59,14 +60,6 @@ class ServerManager
 	#[Inject(Logger::class)]
 	public Logger $logger;
 
-
-	/**
-	 * @var State
-	 */
-	#[Inject(State::class)]
-	public State $state;
-
-
 	/** @var array<string,Port> */
 	public array $ports = [];
 
@@ -74,13 +67,6 @@ class ServerManager
 
 
 	private Server|null $server = null;
-
-
-	/**
-	 * @var Container
-	 */
-	#[Inject(ContainerInterface::class)]
-	public ContainerInterface $container;
 
 
 	const DEFAULT_EVENT = [
