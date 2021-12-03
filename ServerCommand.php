@@ -87,7 +87,7 @@ class ServerCommand extends Command
 		Coroutine::set([
 			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
 			'enable_deadlock_check' => FALSE,
-			'exit_condition'        => function () {
+			'exit_condition'        => static function () {
 				return Coroutine::stats()['coroutine_num'] === 0;
 			}
 		]);
