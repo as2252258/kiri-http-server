@@ -3,16 +3,14 @@
 namespace Server;
 
 use Exception;
-use Kiri\Abstracts\BaseObject;
+use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
-use Kiri\Di\Container;
 use Kiri\Error\Logger;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
 use Note\Inject;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Server\Abstracts\BaseProcess;
@@ -42,7 +40,7 @@ use Swoole\WebSocket\Server as WServer;
  * Class OnServerManager
  * @package Http\Service
  */
-class ServerManager extends BaseObject
+class ServerManager extends Component
 {
 
 

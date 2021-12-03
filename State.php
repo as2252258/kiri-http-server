@@ -3,11 +3,11 @@
 namespace Server;
 
 use Exception;
-use Kiri\Abstracts\BaseObject;
+use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
 use Swoole\Process;
 
-class State extends BaseObject
+class State extends Component
 {
 
 	use TraitServer;

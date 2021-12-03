@@ -3,12 +3,9 @@
 namespace Server\Tasker;
 
 use Exception;
-use Kiri\Abstracts\BaseObject;
+use Kiri\Abstracts\Component;
 use Kiri\Core\HashMap;
-use Kiri\Di\Container;
 use Kiri\Kiri;
-use Note\Inject;
-use Psr\Container\ContainerInterface;
 use ReflectionException;
 use Server\Contract\OnTaskInterface;
 use Server\SwooleServerInterface;
@@ -17,7 +14,7 @@ use Server\SwooleServerInterface;
 /**
  *
  */
-class AsyncTaskExecute extends BaseObject
+class AsyncTaskExecute extends Component
 {
 
 
