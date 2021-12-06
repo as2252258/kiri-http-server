@@ -137,8 +137,9 @@ class Server extends HttpService
 
 	/**
 	 * @return \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
+	 * @throws \ReflectionException
 	 */
-	#[Pure] public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
+	public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
 	{
 		return $this->manager->getServer();
 	}
