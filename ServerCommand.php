@@ -4,13 +4,12 @@ declare(strict_types=1);
 namespace Server;
 
 
-use Note\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
-use Server\Events\OnServerBeforeStart;
+use Note\Inject;
 use Swoole\Coroutine;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -64,12 +63,12 @@ class ServerCommand extends Command
 		if (!in_array($input->getArgument('action'), self::ACTIONS)) {
 			throw new Exception('I don\'t know what I want to do.');
 		}
-		if ($manager->isRunner() && $input->getArgument('action') == 'start') {
-			throw new Exception('Service is running. Please use restart.');
-		}
-		$manager->shutdown();
-		if ($input->getArgument('action') == 'stop') {
-			return 0;
+		$action = $input->getArgument('action');
+		if ($action == 'stop' || $action == 'restart') {
+			$manager->shutdown();
+			if ($action == 'stop') {
+				return 0;
+			}
 		}
 		return $this->generate_runtime_builder($manager);
 	}
@@ -105,7 +104,7 @@ class ServerCommand extends Command
 		$this->configure_set();
 
 		Kiri::app()->getRouter()->read_files();
-		
+
 		$manager->start();
 
 		return 1;
