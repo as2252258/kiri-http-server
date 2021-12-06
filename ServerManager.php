@@ -67,6 +67,9 @@ class ServerManager extends Component
 	private Server|null $server = null;
 
 
+	protected array $initProcesses = [];
+
+
 	const DEFAULT_EVENT = [
 		Constant::WORKER_START    => [OnServerWorker::class, 'onWorkerStart'],
 		Constant::WORKER_EXIT     => [OnServerWorker::class, 'onWorkerExit'],
@@ -160,11 +163,20 @@ class ServerManager extends Component
 			if (Kiri::getPlatform()->isLinux()) {
 				$process->name($system . '(' . $customProcess->getName() . ')');
 			}
-			$customProcess->process($process);
+			$customProcess->onSigterm()->process($process);
 		}, $customProcess->getRedirectStdinAndStdout(), $customProcess->getPipeType(), $customProcess->isEnableCoroutine());
 		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
-		$this->container->setBindings($customProcess->getName(), $process);
+		$this->initProcesses[$customProcess->getName()] = $process;
 		$this->server->addProcess($process);
+	}
+
+
+	/**
+	 * @return array<string,Process>
+	 */
+	public function getProcesses(): array
+	{
+		return $this->initProcesses;
 	}
 
 
@@ -346,7 +358,6 @@ class ServerManager extends Component
 	 * @param array $events
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	private function addTaskListener(array $events = []): void
 	{
@@ -365,7 +376,6 @@ class ServerManager extends Component
 	 * @param array|null $settings
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function bindCallback(?array $settings = [])
 	{

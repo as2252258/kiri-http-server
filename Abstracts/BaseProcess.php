@@ -3,7 +3,7 @@
 namespace Server\Abstracts;
 
 
-use JetBrains\PhpStorm\Pure;
+use Kiri\Context;
 use Server\Contract\OnProcessInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
@@ -75,6 +75,34 @@ abstract class BaseProcess implements OnProcessInterface
 	 *
 	 */
 	public function onProcessStop(): void
+	{
+		$this->isStop = true;
+	}
+
+
+	/**
+	 *
+	 */
+	public function onSigterm(): static
+	{
+		if (!Context::inCoroutine()) {
+			Process::signal(SIGTERM, fn($data) => $this->onShutdown($data));
+		} else {
+			Coroutine::create(function () {
+				$data = Coroutine::waitSignal(SIGTERM, -1);
+				if ($data) {
+					$this->onShutdown($data);
+				}
+			});
+		}
+		return $this;
+	}
+
+
+	/**
+	 * @param $data
+	 */
+	protected function onShutdown($data): void
 	{
 		$this->isStop = true;
 	}
