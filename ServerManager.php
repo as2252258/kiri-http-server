@@ -291,7 +291,7 @@ class ServerManager extends Component
 
 		$id = Config::get('id', 'system-service');
 
-		$this->logger->debug(sprintf('[%s]' . $type . ' service %s::%d start', $id, $host, $port));
+		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
 
 		$this->addDefaultListener($settings);
 	}
@@ -356,8 +356,10 @@ class ServerManager extends Component
 
 	/**
 	 * @param array $events
+	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	private function addTaskListener(array $events = []): void
 	{
@@ -374,8 +376,10 @@ class ServerManager extends Component
 
 	/**
 	 * @param array|null $settings
+	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	public function bindCallback(?array $settings = [])
 	{
