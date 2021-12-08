@@ -5,6 +5,7 @@ namespace Server;
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
+use Kiri\Di\NoteManager;
 use Kiri\Error\Logger;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
@@ -339,6 +340,7 @@ class ServerManager extends Component
 	 */
 	public function start()
 	{
+		NoteManager::clear();
 		$this->server->start();
 	}
 
