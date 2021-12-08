@@ -340,7 +340,6 @@ class ServerManager extends Component
 	 */
 	public function start()
 	{
-		NoteManager::clear();
 		$this->server->start();
 	}
 
