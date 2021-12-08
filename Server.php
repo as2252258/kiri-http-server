@@ -5,10 +5,10 @@ namespace Server;
 
 use Exception;
 use Http\Handler\Abstracts\HttpService;
-use JetBrains\PhpStorm\Pure;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
+use Kiri\Kiri;
 use Note\Inject;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -28,19 +28,7 @@ class Server extends HttpService
 	];
 
 
-	/**
-	 * @Inject ServerManager
-	 * @var null|ServerManager
-	 */
-	#[Inject(ServerManager::class)]
-	public ?ServerManager $manager = null;
-
 	private mixed $daemon = 0;
-
-
-	/** @var EventDispatch */
-	#[Inject(EventDispatch::class)]
-	public EventDispatch $eventDispatch;
 
 
 	/**
@@ -77,36 +65,38 @@ class Server extends HttpService
 	 */
 	public function start(): string
 	{
-		$this->manager->initBaseServer(Config::get('server', [], true), $this->daemon);
+		$this->manager()->initBaseServer(Config::get('server', [], true), $this->daemon);
 
 		$rpcService = Config::get('rpc', []);
 		if (!empty($rpcService)) {
-			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'],
+			$this->manager()->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'],
 				$rpcService['mode'], $rpcService);
 		}
 
 		$processes = array_merge($this->process, Config::get('processes', []));
 		foreach ($processes as $process) {
-			$this->manager->addProcess($process);
+			$this->manager()->addProcess($process);
 		}
 
-		return $this->manager->getServer()->start();
+		return $this->manager()->getServer()->start();
 	}
 
 
 	/**
 	 * @return void
-	 *
-	 * start server
+	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws \ReflectionException
 	 * @throws Exception
 	 */
 	public function shutdown()
 	{
 		$configs = Config::get('server', [], true);
-		foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
+		foreach ($this->manager()->sortService($configs['ports'] ?? []) as $config) {
 			$this->state->exit($config['port']);
 		}
-		$this->eventDispatch->dispatch(new OnShutdown());
+		$this->container->get(EventDispatch::class)->dispatch(new OnShutdown());
 	}
 
 
@@ -141,7 +131,17 @@ class Server extends HttpService
 	 */
 	public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
 	{
-		return $this->manager->getServer();
+		return $this->manager()->getServer();
+	}
+
+
+	/**
+	 * @return ServerManager
+	 * @throws \ReflectionException
+	 */
+	private function manager(): ServerManager
+	{
+		return Kiri::getDi()->get(ServerManager::class);
 	}
 
 }
