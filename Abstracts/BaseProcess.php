@@ -17,7 +17,7 @@ abstract class BaseProcess implements OnProcessInterface
 	protected bool $isStop = false;
 
 
-	protected mixed $redirect_stdin_and_stdout = null;
+	protected bool $redirect_stdin_and_stdout = FALSE;
 
 
 	protected int $pipe_type = SOCK_DGRAM;
@@ -47,10 +47,10 @@ abstract class BaseProcess implements OnProcessInterface
 	}
 
 	/**
-	 * @return mixed
-	 */
-	public function getRedirectStdinAndStdout(): mixed
-	{
+	 * @return bool
+     */
+	public function getRedirectStdinAndStdout(): bool
+    {
 		return $this->redirect_stdin_and_stdout;
 	}
 
