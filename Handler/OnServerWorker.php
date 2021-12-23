@@ -2,12 +2,12 @@
 
 namespace Server\Handler;
 
-use Note\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Kiri;
+use Note\Inject;
 use Server\Events\OnAfterWorkerStart;
 use Server\Events\OnBeforeWorkerStart;
 use Server\Events\OnTaskerStart as OnTaskStart;
@@ -62,8 +62,8 @@ class OnServerWorker extends \Server\Abstracts\Server
 	 */
 	public function onWorkerStop(Server $server, int $workerId)
 	{
-        Timer::clearAll();
-        $this->eventDispatch->dispatch(new OnWorkerStop($server, $workerId));
+		Timer::clearAll();
+		$this->eventDispatch->dispatch(new OnWorkerStop($server, $workerId));
 	}
 
 
@@ -76,8 +76,8 @@ class OnServerWorker extends \Server\Abstracts\Server
 	{
 		set_env('state', 'exit');
 
-        $this->eventDispatch->dispatch(new OnWorkerExit($server, $workerId));
-    }
+		$this->eventDispatch->dispatch(new OnWorkerExit($server, $workerId));
+	}
 
 
 	/**
@@ -98,7 +98,7 @@ class OnServerWorker extends \Server\Abstracts\Server
 
 		$this->logger->error($message);
 
-//		$this->system_mail($message);
+		$this->system_mail($message);
 	}
 
 
@@ -109,7 +109,7 @@ class OnServerWorker extends \Server\Abstracts\Server
 	protected function system_mail($messageContent)
 	{
 		try {
-			$email = Config::get('email');
+			$email = Config::get('email', ['enable' => false]);
 			if (!empty($email) && ($email['enable'] ?? false) == true) {
 				Help::sendEmail($email, 'Service Error', $messageContent);
 			}

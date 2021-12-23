@@ -25,6 +25,7 @@ class OnServerReload
 
 	/**
 	 * @param Server $server
+	 * @throws \ReflectionException
 	 */
 	public function onBeforeReload(Server $server)
 	{
@@ -34,6 +35,7 @@ class OnServerReload
 
 	/**
 	 * @param Server $server
+	 * @throws \ReflectionException
 	 */
 	public function onAfterReload(Server $server)
 	{

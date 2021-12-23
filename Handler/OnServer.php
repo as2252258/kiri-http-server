@@ -5,6 +5,7 @@ namespace Server\Handler;
 use Note\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
+use ReflectionException;
 use Server\Abstracts\Server;
 use Server\Events\OnBeforeShutdown;
 use Server\Events\OnShutdown;
@@ -28,6 +29,7 @@ class OnServer extends Server
 	/**
 	 * @param \Swoole\Server $server
 	 * @throws ConfigException
+	 * @throws ReflectionException
 	 */
 	public function onStart(\Swoole\Server $server)
 	{
@@ -39,6 +41,7 @@ class OnServer extends Server
 
 	/**
 	 * @param \Swoole\Server $server
+	 * @throws ReflectionException
 	 */
 	public function onBeforeShutdown(\Swoole\Server $server)
 	{
@@ -48,6 +51,7 @@ class OnServer extends Server
 
 	/**
 	 * @param \Swoole\Server $server
+	 * @throws ReflectionException
 	 */
 	public function onShutdown(\Swoole\Server $server)
 	{

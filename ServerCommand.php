@@ -10,6 +10,8 @@ use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Server\Events\OnServerBeforeStart;
 use Swoole\Coroutine;
 use Symfony\Component\Console\Command\Command;
@@ -52,6 +54,10 @@ class ServerCommand extends Command
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 * @return int
+	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws \ReflectionException
 	 * @throws Exception
 	 */
 	public function execute(InputInterface $input, OutputInterface $output): int
