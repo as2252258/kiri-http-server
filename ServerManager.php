@@ -5,7 +5,6 @@ namespace Server;
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
-use Kiri\Di\NoteManager;
 use Kiri\Error\Logger;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
@@ -160,15 +159,17 @@ class ServerManager extends Component
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
 		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
-		$process = new Process(function (Process $process) use ($customProcess, $system) {
+		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
+		$this->server->addProcess(new Process(function (Process $process) use ($customProcess, $system) {
 			if (Kiri::getPlatform()->isLinux()) {
 				$process->name($system . '(' . $customProcess->getName() . ')');
 			}
 			$customProcess->onSigterm()->process($process);
-		}, $customProcess->getRedirectStdinAndStdout(), $customProcess->getPipeType(), $customProcess->isEnableCoroutine());
-		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
-		$this->initProcesses[$customProcess->getName()] = $process;
-		$this->server->addProcess($process);
+		},
+			$customProcess->getRedirectStdinAndStdout(),
+			$customProcess->getPipeType(),
+			$customProcess->isEnableCoroutine()
+		));
 	}
 
 
