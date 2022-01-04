@@ -116,7 +116,6 @@ class ServerManager extends Component
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function addListener(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
@@ -277,7 +276,6 @@ class ServerManager extends Component
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
@@ -303,7 +301,6 @@ class ServerManager extends Component
 	 * @param array $settings
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	private function addDefaultListener(array $settings): void
 	{
@@ -323,7 +320,6 @@ class ServerManager extends Component
 	 * @param Server|Port $server
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	private function addServiceEvents(array $events, Server|Port $server)
 	{
@@ -361,7 +357,6 @@ class ServerManager extends Component
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	private function addTaskListener(array $events = []): void
 	{
@@ -381,7 +376,6 @@ class ServerManager extends Component
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function bindCallback(?array $settings = [])
 	{
