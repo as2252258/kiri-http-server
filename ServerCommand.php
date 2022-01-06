@@ -4,15 +4,14 @@ declare(strict_types=1);
 namespace Server;
 
 
-use Note\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
+use Note\Inject;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Server\Events\OnServerBeforeStart;
 use Swoole\Coroutine;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -87,6 +86,7 @@ class ServerCommand extends Command
 	private function configure_set()
 	{
 		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
+		Config::set('servers.settings.enable_coroutine', true);
 		if ($enable_coroutine != true) {
 			return;
 		}

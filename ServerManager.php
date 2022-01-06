@@ -136,7 +136,6 @@ class ServerManager extends Component
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function initBaseServer($configs, int $daemon = 0): void
 	{
@@ -197,7 +196,6 @@ class ServerManager extends Component
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	private function startListenerHandler(ServerManager $context, array $config, int $daemon = 0)
