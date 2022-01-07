@@ -294,7 +294,7 @@ class ServerManager extends Component
 
 		$data->setHeaders(['key', 'value']);
 		foreach ($this->server->setting as $key => $value) {
-			$data->setRow($key, [$value]);
+			$data->setRow($key, [$key, $value]);
 		}
 		$data->render();
 
