@@ -292,7 +292,7 @@ class ServerManager extends Component
 
 		$data = new Table(new ConsoleOutput());
 
-		$data->setHeaders(['key', 'value']);
+		$data->setHeaders([['key'], ['value']]);
 		foreach ($this->server->setting as $key => $value) {
 			$data->setRow($key, [$key, $value]);
 		}
