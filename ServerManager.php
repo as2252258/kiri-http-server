@@ -287,9 +287,11 @@ class ServerManager extends Component
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
+		$string = "| 名称 \t| 值 \t|\n";
 		foreach ($this->server->setting as $key => $value) {
-			echo sprintf("%s \t %s \t\n", $key, $value);
+			$string .= sprintf("|%s \t| %s \t|\n", $key, $value);
 		}
+		echo $string;
 
 		$id = Config::get('id', 'system-service');
 
