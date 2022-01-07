@@ -137,7 +137,6 @@ class Server extends HttpService
 
 	/**
 	 * @return ServerManager
-	 * @throws \ReflectionException
 	 */
 	private function manager(): ServerManager
 	{
