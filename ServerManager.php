@@ -35,6 +35,7 @@ use Swoole\Server;
 use Swoole\Server\Port;
 use Swoole\WebSocket\Server as WServer;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 
@@ -290,12 +291,14 @@ class ServerManager extends Component
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
 		$data = new Table(new ConsoleOutput());
-		$data->setHeaders(['key','value']);
+		$data->setHeaders(['key', 'value']);
 
 		$array = [];
 		foreach ($this->server->setting as $key => $value) {
 			$array[] = [$key, $value];
+			$array[] = new TableSeparator();
 		}
+		$data->setStyle('box-double');
 		$data->setRows($array);
 		$data->render();
 
