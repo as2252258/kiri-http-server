@@ -288,7 +288,7 @@ class ServerManager extends Component
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
 		foreach ($this->server->setting as $key => $value) {
-			$this->logger->debug(sprintf('%s => %s', $key, $value));
+			echo sprintf("%s \t %s \t\n", $key, $value);
 		}
 
 		$id = Config::get('id', 'system-service');
