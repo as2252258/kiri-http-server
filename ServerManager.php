@@ -292,10 +292,9 @@ class ServerManager extends Component
 
 		$string = sprintf("| %s \t| %s \t|\n", str_pad('名称', $maxLength - mb_strlen('名称')), '值');
 		foreach ($this->server->setting as $key => $value) {
-			var_dump(str_pad($key, $maxLength - mb_strlen($key)) . '.');
 			$string .= sprintf("| %s \t| %s \t|\n", str_pad($key, $maxLength - mb_strlen($key),' '), $value);
 		}
-		echo $string;
+		print_r($string);
 
 		$id = Config::get('id', 'system-service');
 
