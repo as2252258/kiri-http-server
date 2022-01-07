@@ -287,9 +287,12 @@ class ServerManager extends Component
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
-		$string = "| 名称 \t| 值 \t|\n";
+
+		$maxLength = $this->getMaxKeyLength($this->server->setting);
+
+		$string = sprintf("| %s \t| %s \t|\n", str_pad('名称', $maxLength - strlen('名称')), '值');
 		foreach ($this->server->setting as $key => $value) {
-			$string .= sprintf("|%s \t| %s \t|\n", $key, $value);
+			$string .= sprintf("| %s \t| %s \t|\n", str_pad($key, $maxLength - strlen($key)), $value);
 		}
 		echo $string;
 
@@ -298,6 +301,20 @@ class ServerManager extends Component
 		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
 
 		$this->addDefaultListener($settings);
+	}
+
+
+	private function getMaxKeyLength($array)
+	{
+		$length = 0;
+
+		foreach ($array as $key => $val) {
+			if (strlen($key) > $length) {
+				$length = strlen($key);
+			}
+		}
+
+		return $length;
 	}
 
 
