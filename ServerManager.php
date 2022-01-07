@@ -292,6 +292,7 @@ class ServerManager extends Component
 
 		$string = sprintf("| %s \t| %s \t|\n", str_pad('名称', $maxLength - strlen('名称')), '值');
 		foreach ($this->server->setting as $key => $value) {
+			var_dump(str_pad($key, $maxLength - strlen($key)) . '.');
 			$string .= sprintf("| %s \t| %s \t|\n", str_pad($key, $maxLength - strlen($key)), $value);
 		}
 		echo $string;
