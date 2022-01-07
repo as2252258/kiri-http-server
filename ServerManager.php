@@ -34,6 +34,8 @@ use Swoole\Process;
 use Swoole\Server;
 use Swoole\Server\Port;
 use Swoole\WebSocket\Server as WServer;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 
 /**
@@ -288,33 +290,19 @@ class ServerManager extends Component
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
 
-		$maxLength = $this->getMaxKeyLength($this->server->setting);
+		$data = new Table(new ConsoleOutput());
 
-		$string = sprintf("| %s \t| %s \t|\n", str_pad('名称', $maxLength - mb_strlen('名称')), '值');
+		$data->setHeaders(['key', 'value']);
 		foreach ($this->server->setting as $key => $value) {
-			$string .= sprintf("| %s \t| %s \t|\n", str_pad($key, $maxLength - mb_strlen($key),' '), $value);
+			$data->setRow($key, $value);
 		}
-		print_r($string);
+		$data->render();
 
 		$id = Config::get('id', 'system-service');
 
 		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
 
 		$this->addDefaultListener($settings);
-	}
-
-
-	private function getMaxKeyLength($array)
-	{
-		$length = 0;
-
-		foreach ($array as $key => $val) {
-			if (mb_strlen($key) > $length) {
-				$length = mb_strlen($key);
-			}
-		}
-
-		return $length;
 	}
 
 
