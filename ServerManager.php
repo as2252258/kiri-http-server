@@ -290,10 +290,10 @@ class ServerManager extends Component
 
 		$maxLength = $this->getMaxKeyLength($this->server->setting);
 
-		$string = sprintf("| %s \t| %s \t|\n", str_pad('名称', $maxLength - strlen('名称')), '值');
+		$string = sprintf("| %s \t| %s \t|\n", str_pad('名称', $maxLength - mb_strlen('名称')), '值');
 		foreach ($this->server->setting as $key => $value) {
-			var_dump(str_pad($key, $maxLength - strlen($key)) . '.');
-			$string .= sprintf("| %s \t| %s \t|\n", str_pad($key, $maxLength - strlen($key),' '), $value);
+			var_dump(str_pad($key, $maxLength - mb_strlen($key)) . '.');
+			$string .= sprintf("| %s \t| %s \t|\n", str_pad($key, $maxLength - mb_strlen($key),' '), $value);
 		}
 		echo $string;
 
@@ -310,8 +310,8 @@ class ServerManager extends Component
 		$length = 0;
 
 		foreach ($array as $key => $val) {
-			if (strlen($key) > $length) {
-				$length = strlen($key);
+			if (mb_strlen($key) > $length) {
+				$length = mb_strlen($key);
 			}
 		}
 
