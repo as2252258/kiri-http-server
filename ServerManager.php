@@ -287,7 +287,9 @@ class ServerManager extends Component
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
-		var_dump($this->server->setting);
+		foreach ($this->server->setting as $key => $value) {
+			$this->logger->debug(sprintf('%s => %s', $key, $value));
+		}
 
 		$id = Config::get('id', 'system-service');
 
