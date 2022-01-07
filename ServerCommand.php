@@ -64,19 +64,19 @@ class ServerCommand extends Command
 		$manager = Kiri::app()->getServer();
 		$manager->setDaemon((int)!is_null($input->getOption('daemon')));
 		if (is_null($input->getArgument('action'))) {
-			$input->setArgument('action', 'restart');
+			throw new Exception('I don\'t know what I want to do.');
 		}
 		if (!in_array($input->getArgument('action'), self::ACTIONS)) {
 			throw new Exception('I don\'t know what I want to do.');
 		}
-		if ($manager->isRunner() && $input->getArgument('action') == 'start') {
-			throw new Exception('Service is running. Please use restart.');
+		if ($input->getArgument('action') == 'restart') {
+			$manager->shutdown();
+		}
+		if ($input->getArgument('action') != 'stop') {
+			return $this->generate_runtime_builder($manager);
 		}
 		$manager->shutdown();
-		if ($input->getArgument('action') == 'stop') {
-			return 0;
-		}
-		return $this->generate_runtime_builder($manager);
+		return 0;
 	}
 
 
