@@ -298,6 +298,9 @@ class ServerManager extends Component
 			$array[] = [$key, $value];
 			$array[] = new TableSeparator();
 		}
+
+		array_pop($array);
+
 		$data->setStyle('box-double');
 		$data->setRows($array);
 		$data->render();
