@@ -15,7 +15,7 @@
         "psr/http-server-middleware": "^1.0",
         "psr/http-message": "^1.0",
         "psr/event-dispatcher": "^1.0",
-        "game-worker/kiri-http-message": "^v2.0"
+        "game-worker/kiri-http-message": "^~v2.0"
     },
     "autoload": {
         "psr-4": {
