@@ -2,7 +2,7 @@
 
 namespace Server\Handler;
 
-use Note\Inject;
+use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Server\Events\OnAfterReload;
 use Server\Events\OnBeforeReload;

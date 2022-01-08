@@ -2,7 +2,7 @@
 
 namespace Server\Handler;
 
-use Note\Inject;
+use Kiri\Annotation\Inject;
 use Server\Abstracts\Server;
 use Exception;
 use Server\Contract\OnPipeMessageInterface;

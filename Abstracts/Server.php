@@ -4,7 +4,7 @@
 namespace Server\Abstracts;
 
 
-use Note\Inject;
+use Kiri\Annotation\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Exception\ConfigException;

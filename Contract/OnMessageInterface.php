@@ -2,7 +2,7 @@
 
 namespace Server\Contract;
 
-use Swoole\Server;
+use Kiri\Websocket\WebSocketInterface;
 use Swoole\WebSocket\Frame;
 
 interface OnMessageInterface
@@ -10,10 +10,9 @@ interface OnMessageInterface
 
 
 	/**
-	 * @param Server $server
 	 * @param Frame $frame
 	 * @return void
 	 */
-	public function onMessage(Server $server, Frame $frame): void;
+	public function onMessage(Frame $frame): void;
 
 }

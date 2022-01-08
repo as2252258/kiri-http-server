@@ -13,10 +13,9 @@ interface OnCloseInterface
 
 
 	/**
-	 * @param Server $server
 	 * @param int $fd
 	 */
-	public function onClose(Server $server, int $fd): void;
+	public function onClose(int $fd): void;
 
 
 }

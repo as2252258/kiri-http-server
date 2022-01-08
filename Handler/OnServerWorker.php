@@ -7,7 +7,7 @@ use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Kiri;
-use Note\Inject;
+use Kiri\Annotation\Inject;
 use Server\Events\OnAfterWorkerStart;
 use Server\Events\OnBeforeWorkerStart;
 use Server\Events\OnTaskerStart as OnTaskStart;

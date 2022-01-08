@@ -4,7 +4,7 @@
 namespace Server\Tasker;
 
 
-use Note\Inject;
+use Kiri\Annotation\Inject;
 use Kiri\Abstracts\Logger;
 use Kiri\Exception\ConfigException;
 use Server\Contract\OnTaskInterface;

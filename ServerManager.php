@@ -9,7 +9,7 @@ use Kiri\Error\Logger;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
-use Note\Inject;
+use Kiri\Annotation\Inject;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
