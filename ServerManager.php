@@ -37,6 +37,7 @@ use Swoole\WebSocket\Server as WServer;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 
 /**
@@ -290,7 +291,7 @@ class ServerManager extends Component
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
-		$data = new Table(new ConsoleOutput());
+		$data = new Table($this->container->get(OutputInterface::class));
 		$data->setHeaders(['key', 'value']);
 
 		$array = [];
