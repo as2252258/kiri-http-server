@@ -63,20 +63,22 @@ class ServerCommand extends Command
 	{
 		$manager = Kiri::app()->getServer();
 		$manager->setDaemon((int)!is_null($input->getOption('daemon')));
-		if (is_null($input->getArgument('action'))) {
+
+        $action = $input->getArgument('action');
+        if (is_null($action)) {
 			throw new Exception('I don\'t know what I want to do.');
 		}
-		if (!in_array($input->getArgument('action'), self::ACTIONS)) {
+		if (!in_array($action, self::ACTIONS)) {
 			throw new Exception('I don\'t know what I want to do.');
 		}
-		if ($input->getArgument('action') == 'restart') {
+		if ($action == 'restart' || $action == 'stop') {
 			$manager->shutdown();
+            if ($action == 'stop') {
+                return 1;
+            }
 		}
-		if ($input->getArgument('action') != 'stop') {
-			return $this->generate_runtime_builder($manager);
-		}
-		$manager->shutdown();
-		return 0;
+        $manager->runtime_start();
+        return 0;
 	}
 
 

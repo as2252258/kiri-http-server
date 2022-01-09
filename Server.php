@@ -5,6 +5,7 @@ namespace Server;
 
 use Exception;
 use Http\Handler\Abstracts\HttpService;
+use Http\Handler\Router;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
@@ -13,6 +14,7 @@ use Kiri\Annotation\Inject;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Server\Events\OnShutdown;
+use Swoole\Coroutine;
 
 
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -81,8 +83,46 @@ class Server extends HttpService
 		return $this->manager()->getServer()->start();
 	}
 
+    /**
+     * @throws ConfigException
+     */
+    private function configure_set()
+    {
+        $enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
+        Config::set('servers.settings.enable_coroutine', true);
+        if ($enable_coroutine != true) {
+            return;
+        }
+        Coroutine::set([
+            'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
+            'enable_deadlock_check' => FALSE,
+            'exit_condition'        => function () {
+                return Coroutine::stats()['coroutine_num'] === 0;
+            }
+        ]);
+    }
 
-	/**
+
+    /**
+     * @return void
+     * @throws ConfigException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
+    public function runtime_start(): void
+    {
+        $this->configure_set();
+
+        $this->container->get(Router::class)->read_files();
+
+        $this->start();
+    }
+
+
+
+    /**
 	 * @return void
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
