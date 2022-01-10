@@ -9,6 +9,7 @@ use Kiri\Kiri;
 use ReflectionException;
 use Kiri\Server\Contract\OnTaskInterface;
 use Kiri\Server\SwooleServerInterface;
+use Swoole\Server;
 
 
 /**
@@ -19,9 +20,9 @@ class AsyncTaskExecute extends Component
 
 
 	/**
-	 * @var SwooleServerInterface|null
+	 * @var Server|\Swoole\WebSocket\Server|\Swoole\Http\Server
 	 */
-	public ?SwooleServerInterface $server = null;
+	public mixed $server = null;
 
 
 	private HashMap $hashMap;
