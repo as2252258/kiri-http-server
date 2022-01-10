@@ -23,7 +23,7 @@ use Swoole\Timer;
  * Class OnServerWorker
  * @package Server\Worker
  */
-class OnServerWorker extends \Server\Abstracts\Server
+class OnServerWorker extends \Kiri\Server\Abstracts\Server
 {
 
 
