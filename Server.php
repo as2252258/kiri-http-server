@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Server;
+namespace Kiri\Server;
 
 use Exception;
-use Http\Handler\Abstracts\HttpService;
-use Http\Handler\Router;
+use Kiri\Message\Handler\Abstracts\HttpService;
+use Kiri\Message\Handler\Router;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
@@ -13,7 +13,7 @@ use Kiri\Kiri;
 use Kiri\Annotation\Inject;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Server\Events\OnShutdown;
+use Kiri\Server\Events\OnShutdown;
 use Swoole\Coroutine;
 
 

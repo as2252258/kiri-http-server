@@ -1,6 +1,6 @@
 <?php
 
-namespace Server;
+namespace Kiri\Server;
 
 use Exception;
 use Kiri\Abstracts\Component;
@@ -13,22 +13,22 @@ use Kiri\Annotation\Inject;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
-use Server\Abstracts\BaseProcess;
-use Server\Contract\OnCloseInterface;
-use Server\Contract\OnConnectInterface;
-use Server\Contract\OnDisconnectInterface;
-use Server\Contract\OnHandshakeInterface;
-use Server\Contract\OnMessageInterface;
-use Server\Contract\OnPacketInterface;
-use Server\Contract\OnProcessInterface;
-use Server\Contract\OnReceiveInterface;
-use Server\Events\OnServerBeforeStart;
-use Server\Handler\OnPipeMessage;
-use Server\Handler\OnServer;
-use Server\Handler\OnServerManager;
-use Server\Handler\OnServerReload;
-use Server\Handler\OnServerWorker;
-use Server\Tasker\OnServerTask;
+use Kiri\Server\Abstracts\BaseProcess;
+use Kiri\Server\Contract\OnCloseInterface;
+use Kiri\Server\Contract\OnConnectInterface;
+use Kiri\Server\Contract\OnDisconnectInterface;
+use Kiri\Server\Contract\OnHandshakeInterface;
+use Kiri\Server\Contract\OnMessageInterface;
+use Kiri\Server\Contract\OnPacketInterface;
+use Kiri\Server\Contract\OnProcessInterface;
+use Kiri\Server\Contract\OnReceiveInterface;
+use Kiri\Server\Events\OnServerBeforeStart;
+use Kiri\Server\Handler\OnPipeMessage;
+use Kiri\Server\Handler\OnServer;
+use Kiri\Server\Handler\OnServerManager;
+use Kiri\Server\Handler\OnServerReload;
+use Kiri\Server\Handler\OnServerWorker;
+use Kiri\Server\Tasker\OnServerTask;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Server\Contract;
+namespace Kiri\Server\Contract;
 
 interface OnBeforeShutdown
 {

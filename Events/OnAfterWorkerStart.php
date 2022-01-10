@@ -1,6 +1,6 @@
 <?php
 
-namespace Server\Events;
+namespace Kiri\Server\Events;
 
 class OnAfterWorkerStart
 {

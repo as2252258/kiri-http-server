@@ -1,6 +1,6 @@
 <?php
 
-namespace Server;
+namespace Kiri\Server;
 
 
 use Swoole\Server;

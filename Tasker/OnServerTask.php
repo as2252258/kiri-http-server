@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Server\Tasker;
+namespace Kiri\Server\Tasker;
 
 
 use Kiri\Annotation\Inject;
 use Kiri\Abstracts\Logger;
 use Kiri\Exception\ConfigException;
-use Server\Contract\OnTaskInterface;
+use Kiri\Server\Contract\OnTaskInterface;
 use Swoole\Server;
 
 

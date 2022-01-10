@@ -1,11 +1,11 @@
 <?php
 
-namespace Server\Handler;
+namespace Kiri\Server\Handler;
 
 use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
-use Server\Events\OnAfterReload;
-use Server\Events\OnBeforeReload;
+use Kiri\Server\Events\OnAfterReload;
+use Kiri\Server\Events\OnBeforeReload;
 use Swoole\Server;
 
 

@@ -1,15 +1,15 @@
 <?php
 
-namespace Server\Handler;
+namespace Kiri\Server\Handler;
 
 use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use ReflectionException;
-use Server\Abstracts\Server;
-use Server\Events\OnBeforeShutdown;
-use Server\Events\OnShutdown;
-use Server\Events\OnStart;
+use Kiri\Server\Abstracts\Server;
+use Kiri\Server\Events\OnBeforeShutdown;
+use Kiri\Server\Events\OnShutdown;
+use Kiri\Server\Events\OnStart;
 
 
 /**

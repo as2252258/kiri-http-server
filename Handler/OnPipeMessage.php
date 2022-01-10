@@ -1,11 +1,11 @@
 <?php
 
-namespace Server\Handler;
+namespace Kiri\Server\Handler;
 
 use Kiri\Annotation\Inject;
-use Server\Abstracts\Server;
+use Kiri\Server\Abstracts\Server;
 use Exception;
-use Server\Contract\OnPipeMessageInterface;
+use Kiri\Server\Contract\OnPipeMessageInterface;
 use Kiri\Events\EventDispatch;
 
 /**

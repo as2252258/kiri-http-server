@@ -1,8 +1,8 @@
 <?php
 
-namespace Server\Contract;
+namespace Kiri\Server\Contract;
 
-use Server\Abstracts\Server;
+use Kiri\Server\Abstracts\Server;
 
 interface OnPacketInterface
 {

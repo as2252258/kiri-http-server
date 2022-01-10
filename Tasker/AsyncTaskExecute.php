@@ -1,14 +1,14 @@
 <?php
 
-namespace Server\Tasker;
+namespace Kiri\Server\Tasker;
 
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Core\HashMap;
 use Kiri\Kiri;
 use ReflectionException;
-use Server\Contract\OnTaskInterface;
-use Server\SwooleServerInterface;
+use Kiri\Server\Contract\OnTaskInterface;
+use Kiri\Server\SwooleServerInterface;
 
 
 /**

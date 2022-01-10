@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Server;
+namespace Kiri\Server;
 
 
 use Exception;

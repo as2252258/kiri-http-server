@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Server\Abstracts;
+namespace Kiri\Server\Abstracts;
 
 
 use Kiri\Annotation\Inject;

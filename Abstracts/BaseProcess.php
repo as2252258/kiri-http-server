@@ -1,10 +1,10 @@
 <?php
 
-namespace Server\Abstracts;
+namespace Kiri\Server\Abstracts;
 
 
 use Kiri\Context;
-use Server\Contract\OnProcessInterface;
+use Kiri\Server\Contract\OnProcessInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
 

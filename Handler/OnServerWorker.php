@@ -1,6 +1,6 @@
 <?php
 
-namespace Server\Handler;
+namespace Kiri\Server\Handler;
 
 use Exception;
 use Kiri\Abstracts\Config;
@@ -8,13 +8,13 @@ use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Kiri;
 use Kiri\Annotation\Inject;
-use Server\Events\OnAfterWorkerStart;
-use Server\Events\OnBeforeWorkerStart;
-use Server\Events\OnTaskerStart as OnTaskStart;
-use Server\Events\OnWorkerError;
-use Server\Events\OnWorkerExit;
-use Server\Events\OnWorkerStart;
-use Server\Events\OnWorkerStop;
+use Kiri\Server\Events\OnAfterWorkerStart;
+use Kiri\Server\Events\OnBeforeWorkerStart;
+use Kiri\Server\Events\OnTaskerStart as OnTaskStart;
+use Kiri\Server\Events\OnWorkerError;
+use Kiri\Server\Events\OnWorkerExit;
+use Kiri\Server\Events\OnWorkerStart;
+use Kiri\Server\Events\OnWorkerStop;
 use Swoole\Server;
 use Swoole\Timer;
 

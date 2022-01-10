@@ -1,6 +1,6 @@
 <?php
 
-namespace Server\Contract;
+namespace Kiri\Server\Contract;
 
 use Swoole\Http\Request;
 
