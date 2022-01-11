@@ -279,6 +279,23 @@ class ServerManager extends Component
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
+	 *
+	 *
+	 *
+	$data = new Table($this->container->get(OutputInterface::class));
+	$data->setHeaders(['key', 'value']);
+
+	$array = [];
+	foreach ($this->server->setting as $key => $value) {
+	$array[] = [$key, $value];
+	$array[] = new TableSeparator();
+	}
+
+	array_pop($array);
+
+	$data->setStyle('box-double');
+	$data->setRows($array);
+	$data->render();
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
@@ -290,21 +307,6 @@ class ServerManager extends Component
 		};
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
-
-		$data = new Table($this->container->get(OutputInterface::class));
-		$data->setHeaders(['key', 'value']);
-
-		$array = [];
-		foreach ($this->server->setting as $key => $value) {
-			$array[] = [$key, $value];
-			$array[] = new TableSeparator();
-		}
-
-		array_pop($array);
-
-		$data->setStyle('box-double');
-		$data->setRows($array);
-		$data->render();
 
 		$id = Config::get('id', 'system-service');
 
