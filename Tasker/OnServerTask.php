@@ -58,7 +58,7 @@ class OnServerTask
 
 			$this->logger->error('task', [$data]);
 		} finally {
-			$server->finish($data);
+			$task->finish($data);
 		}
 	}
 
