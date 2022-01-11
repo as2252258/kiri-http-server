@@ -37,7 +37,7 @@ class OnServerTask
 		} catch (\Throwable $exception) {
 			$data = jTraceEx($exception);
 
-			$this->logger->error('task', [$data]);
+			$this->logger->error('task', [error_trigger_format($exception)]);
 		} finally {
 			$server->finish($data);
 		}
@@ -56,7 +56,7 @@ class OnServerTask
 		} catch (\Throwable $exception) {
 			$data = jTraceEx($exception);
 
-			$this->logger->error('task', [$data]);
+			$this->logger->error('task', [error_trigger_format($exception)]);
 		} finally {
 			$task->finish($data);
 		}
