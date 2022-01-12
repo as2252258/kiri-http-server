@@ -5,7 +5,7 @@ namespace Kiri\Server\Tasker;
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Core\HashMap;
-use Kiri\Kiri;
+use Kiri;
 use ReflectionException;
 use Kiri\Server\Contract\OnTaskInterface;
 use Kiri\Server\SwooleServerInterface;

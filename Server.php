@@ -8,7 +8,7 @@ use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
-use Kiri\Kiri;
+use Kiri;
 use Kiri\Message\Handler\Abstracts\HttpService;
 use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnShutdown;

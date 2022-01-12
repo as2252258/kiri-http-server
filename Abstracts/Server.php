@@ -8,7 +8,7 @@ use Kiri\Annotation\Inject;
 use Exception;
 use Kiri\Abstracts\Config;
 use Kiri\Exception\ConfigException;
-use Kiri\Kiri;
+use Kiri;
 use Psr\Log\LoggerInterface;
 
 

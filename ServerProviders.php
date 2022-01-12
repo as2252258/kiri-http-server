@@ -7,7 +7,7 @@ namespace Kiri\Server;
 use Exception;
 use Kiri\Abstracts\Providers;
 use Kiri\Application;
-use Kiri\Kiri;
+use Kiri;
 
 /**
  * Class DatabasesProviders

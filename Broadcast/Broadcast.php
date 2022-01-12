@@ -2,7 +2,7 @@
 
 namespace Kiri\Server\Broadcast;
 
-use Kiri\Kiri;
+use Kiri;
 use Kiri\Server\ProcessManager;
 use Kiri\Server\SwooleServerInterface;
 

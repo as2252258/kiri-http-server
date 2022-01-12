@@ -3,7 +3,7 @@
 namespace Kiri\Server\Broadcast;
 
 
-use Kiri\Kiri;
+use Kiri;
 use Kiri\Server\Contract\OnPipeMessageInterface;
 use Psr\Log\LoggerInterface;
 

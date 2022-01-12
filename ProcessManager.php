@@ -6,7 +6,7 @@ use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
 use Kiri\Context;
 use Kiri\Exception\ConfigException;
-use Kiri\Kiri;
+use Kiri;
 use Kiri\Server\Abstracts\BaseProcess;
 use Kiri\Server\Broadcast\Message;
 use Kiri\Server\Contract\OnProcessInterface;
