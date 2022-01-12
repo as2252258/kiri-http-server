@@ -3,7 +3,9 @@
 namespace Kiri\Server\Broadcast;
 
 
+use Kiri\Kiri;
 use Kiri\Server\Contract\OnPipeMessageInterface;
+use Psr\Log\LoggerInterface;
 
 class Message implements OnPipeMessageInterface
 {
@@ -21,9 +23,9 @@ class Message implements OnPipeMessageInterface
 	 */
 	public function process(): void
 	{
-		$workerId = func_get_args()[1];
-
-		var_dump($workerId, $this->data);
+		$logger = Kiri::getDi()->get(LoggerInterface::class);
+		$logger->debug('workerId::' . env('environmental_workerId'));
+		$logger->debug($this->data->data . '::' . static::class);
 	}
 
 }
