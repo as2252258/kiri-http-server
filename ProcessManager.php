@@ -3,12 +3,14 @@
 namespace Kiri\Server;
 
 use Kiri\Abstracts\Config;
+use Kiri\Annotation\Inject;
 use Kiri\Context;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
 use Kiri\Server\Abstracts\BaseProcess;
 use Kiri\Server\Broadcast\Message;
 use Kiri\Server\Contract\OnProcessInterface;
+use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
 
@@ -19,6 +21,9 @@ class ProcessManager
 	/** @var array<string, Process> */
 	private array $_process = [];
 
+
+	#[Inject(LoggerInterface::class)]
+	public LoggerInterface $logger;
 
 	/**
 	 * @param string|OnProcessInterface|BaseProcess $customProcess
@@ -31,8 +36,11 @@ class ProcessManager
 		if (is_string($customProcess)) {
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
+
 		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
-		$server->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
+
+		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
+
 		$server->addProcess($process = $this->parse($customProcess, $system));
 		$this->_process[$customProcess->getName()] = $process;
 	}
