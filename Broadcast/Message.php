@@ -7,7 +7,11 @@ use Kiri\Kiri;
 use Kiri\Server\Contract\OnPipeMessageInterface;
 use Psr\Log\LoggerInterface;
 
-class Message implements OnPipeMessageInterface
+
+/**
+ *
+ */
+class Message implements OnPipeMessageInterface, OnBroadcastInterface
 {
 
 	/**
@@ -24,8 +28,7 @@ class Message implements OnPipeMessageInterface
 	public function process(): void
 	{
 		$logger = Kiri::getDi()->get(LoggerInterface::class);
-		$logger->debug('workerId::' . env('environmental_workerId'));
-		$logger->debug($this->data . '::' . static::class);
+		$logger->debug(env('environmental') . '::' . env('environmental_workerId', 0) . '::' . $this->data);
 	}
 
 }

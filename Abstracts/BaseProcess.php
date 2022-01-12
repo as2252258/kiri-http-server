@@ -4,6 +4,7 @@ namespace Kiri\Server\Abstracts;
 
 
 use Kiri\Context;
+use Kiri\Server\Broadcast\OnBroadcastInterface;
 use Kiri\Server\Contract\OnProcessInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
@@ -78,9 +79,6 @@ abstract class BaseProcess implements OnProcessInterface
 	{
 		$this->isStop = true;
 	}
-
-
-	abstract public function onBroadcast($message);
 
 
 	/**

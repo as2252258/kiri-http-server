@@ -57,6 +57,7 @@ class ProcessManager
 			if (Kiri::getPlatform()->isLinux()) {
 				$process->name($system . '(' . $customProcess->getName() . ')');
 			}
+			set_env('environmental', Kiri::PROCESS);
 			$channel = Coroutine::create(function () use ($process, $customProcess) {
 				while (!$customProcess->isStop()) {
 					$message = $process->read();
