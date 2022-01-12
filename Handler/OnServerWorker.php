@@ -3,11 +3,12 @@
 namespace Kiri\Server\Handler;
 
 use Exception;
+use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
-use Kiri;
+use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
 use Kiri\Server\Events\OnTaskerStart as OnTaskStart;
@@ -44,6 +45,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 		$this->eventDispatch->dispatch(new OnBeforeWorkerStart($workerId));
 		set_env('environmental_workerId', $workerId);
 		if ($workerId < $server->setting['worker_num']) {
+			Kiri::getContainer()->get(Router::class)->scan_build_route();
 			$this->eventDispatch->dispatch(new OnWorkerStart($server, $workerId));
 			$this->setProcessName(sprintf('Worker[%d].%d', $server->worker_pid, $workerId));
 			set_env('environmental', Kiri::WORKER);

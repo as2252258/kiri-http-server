@@ -65,8 +65,10 @@ class Server extends HttpService
 	 * @throws \ReflectionException
 	 * @throws Exception
 	 */
-	public function start(): string
+	public function start(): mixed
 	{
+		$this->configure_set();
+
 		$this->manager()->initBaseServer(Config::get('server', [], true), $this->daemon);
 
 		$rpcService = Config::get('rpc', []);
@@ -101,23 +103,6 @@ class Server extends HttpService
 		]);
 	}
 
-
-	/**
-	 * @return void
-	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws \ReflectionException
-	 * @throws \Exception
-	 */
-	public function runtime_start(): void
-	{
-		$this->configure_set();
-
-		$this->container->get(Router::class)->read_files();
-
-		$this->start();
-	}
 
 
 	/**

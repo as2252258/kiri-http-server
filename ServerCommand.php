@@ -77,46 +77,7 @@ class ServerCommand extends Command
                 return 1;
             }
 		}
-        $manager->runtime_start();
-        return 0;
-	}
-
-
-	/**
-	 * @throws ConfigException
-	 */
-	private function configure_set()
-	{
-		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
-		Config::set('servers.settings.enable_coroutine', true);
-		if ($enable_coroutine != true) {
-			return;
-		}
-		Coroutine::set([
-			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
-			'enable_deadlock_check' => FALSE,
-			'exit_condition'        => function () {
-				return Coroutine::stats()['coroutine_num'] === 0;
-			}
-		]);
-	}
-
-
-	/**
-	 * @param $manager
-	 * @return int
-	 * @throws ConfigException
-	 * @throws Exception
-	 */
-	private function generate_runtime_builder($manager): int
-	{
-		$this->configure_set();
-
-		Kiri::app()->getRouter()->read_files();
-
-		$manager->start();
-
-		return 1;
+        return $manager->start();
 	}
 
 }
