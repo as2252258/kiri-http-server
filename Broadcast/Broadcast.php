@@ -23,6 +23,9 @@ class Broadcast
 
 		$total = $server->setting['worker_num'] + $server->setting['task_worker_num'];
 		for ($i = 0; $i < $total; $i++) {
+			if ($i == env('environmental_workerId')) {
+				continue;
+			}
 			$server->sendMessage(serialize(new Message($message)), $i);
 		}
 	}

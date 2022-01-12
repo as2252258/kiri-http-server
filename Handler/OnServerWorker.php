@@ -4,10 +4,10 @@ namespace Kiri\Server\Handler;
 
 use Exception;
 use Kiri\Abstracts\Config;
+use Kiri\Annotation\Inject;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Kiri;
-use Kiri\Annotation\Inject;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
 use Kiri\Server\Events\OnTaskerStart as OnTaskStart;
@@ -42,6 +42,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	public function onWorkerStart(Server $server, int $workerId)
 	{
 		$this->eventDispatch->dispatch(new OnBeforeWorkerStart($workerId));
+		set_env('environmental_workerId', $workerId);
 		if ($workerId < $server->setting['worker_num']) {
 			$this->eventDispatch->dispatch(new OnWorkerStart($server, $workerId));
 			$this->setProcessName(sprintf('Worker[%d].%d', $server->worker_pid, $workerId));
