@@ -48,9 +48,9 @@ abstract class BaseProcess implements OnProcessInterface
 
 	/**
 	 * @return bool
-     */
+	 */
 	public function getRedirectStdinAndStdout(): bool
-    {
+	{
 		return $this->redirect_stdin_and_stdout;
 	}
 
@@ -80,6 +80,9 @@ abstract class BaseProcess implements OnProcessInterface
 	}
 
 
+	abstract public function onBroadcast($message);
+
+
 	/**
 	 *
 	 */
@@ -105,6 +108,10 @@ abstract class BaseProcess implements OnProcessInterface
 	protected function onShutdown($data): void
 	{
 		$this->isStop = true;
+		$value = Context::getContext('waite:process:message');
+		if (Coroutine::exists($value)) {
+			Coroutine::cancel($value);
+		}
 	}
 
 

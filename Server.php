@@ -4,16 +4,16 @@
 namespace Kiri\Server;
 
 use Exception;
-use Kiri\Message\Handler\Abstracts\HttpService;
-use Kiri\Message\Handler\Router;
 use Kiri\Abstracts\Config;
+use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
-use Kiri\Annotation\Inject;
+use Kiri\Message\Handler\Abstracts\HttpService;
+use Kiri\Message\Handler\Router;
+use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Kiri\Server\Events\OnShutdown;
 use Swoole\Coroutine;
 
 
@@ -76,53 +76,51 @@ class Server extends HttpService
 		}
 
 		$processes = array_merge($this->process, Config::get('processes', []));
-		foreach ($processes as $process) {
-			$this->manager()->addProcess($process);
-		}
+
+		$this->container->get(ProcessManager::class)->batch($processes);
 
 		return $this->manager()->getServer()->start();
 	}
 
-    /**
-     * @throws ConfigException
-     */
-    private function configure_set()
-    {
-        $enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
-        Config::set('servers.settings.enable_coroutine', true);
-        if ($enable_coroutine != true) {
-            return;
-        }
-        Coroutine::set([
-            'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
-            'enable_deadlock_check' => FALSE,
-            'exit_condition'        => function () {
-                return Coroutine::stats()['coroutine_num'] === 0;
-            }
-        ]);
-    }
+	/**
+	 * @throws ConfigException
+	 */
+	private function configure_set()
+	{
+		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
+		Config::set('servers.settings.enable_coroutine', true);
+		if ($enable_coroutine != true) {
+			return;
+		}
+		Coroutine::set([
+			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
+			'enable_deadlock_check' => FALSE,
+			'exit_condition'        => function () {
+				return Coroutine::stats()['coroutine_num'] === 0;
+			}
+		]);
+	}
 
 
-    /**
-     * @return void
-     * @throws ConfigException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws \ReflectionException
-     * @throws \Exception
-     */
-    public function runtime_start(): void
-    {
-        $this->configure_set();
+	/**
+	 * @return void
+	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws \ReflectionException
+	 * @throws \Exception
+	 */
+	public function runtime_start(): void
+	{
+		$this->configure_set();
 
-        $this->container->get(Router::class)->read_files();
+		$this->container->get(Router::class)->read_files();
 
-        $this->start();
-    }
+		$this->start();
+	}
 
 
-
-    /**
+	/**
 	 * @return void
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface

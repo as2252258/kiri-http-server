@@ -5,14 +5,12 @@ namespace Kiri\Server;
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
+use Kiri\Annotation\Inject;
+use Kiri\Context;
 use Kiri\Error\Logger;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
-use Kiri\Annotation\Inject;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use ReflectionException;
 use Kiri\Server\Abstracts\BaseProcess;
 use Kiri\Server\Contract\OnCloseInterface;
 use Kiri\Server\Contract\OnConnectInterface;
@@ -29,15 +27,15 @@ use Kiri\Server\Handler\OnServerManager;
 use Kiri\Server\Handler\OnServerReload;
 use Kiri\Server\Handler\OnServerWorker;
 use Kiri\Server\Tasker\OnServerTask;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
+use Swoole\Coroutine;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;
 use Swoole\Server\Port;
 use Swoole\WebSocket\Server as WServer;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 
 /**
@@ -152,30 +150,6 @@ class ServerManager extends Component
 
 
 	/**
-	 * @param string|OnProcessInterface|BaseProcess $customProcess
-	 * @throws Exception
-	 */
-	public function addProcess(string|OnProcessInterface|BaseProcess $customProcess)
-	{
-		if (is_string($customProcess)) {
-			$customProcess = Kiri::getDi()->get($customProcess);
-		}
-		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
-		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
-		$this->server->addProcess(new Process(function (Process $process) use ($customProcess, $system) {
-			if (Kiri::getPlatform()->isLinux()) {
-				$process->name($system . '(' . $customProcess->getName() . ')');
-			}
-			$customProcess->onSigterm()->process($process);
-		},
-			$customProcess->getRedirectStdinAndStdout(),
-			$customProcess->getPipeType(),
-			$customProcess->isEnableCoroutine()
-		));
-	}
-
-
-	/**
 	 * @return array<string,Process>
 	 */
 	public function getProcesses(): array
@@ -282,20 +256,20 @@ class ServerManager extends Component
 	 *
 	 *
 	 *
-	$data = new Table($this->container->get(OutputInterface::class));
-	$data->setHeaders(['key', 'value']);
-
-	$array = [];
-	foreach ($this->server->setting as $key => $value) {
-	$array[] = [$key, $value];
-	$array[] = new TableSeparator();
-	}
-
-	array_pop($array);
-
-	$data->setStyle('box-double');
-	$data->setRows($array);
-	$data->render();
+	 * $data = new Table($this->container->get(OutputInterface::class));
+	 * $data->setHeaders(['key', 'value']);
+	 *
+	 * $array = [];
+	 * foreach ($this->server->setting as $key => $value) {
+	 * $array[] = [$key, $value];
+	 * $array[] = new TableSeparator();
+	 * }
+	 *
+	 * array_pop($array);
+	 *
+	 * $data->setStyle('box-double');
+	 * $data->setRows($array);
+	 * $data->render();
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
