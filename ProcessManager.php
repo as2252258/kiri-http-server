@@ -7,6 +7,7 @@ use Kiri\Context;
 use Kiri\Exception\ConfigException;
 use Kiri\Kiri;
 use Kiri\Server\Abstracts\BaseProcess;
+use Kiri\Server\Broadcast\Message;
 use Kiri\Server\Contract\OnProcessInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
@@ -48,13 +49,16 @@ class ProcessManager
 			if (Kiri::getPlatform()->isLinux()) {
 				$process->name($system . '(' . $customProcess->getName() . ')');
 			}
-
 			$channel = Coroutine::create(function () use ($process, $customProcess) {
 				while (!$customProcess->isStop()) {
 					$message = $process->read();
 					if (!empty($message)) {
-						$customProcess->onBroadcast($message);
+						$message = unserialize($message);
 					}
+					if (is_null($message)) {
+						continue;
+					}
+					$customProcess->onBroadcast($message);
 				}
 			});
 			Context::setContext('waite:process:message', $channel);
@@ -93,7 +97,7 @@ class ProcessManager
 			$processes = [$this->_process[$name]];
 		}
 		foreach ($processes as $process) {
-			$process->write($message);
+			$process->write(serialize(new Message($message)));
 		}
 	}
 

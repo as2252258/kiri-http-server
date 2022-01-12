@@ -6,19 +6,15 @@ use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
-use Kiri\Context;
 use Kiri\Error\Logger;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
-use Kiri\Kiri;
-use Kiri\Server\Abstracts\BaseProcess;
 use Kiri\Server\Contract\OnCloseInterface;
 use Kiri\Server\Contract\OnConnectInterface;
 use Kiri\Server\Contract\OnDisconnectInterface;
 use Kiri\Server\Contract\OnHandshakeInterface;
 use Kiri\Server\Contract\OnMessageInterface;
 use Kiri\Server\Contract\OnPacketInterface;
-use Kiri\Server\Contract\OnProcessInterface;
 use Kiri\Server\Contract\OnReceiveInterface;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Handler\OnPipeMessage;
@@ -30,7 +26,6 @@ use Kiri\Server\Tasker\OnServerTask;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
-use Swoole\Coroutine;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;
@@ -282,6 +277,8 @@ class ServerManager extends Component
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
+		$this->container->setBindings(SwooleServerInterface::class, $this->server);
+
 		$id = Config::get('id', 'system-service');
 
 		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
@@ -300,7 +297,6 @@ class ServerManager extends Component
 		if (($this->server->setting['task_worker_num'] ?? 0) > 0) {
 			$this->addTaskListener($settings['events']);
 		}
-		$this->container->setBindings(SwooleServerInterface::class, $this->server);
 		$this->addServiceEvents(ServerManager::DEFAULT_EVENT, $this->server);
 		if (!empty($settings['events']) && is_array($settings['events'])) {
 			$this->addServiceEvents($settings['events'], $this->server);

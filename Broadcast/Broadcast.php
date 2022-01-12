@@ -1,8 +1,10 @@
 <?php
 
-namespace Kiri\Server;
+namespace Kiri\Server\Broadcast;
 
 use Kiri\Kiri;
+use Kiri\Server\ProcessManager;
+use Kiri\Server\SwooleServerInterface;
 
 class Broadcast
 {
@@ -21,7 +23,7 @@ class Broadcast
 
 		$total = $server->setting['worker_num'] + $server->setting['task_worker_num'];
 		for ($i = 0; $i < $total; $i++) {
-			$server->sendMessage($message, $i);
+			$server->sendMessage(serialize(new Message($message)), $i);
 		}
 	}
 

@@ -2,11 +2,11 @@
 
 namespace Kiri\Server\Handler;
 
-use Kiri\Annotation\Inject;
-use Kiri\Server\Abstracts\Server;
 use Exception;
-use Kiri\Server\Contract\OnPipeMessageInterface;
+use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
+use Kiri\Server\Abstracts\Server;
+use Kiri\Server\Contract\OnPipeMessageInterface;
 
 /**
  *
@@ -15,7 +15,7 @@ class OnPipeMessage extends Server
 {
 
 
-	/** @var EventDispatch  */
+	/** @var EventDispatch */
 	#[Inject(EventDispatch::class)]
 	public EventDispatch $eventDispatch;
 
@@ -28,6 +28,9 @@ class OnPipeMessage extends Server
 	 */
 	public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message)
 	{
+		if (is_string($message)) {
+			$message = unserialize($message);
+		}
 		if (!is_object($message) || !($message instanceof OnPipeMessageInterface)) {
 			return;
 		}
