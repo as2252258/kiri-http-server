@@ -4,13 +4,12 @@
 namespace Kiri\Server;
 
 use Exception;
+use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
-use Kiri;
 use Kiri\Message\Handler\Abstracts\HttpService;
-use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -40,11 +39,27 @@ class Server extends HttpService
 	public State $state;
 
 
+	public ServerManager $manager;
+
+
 	/**
 	 *
 	 */
 	public function init()
 	{
+		$this->manager = Kiri::getContainer()->get(ServerManager::class);
+		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
+		Config::set('servers.settings.enable_coroutine', true);
+		if ($enable_coroutine != true) {
+			return;
+		}
+		Coroutine::set([
+			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
+			'enable_deadlock_check' => FALSE,
+			'exit_condition'        => function () {
+				return Coroutine::stats()['coroutine_num'] === 0;
+			}
+		]);
 	}
 
 
@@ -67,13 +82,11 @@ class Server extends HttpService
 	 */
 	public function start(): mixed
 	{
-		$this->configure_set();
-
-		$this->manager()->initBaseServer(Config::get('server', [], true), $this->daemon);
+		$this->manager->initBaseServer(Config::get('server', [], true), $this->daemon);
 
 		$rpcService = Config::get('rpc', []);
 		if (!empty($rpcService)) {
-			$this->manager()->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'],
+			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'],
 				$rpcService['mode'], $rpcService);
 		}
 
@@ -81,28 +94,8 @@ class Server extends HttpService
 
 		$this->container->get(ProcessManager::class)->batch($processes);
 
-		return $this->manager()->getServer()->start();
+		return $this->manager->getServer()->start();
 	}
-
-	/**
-	 * @throws ConfigException
-	 */
-	private function configure_set()
-	{
-		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
-		Config::set('servers.settings.enable_coroutine', true);
-		if ($enable_coroutine != true) {
-			return;
-		}
-		Coroutine::set([
-			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
-			'enable_deadlock_check' => FALSE,
-			'exit_condition'        => function () {
-				return Coroutine::stats()['coroutine_num'] === 0;
-			}
-		]);
-	}
-
 
 
 	/**
@@ -116,7 +109,7 @@ class Server extends HttpService
 	public function shutdown()
 	{
 		$configs = Config::get('server', [], true);
-		foreach ($this->manager()->sortService($configs['ports'] ?? []) as $config) {
+		foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
 			$this->state->exit($config['port']);
 		}
 		$this->container->get(EventDispatch::class)->dispatch(new OnShutdown());
@@ -154,16 +147,7 @@ class Server extends HttpService
 	 */
 	public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
 	{
-		return $this->manager()->getServer();
-	}
-
-
-	/**
-	 * @return ServerManager
-	 */
-	private function manager(): ServerManager
-	{
-		return Kiri::getDi()->get(ServerManager::class);
+		return $this->manager->getServer();
 	}
 
 }
