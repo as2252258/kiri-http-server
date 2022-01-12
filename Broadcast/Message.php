@@ -25,7 +25,7 @@ class Message implements OnPipeMessageInterface
 	{
 		$logger = Kiri::getDi()->get(LoggerInterface::class);
 		$logger->debug('workerId::' . env('environmental_workerId'));
-		$logger->debug($this->data->data . '::' . static::class);
+		$logger->debug($this->data . '::' . static::class);
 	}
 
 }
