@@ -45,9 +45,9 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 		$this->eventDispatch->dispatch(new OnBeforeWorkerStart($workerId));
 		set_env('environmental_workerId', $workerId);
 		if ($workerId < $server->setting['worker_num']) {
-			Kiri::getContainer()->get(Router::class)->scan_build_route();
-			$this->eventDispatch->dispatch(new OnWorkerStart($server, $workerId));
 			$this->setProcessName(sprintf('Worker[%d].%d', $server->worker_pid, $workerId));
+			Kiri::getDi()->get(Router::class)->scan_build_route();
+			$this->eventDispatch->dispatch(new OnWorkerStart($server, $workerId));
 			set_env('environmental', Kiri::WORKER);
 		} else {
 			$this->eventDispatch->dispatch(new OnTaskStart($server, $workerId));
