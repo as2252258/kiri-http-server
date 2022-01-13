@@ -4,6 +4,7 @@
 namespace Kiri\Server;
 
 use Exception;
+use JetBrains\PhpStorm\Pure;
 use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
@@ -146,9 +147,8 @@ class Server extends HttpService
 
 	/**
 	 * @return \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
-	 * @throws \ReflectionException
 	 */
-	public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
+	#[Pure] public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
 	{
 		return $this->manager->getServer();
 	}
