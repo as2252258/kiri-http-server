@@ -7,7 +7,6 @@ use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
 use Kiri\Error\Logger;
-use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Contract\OnCloseInterface;
 use Kiri\Server\Contract\OnConnectInterface;
@@ -16,7 +15,6 @@ use Kiri\Server\Contract\OnHandshakeInterface;
 use Kiri\Server\Contract\OnMessageInterface;
 use Kiri\Server\Contract\OnPacketInterface;
 use Kiri\Server\Contract\OnReceiveInterface;
-use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Handler\OnPipeMessage;
 use Kiri\Server\Handler\OnServer;
 use Kiri\Server\Handler\OnServerManager;
@@ -25,7 +23,6 @@ use Kiri\Server\Handler\OnServerWorker;
 use Kiri\Server\Tasker\OnServerTask;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use ReflectionException;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;
@@ -95,11 +92,9 @@ class ServerManager extends Component
 
 	/**
 	 * @return Server|WServer|HServer|null
-	 * @throws ReflectionException
 	 */
 	public function getServer(): Server|WServer|HServer|null
 	{
-		di(EventDispatch::class)->dispatch(new OnServerBeforeStart());
 		return $this->server;
 	}
 

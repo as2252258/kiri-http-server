@@ -12,6 +12,7 @@ use Kiri\Exception\ConfigException;
 use Kiri\Message\Handler\Abstracts\HttpService;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
+use Kiri\Server\Events\OnServerBeforeStart;
 use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Coroutine;
 
@@ -93,6 +94,8 @@ class Server extends HttpService
 		$processes = array_merge($this->process, Config::get('processes', []));
 
 		$this->container->get(ProcessManager::class)->batch($processes);
+
+		$this->eventDispatch->dispatch(new OnServerBeforeStart());
 
 		return $this->manager->getServer()->start();
 	}
