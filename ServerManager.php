@@ -79,6 +79,9 @@ class ServerManager extends Component
 	];
 
 
+	/**
+	 * @var array|string[]
+	 */
 	private array $eventInterface = [
 		OnReceiveInterface::class    => 'receive',
 		OnPacketInterface::class     => 'packet',
