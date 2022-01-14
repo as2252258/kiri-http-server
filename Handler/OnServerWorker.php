@@ -35,6 +35,18 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	public EventDispatch $eventDispatch;
 
 
+	public Router $collector;
+
+
+	/**
+	 * @return void
+	 */
+	public function init()
+	{
+		$this->collector = Kiri::getDi()->get(Router::class);
+	}
+
+
 	/**
 	 * @param Server $server
 	 * @param int $workerId
@@ -46,6 +58,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 		set_env('environmental_workerId', $workerId);
 		if ($workerId < $server->setting['worker_num']) {
 			$this->setProcessName(sprintf('Worker[%d].%d', $server->worker_pid, $workerId));
+			$this->collector->scan_build_route();
 			$this->eventDispatch->dispatch(new OnWorkerStart($server, $workerId));
 			set_env('environmental', Kiri::WORKER);
 		} else {
