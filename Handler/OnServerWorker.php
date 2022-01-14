@@ -77,8 +77,6 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerExit(Server $server, int $workerId)
 	{
-		set_env('state', 'exit');
-
 		$this->eventDispatch->dispatch(new OnWorkerExit($server, $workerId));
 	}
 
