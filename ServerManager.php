@@ -277,9 +277,6 @@ class ServerManager extends Component
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
 		$this->container->setBindings(SwooleServerInterface::class, $this->server);
-		if ($match == WServer::class) {
-			$this->container->setBindings(WebSocketInterface::class, $this->server);
-		}
 
 		$id = Config::get('id', 'system-service');
 
