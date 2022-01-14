@@ -2,14 +2,16 @@
 
 namespace Kiri\Server;
 
+use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
 use Kiri\Context;
+use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
-use Kiri;
 use Kiri\Server\Abstracts\BaseProcess;
 use Kiri\Server\Broadcast\Message;
 use Kiri\Server\Contract\OnProcessInterface;
+use Kiri\Server\Events\OnProcessStart;
 use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
@@ -57,6 +59,9 @@ class ProcessManager
 			if (Kiri::getPlatform()->isLinux()) {
 				$process->name($system . '(' . $customProcess->getName() . ')');
 			}
+
+			Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnProcessStart());
+
 			set_env('environmental', Kiri::PROCESS);
 			$channel = Coroutine::create(function () use ($process, $customProcess) {
 				while (!$customProcess->isStop()) {
