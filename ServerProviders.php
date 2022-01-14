@@ -23,8 +23,6 @@ class ServerProviders extends Providers
 	 */
 	public function onImport(Application $application)
 	{
-		$application->set('server', ['class' => Server::class]);
-
 		$container = Kiri::getDi();
 
 		$console = $container->get(\Symfony\Component\Console\Application::class);
