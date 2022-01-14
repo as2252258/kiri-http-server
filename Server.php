@@ -11,6 +11,7 @@ use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Message\Handler\Abstracts\HttpService;
+use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Kiri\Server\Events\OnServerBeforeStart;
@@ -97,6 +98,8 @@ class Server extends HttpService
 		$this->container->get(ProcessManager::class)->batch($processes);
 
 		$this->eventDispatch->dispatch(new OnServerBeforeStart());
+
+		Kiri::getDi()->get(Router::class)->scan_build_route();
 
 		return $this->manager->getServer()->start();
 	}
