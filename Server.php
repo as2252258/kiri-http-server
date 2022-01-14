@@ -99,6 +99,8 @@ class Server extends HttpService
 
 		$this->eventDispatch->dispatch(new OnServerBeforeStart());
 
+		Kiri::getDi()->get(Router::class)->scan_build_route();
+
 		return $this->manager->getServer()->start();
 	}
 
