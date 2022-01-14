@@ -263,7 +263,6 @@ class ServerManager extends Component
 	 *
 	 * $data->setStyle('box-double');
 	 * $data->setRows($array);
-	 * $data->render();
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
