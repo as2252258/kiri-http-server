@@ -21,6 +21,7 @@ use Kiri\Server\Handler\OnServerManager;
 use Kiri\Server\Handler\OnServerReload;
 use Kiri\Server\Handler\OnServerWorker;
 use Kiri\Server\Tasker\OnServerTask;
+use Kiri\Websocket\WebSocketInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Http\Server as HServer;
@@ -276,6 +277,9 @@ class ServerManager extends Component
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
 		$this->container->setBindings(SwooleServerInterface::class, $this->server);
+		if ($match == WServer::class) {
+			$this->container->setBindings(WebSocketInterface::class, $this->server);
+		}
 
 		$id = Config::get('id', 'system-service');
 
