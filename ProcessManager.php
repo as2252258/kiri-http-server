@@ -42,8 +42,14 @@ class ProcessManager
 		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
 
 		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
-
-		$server->addProcess($process = $this->parse($customProcess, $system));
+		$process = $this->parse($customProcess, $system);
+		if (Context::inCoroutine()) {
+			Coroutine::create(function () use ($process) {
+				$process->start();
+			});
+		} else {
+			$server->addProcess($process = $this->parse($customProcess, $system));
+		}
 		$this->_process[$customProcess->getName()] = $process;
 	}
 

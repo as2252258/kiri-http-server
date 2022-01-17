@@ -61,9 +61,6 @@ class ServerManager extends Component
 	private Server|null $server = null;
 
 
-	protected array $initProcesses = [];
-
-
 	const DEFAULT_EVENT = [
 		Constant::WORKER_START    => [OnServerWorker::class, 'onWorkerStart'],
 		Constant::WORKER_EXIT     => [OnServerWorker::class, 'onWorkerExit'],
@@ -157,15 +154,6 @@ class ServerManager extends Component
 		}
 
 		$this->getContainer()->get(TaskManager::class)->taskListener($this->server);
-	}
-
-
-	/**
-	 * @return array<string,Process>
-	 */
-	public function getProcesses(): array
-	{
-		return $this->initProcesses;
 	}
 
 
