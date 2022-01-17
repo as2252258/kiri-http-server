@@ -20,8 +20,7 @@ use Kiri\Server\Handler\OnServer;
 use Kiri\Server\Handler\OnServerManager;
 use Kiri\Server\Handler\OnServerReload;
 use Kiri\Server\Handler\OnServerWorker;
-use Kiri\Server\Tasker\OnServerTask;
-use Kiri\Websocket\WebSocketInterface;
+use Kiri\Task\TaskManager;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Http\Server as HServer;
@@ -139,7 +138,25 @@ class ServerManager extends Component
 		foreach ($this->sortService($configs['ports']) as $config) {
 			$this->startListenerHandler($context, $config, $daemon);
 		}
-		$this->bindCallback([Constant::PIPE_MESSAGE => [OnPipeMessage::class, 'onPipeMessage']]);
+		$this->bindPipeMessage();
+	}
+
+
+	/**
+	 * @return void
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 */
+	public function bindPipeMessage(): void
+	{
+		$pipeMessage = $this->getContainer()->get(OnPipeMessage::class);
+		$this->server->on(Constant::PIPE_MESSAGE, [$pipeMessage, 'onPipeMessage']);
+
+		if (!isset($this->server->setting['task_worker_num']) || $this->server->setting['task_worker_num'] < 1) {
+			return;
+		}
+
+		$this->getContainer()->get(TaskManager::class)->taskListener($this->server);
 	}
 
 
@@ -247,22 +264,6 @@ class ServerManager extends Component
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
-	 *
-	 *
-	 *
-	 * $data = new Table($this->container->get(OutputInterface::class));
-	 * $data->setHeaders(['key', 'value']);
-	 *
-	 * $array = [];
-	 * foreach ($this->server->setting as $key => $value) {
-	 * $array[] = [$key, $value];
-	 * $array[] = new TableSeparator();
-	 * }
-	 *
-	 * array_pop($array);
-	 *
-	 * $data->setStyle('box-double');
-	 * $data->setRows($array);
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
@@ -292,9 +293,6 @@ class ServerManager extends Component
 	 */
 	private function addDefaultListener(array $settings): void
 	{
-		if (($this->server->setting['task_worker_num'] ?? 0) > 0) {
-			$this->addTaskListener($settings['events']);
-		}
 		$this->addServiceEvents(ServerManager::DEFAULT_EVENT, $this->server);
 		if (!empty($settings['events']) && is_array($settings['events'])) {
 			$this->addServiceEvents($settings['events'], $this->server);
@@ -328,55 +326,4 @@ class ServerManager extends Component
 	}
 
 
-	/**
-	 * @param mixed $message
-	 * @param int $workerId
-	 * @return mixed
-	 */
-	public function sendMessage(mixed $message, int $workerId): mixed
-	{
-		return $this->server?->sendMessage($message, $workerId);
-	}
-
-
-	/**
-	 * @param array $events
-	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 */
-	private function addTaskListener(array $events = []): void
-	{
-		$task_use_object = $this->server->setting['task_object'] ?? $this->server->setting['task_use_object'] ?? false;
-		$reflect = $this->container->get(OnServerTask::class);
-		$this->server->on('finish', $events[Constant::FINISH] ?? [$reflect, 'onFinish']);
-		if ($task_use_object || $this->server->setting['task_enable_coroutine']) {
-			$this->server->on('task', $events[Constant::TASK] ?? [$reflect, 'onCoroutineTask']);
-		} else {
-			$this->server->on('task', $events[Constant::TASK] ?? [$reflect, 'onTask']);
-		}
-	}
-
-
-	/**
-	 * @param array|null $settings
-	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 */
-	public function bindCallback(?array $settings = [])
-	{
-		if (count($settings) < 1) {
-			return;
-		}
-		foreach ($settings as $event_type => $callback) {
-			if ($this->server->getCallback($event_type) !== null) {
-				continue;
-			}
-			if (is_array($callback) && !is_object($callback[0])) {
-				$callback[0] = $this->container->get($callback[0]);
-			}
-			$this->server->on($event_type, $callback);
-		}
-	}
 }

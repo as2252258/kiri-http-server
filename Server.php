@@ -11,11 +11,11 @@ use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Message\Handler\Abstracts\HttpService;
-use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use Swoole\Coroutine;
 
 
@@ -80,7 +80,7 @@ class Server extends HttpService
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws \ReflectionException
+	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	public function start(): mixed
@@ -108,7 +108,7 @@ class Server extends HttpService
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws \ReflectionException
+	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	public function shutdown()
