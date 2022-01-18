@@ -67,7 +67,6 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 			$this->setProcessName(sprintf('Tasker[%d].%d', $server->worker_pid, $workerId));
 			set_env('environmental', Kiri::TASK);
 		}
-		Kiri::getDi()->get(Waite::class)->setWaite(false);
 		$this->eventDispatch->dispatch(new OnAfterWorkerStart());
 	}
 
