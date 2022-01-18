@@ -9,6 +9,7 @@ use Kiri\Annotation\Inject;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Message\Handler\Router;
+use Kiri\Message\Waite;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
 use Kiri\Server\Events\OnTaskerStart as OnTaskStart;
@@ -66,6 +67,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 			$this->setProcessName(sprintf('Tasker[%d].%d', $server->worker_pid, $workerId));
 			set_env('environmental', Kiri::TASK);
 		}
+		Kiri::getDi()->get(Waite::class)->setWaite(false);
 		$this->eventDispatch->dispatch(new OnAfterWorkerStart());
 	}
 
