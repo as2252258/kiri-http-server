@@ -264,7 +264,7 @@ class ServerManager extends Component
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
-		$this->container->setBindings(SwooleServerInterface::class, $this->server);
+		$this->getContainer()->setBindings(SwooleServerInterface::class, $this->server);
 
 		$id = Config::get('id', 'system-service');
 
@@ -298,7 +298,7 @@ class ServerManager extends Component
 	{
 		foreach ($events as $name => $event) {
 			if (is_array($event) && is_string($event[0])) {
-				$event[0] = $this->container->get($event[0]);
+				$event[0] = $this->getContainer()->get($event[0]);
 			}
 			$server->on($name, $event);
 		}

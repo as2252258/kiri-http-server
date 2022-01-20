@@ -30,12 +30,6 @@ class ServerCommand extends Command
 	const ACTIONS = ['start', 'stop', 'restart'];
 
 
-	/**
-	 * @var EventDispatch
-	 */
-	#[Inject(EventDispatch::class)]
-	public EventDispatch $eventProvider;
-
 
 	/**
 	 *

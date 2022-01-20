@@ -18,13 +18,7 @@ use Kiri\Server\Events\OnStart;
  */
 class OnServer extends Server
 {
-
-	/**
-	 * @var EventDispatch
-	 */
-	#[Inject(EventDispatch::class)]
-	public EventDispatch $eventDispatch;
-
+	
 
 	/**
 	 * @param \Swoole\Server $server
@@ -35,7 +29,7 @@ class OnServer extends Server
 	{
 		$this->setProcessName(sprintf('start[%d].server', $server->master_pid));
 
-		$this->eventDispatch->dispatch(new OnStart($server));
+		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnStart($server));
 	}
 
 
@@ -45,7 +39,7 @@ class OnServer extends Server
 	 */
 	public function onBeforeShutdown(\Swoole\Server $server)
 	{
-		$this->eventDispatch->dispatch(new OnBeforeShutdown($server));
+		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnBeforeShutdown($server));
 	}
 
 
@@ -55,7 +49,7 @@ class OnServer extends Server
 	 */
 	public function onShutdown(\Swoole\Server $server)
 	{
-		$this->eventDispatch->dispatch(new OnShutdown($server));
+		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnShutdown($server));
 	}
 
 

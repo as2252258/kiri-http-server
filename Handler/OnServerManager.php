@@ -18,12 +18,6 @@ use Kiri\Server\Events\OnManagerStop;
 class OnServerManager extends Server
 {
 
-	/**
-	 * @var EventDispatch
-	 */
-	#[Inject(EventDispatch::class)]
-	public EventDispatch $eventDispatch;
-
 
 	/**
      * @param \Swoole\Server $server
@@ -33,7 +27,7 @@ class OnServerManager extends Server
 	{
         $this->setProcessName(sprintf('manger[%d].0', $server->manager_pid));
 
-		$this->eventDispatch->dispatch(new OnManagerStart($server));
+		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnManagerStart($server));
 	}
 
 
@@ -43,7 +37,7 @@ class OnServerManager extends Server
 	 */
 	public function onManagerStop(\Swoole\Server $server)
 	{
-		$this->eventDispatch->dispatch(new OnManagerStop($server));
+		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnManagerStop($server));
 	}
 
 

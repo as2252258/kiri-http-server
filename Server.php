@@ -95,9 +95,9 @@ class Server extends HttpService
 
 		$processes = array_merge($this->process, Config::get('processes', []));
 
-		$this->container->get(ProcessManager::class)->batch($processes);
+		$this->getContainer()->get(ProcessManager::class)->batch($processes);
 
-		$this->eventDispatch->dispatch(new OnServerBeforeStart());
+		$this->getEventDispatch()->dispatch(new OnServerBeforeStart());
 
 		return $this->manager->getServer()->start();
 	}
@@ -117,7 +117,7 @@ class Server extends HttpService
 		foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
 			$this->state->exit($config['port']);
 		}
-		$this->container->get(EventDispatch::class)->dispatch(new OnShutdown());
+		$this->getContainer()->get(EventDispatch::class)->dispatch(new OnShutdown());
 	}
 
 

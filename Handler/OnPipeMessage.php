@@ -15,10 +15,6 @@ class OnPipeMessage extends Server
 {
 
 
-	/** @var EventDispatch */
-	#[Inject(EventDispatch::class)]
-	public EventDispatch $eventDispatch;
-
 
 	/**
 	 * @param \Swoole\Server $server
