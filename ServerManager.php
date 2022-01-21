@@ -66,12 +66,7 @@ class ServerManager extends Component
 		Constant::WORKER_EXIT     => [OnServerWorker::class, 'onWorkerExit'],
 		Constant::WORKER_STOP     => [OnServerWorker::class, 'onWorkerStop'],
 		Constant::WORKER_ERROR    => [OnServerWorker::class, 'onWorkerError'],
-		Constant::MANAGER_START   => [OnServerManager::class, 'onManagerStart'],
-		Constant::MANAGER_STOP    => [OnServerManager::class, 'onManagerStop'],
-		Constant::BEFORE_RELOAD   => [OnServerReload::class, 'onBeforeReload'],
-		Constant::AFTER_RELOAD    => [OnServerReload::class, 'onAfterReload'],
 		Constant::START           => [OnServer::class, 'onStart'],
-		Constant::BEFORE_SHUTDOWN => [OnServer::class, 'onBeforeShutdown'],
 		Constant::SHUTDOWN        => [OnServer::class, 'onShutdown'],
 	];
 
