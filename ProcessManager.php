@@ -44,9 +44,7 @@ class ProcessManager
 		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
 		$process = $this->parse($customProcess, $system);
 		if (Context::inCoroutine()) {
-			Coroutine::create(function () use ($process) {
-				$process->start();
-			});
+			$process->start();
 		} else {
 			$server->addProcess($process = $this->parse($customProcess, $system));
 		}
