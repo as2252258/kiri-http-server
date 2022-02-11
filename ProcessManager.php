@@ -24,15 +24,20 @@ class ProcessManager
 	private array $_process = [];
 
 
+	/** @var array<string, Process> */
+	private array $_taskProcess = [];
+
+
 	#[Inject(LoggerInterface::class)]
 	public LoggerInterface $logger;
 
 	/**
 	 * @param string|OnProcessInterface|BaseProcess $customProcess
+	 * @param string $tag
 	 * @return void
 	 * @throws ConfigException
 	 */
-	public function add(string|OnProcessInterface|BaseProcess $customProcess)
+	public function add(string|OnProcessInterface|BaseProcess $customProcess, string $tag = 'default')
 	{
 		$server = Kiri::getDi()->get(SwooleServerInterface::class);
 		if (is_string($customProcess)) {
@@ -48,7 +53,42 @@ class ProcessManager
 		} else {
 			$server->addProcess($process = $this->parse($customProcess, $system));
 		}
-		$this->_process[$customProcess->getName()] = $process;
+		$this->_process[$tag][$customProcess->getName()] = $process;
+	}
+
+
+	/**
+	 * @param string|null $name
+	 * @param string $tag
+	 * @return Process|null
+	 */
+	public function get(?string $name = null, string $tag = 'default'): array|Process|null
+	{
+		$process = $this->_process[$tag] ?? null;
+		if (empty($process)) {
+			return null;
+		}
+		if (!empty($name)) {
+			if (!isset($process[$name])) {
+				return null;
+			}
+			return $process[$name];
+		}
+		return $process;
+	}
+
+
+	/**
+	 * @return void
+	 */
+	public function stop()
+	{
+		foreach ($this->_process as $process) {
+			$process->exit(0);
+		}
+		foreach ($this->_taskProcess as $process) {
+			$process->exit(0);
+		}
 	}
 
 
@@ -92,13 +132,14 @@ class ProcessManager
 
 	/**
 	 * @param array $processes
+	 * @param string $tag
 	 * @return void
 	 * @throws ConfigException
 	 */
-	public function batch(array $processes)
+	public function batch(array $processes, string $tag = 'default')
 	{
 		foreach ($processes as $process) {
-			$this->add($process);
+			$this->add($process, $tag);
 		}
 	}
 
@@ -106,9 +147,10 @@ class ProcessManager
 	/**
 	 * @param string $message
 	 * @param string $name
+	 * @param string $tag
 	 * @return void
 	 */
-	public function push(string $message, string $name = '')
+	public function push(string $message, string $name = '', string $tag = 'default')
 	{
 		$processes = $this->_process;
 		if (!empty($this->_process[$name])) {
