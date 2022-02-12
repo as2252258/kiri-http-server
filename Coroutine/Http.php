@@ -10,6 +10,7 @@ use Kiri\Server\ProcessManager;
 use Kiri\Server\TraitServer;
 use Kiri\Task\AsyncTaskExecute;
 use Kiri\Task\CoroutineTaskExecute;
+use Kiri\Websocket\Sender;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Coroutine;
@@ -195,6 +196,9 @@ class Http extends Component
 	private function WebSocketService($value, $handshake, $open, $close, $message)
 	{
 		$server = new Coroutine\Http\Server($value['host'], $value['port'], null, true);
+
+		$sender = $this->getContainer()->get(Sender::class);
+		$sender->setServer($server);
 
 		$this->servers[$value['port']] = $server;
 
