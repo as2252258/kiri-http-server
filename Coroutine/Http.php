@@ -170,8 +170,6 @@ class Http extends Component
 					call_user_func($close, $response->fd);
 				} catch (\Throwable $throwable) {
 					$this->logger()->error($throwable->getMessage());
-				} finally {
-					$fdCollector->remove($response->fd);
 				}
 			});
 		} else {
