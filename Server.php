@@ -99,7 +99,7 @@ class Server extends HttpService
 
 		$this->getEventDispatch()->dispatch(new OnServerBeforeStart());
 
-		return $this->manager->getServer()->start();
+		return $this->manager->start();
 	}
 
 

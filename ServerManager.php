@@ -59,12 +59,12 @@ class ServerManager extends Component
 
 
 	const DEFAULT_EVENT = [
-		Constant::WORKER_START    => [OnServerWorker::class, 'onWorkerStart'],
-		Constant::WORKER_EXIT     => [OnServerWorker::class, 'onWorkerExit'],
-		Constant::WORKER_STOP     => [OnServerWorker::class, 'onWorkerStop'],
-		Constant::WORKER_ERROR    => [OnServerWorker::class, 'onWorkerError'],
-		Constant::START           => [OnServer::class, 'onStart'],
-		Constant::SHUTDOWN        => [OnServer::class, 'onShutdown'],
+		Constant::WORKER_START => [OnServerWorker::class, 'onWorkerStart'],
+		Constant::WORKER_EXIT  => [OnServerWorker::class, 'onWorkerExit'],
+		Constant::WORKER_STOP  => [OnServerWorker::class, 'onWorkerStop'],
+		Constant::WORKER_ERROR => [OnServerWorker::class, 'onWorkerError'],
+		Constant::START        => [OnServer::class, 'onStart'],
+		Constant::SHUTDOWN     => [OnServer::class, 'onShutdown'],
 	];
 
 
