@@ -11,9 +11,9 @@ use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Message\Handler\Abstracts\HttpService;
+use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
-use Kiri\Server\Events\OnServerBeforeStart;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Coroutine;
@@ -83,7 +83,7 @@ class Server extends HttpService
 	 * @throws ReflectionException
 	 * @throws Exception
 	 */
-	public function start(): mixed
+	public function start(): void
 	{
 		$this->manager->initBaseServer(Config::get('server', [], true), $this->daemon);
 
@@ -99,7 +99,7 @@ class Server extends HttpService
 
 		$this->getEventDispatch()->dispatch(new OnServerBeforeStart());
 
-		return $this->manager->start();
+		$this->manager->start();
 	}
 
 

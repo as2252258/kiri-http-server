@@ -4,6 +4,7 @@ namespace Kiri\Server\Coroutine;
 
 use Kiri\Abstracts\Component;
 use Kiri\Exception\ConfigException;
+use Kiri\Message\Handler\Router;
 use Kiri\Server\Constant;
 use Kiri\Server\ProcessManager;
 use Kiri\Server\TraitServer;
@@ -28,6 +29,15 @@ class Http extends Component
 
 
 	private array $configs = [];
+
+
+	public Router $collector;
+
+
+	public function init()
+	{
+		$this->collector = \Kiri::getDi()->get(Router::class);
+	}
 
 
 	/**
@@ -89,7 +99,7 @@ class Http extends Component
 	public function initBaseServer(array $config, $daemon)
 	{
 		$this->configs = $config;
-		foreach ($config as $value) {
+		foreach ($config['port'] as $value) {
 			$this->_addListener($value);
 		}
 	}
@@ -191,6 +201,9 @@ class Http extends Component
 	{
 		run(function () {
 			$this->startTaskWorker($this->configs);
+
+			$this->collector->scan_build_route();
+
 			foreach ($this->servers as $value) {
 				Coroutine::create(function () use ($value) {
 					$value->start();
