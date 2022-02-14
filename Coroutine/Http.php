@@ -99,7 +99,7 @@ class Http extends Component
 	public function initBaseServer(array $config, $daemon)
 	{
 		$this->configs = $config;
-		foreach ($config['port'] as $value) {
+		foreach ($config['ports'] as $value) {
 			$this->_addListener($value);
 		}
 	}
