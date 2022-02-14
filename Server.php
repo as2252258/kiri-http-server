@@ -42,7 +42,7 @@ class Server extends HttpService
 	public State $state;
 
 
-	public ServerManager $manager;
+	public Kiri\Server\Coroutine\Http $manager;
 
 
 	/**
@@ -50,7 +50,7 @@ class Server extends HttpService
 	 */
 	public function init()
 	{
-		$this->manager = Kiri::getContainer()->get(ServerManager::class);
+		$this->manager = Kiri::getContainer()->get(Kiri\Server\Coroutine\Http::class);
 		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
 		Config::set('servers.settings.enable_coroutine', true);
 		if ($enable_coroutine != true) {
