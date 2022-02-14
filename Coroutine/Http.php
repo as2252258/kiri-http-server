@@ -152,18 +152,22 @@ class Http extends Component
 			$this->servers[$value['port']] = $server;
 
 			$server->handle('/', function (Request $request, Response $response) use ($handshake, $open, $close, $message) {
-				if (is_null($handshake)) {
-					$response->upgrade();
-				} else {
-					call_user_func($handshake, $request, $response);
+				try {
+					if (is_null($handshake)) {
+						$response->upgrade();
+					} else {
+						call_user_func($handshake, $request, $response);
+					}
+					if ($response->isWritable() && is_callable($open)) {
+						call_user_func($open, $response);
+					}
+					while (($data = $response->recv()) instanceof Frame) {
+						call_user_func($message, $data);
+					}
+					call_user_func($close, $response->fd);
+				} catch (\Throwable $throwable) {
+					$this->logger()->error($throwable->getMessage());
 				}
-				if ($response->isWritable() && is_callable($open)) {
-					call_user_func($open, $response);
-				}
-				while (($data = $response->recv()) instanceof Frame) {
-					call_user_func($message, $data);
-				}
-				call_user_func($close, $response->fd);
 			});
 		} else {
 			$message = $value['events'][Constant::RECEIVE] ?? null;
