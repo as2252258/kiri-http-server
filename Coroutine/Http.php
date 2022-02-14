@@ -164,16 +164,14 @@ class Http extends Component
 						}
 					}
 
-					if ($response->isWritable()) {
-						while (($data = $response->recv()) instanceof Frame) {
-							try {
-								if ($data->opcode == WEBSOCKET_OPCODE_PING || $data->opcode == WEBSOCKET_OPCODE_PONG) {
-									continue;
-								}
-								call_user_func($message, $data);
-							} catch (\Throwable $throwable) {
-								$this->logger()->error($throwable->getMessage());
+					while (($data = $response->recv()) instanceof Frame) {
+						try {
+							if ($data->opcode == WEBSOCKET_OPCODE_PING || $data->opcode == WEBSOCKET_OPCODE_PONG) {
+								continue;
 							}
+							call_user_func($message, $data);
+						} catch (\Throwable $throwable) {
+							$this->logger()->error($throwable->getMessage());
 						}
 					}
 					call_user_func($close, $response->fd);
