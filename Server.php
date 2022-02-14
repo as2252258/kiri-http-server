@@ -81,7 +81,6 @@ class Server extends HttpService
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
-	 * @throws \Swoole\Exception
 	 */
 	public function start(): void
 	{
