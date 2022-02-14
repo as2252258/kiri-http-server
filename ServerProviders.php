@@ -27,6 +27,5 @@ class ServerProviders extends Providers
 
 		$console = $container->get(\Symfony\Component\Console\Application::class);
 		$console->add($container->get(ServerCommand::class));
-
 	}
 }

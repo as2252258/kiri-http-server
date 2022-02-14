@@ -42,7 +42,7 @@ class Server extends HttpService
 	public State $state;
 
 
-	public Kiri\Server\Coroutine\Http $manager;
+	public Server $manager;
 
 
 	/**
@@ -50,7 +50,7 @@ class Server extends HttpService
 	 */
 	public function init()
 	{
-		$this->manager = Kiri::getContainer()->get(Kiri\Server\Coroutine\Http::class);
+		$this->manager = Kiri::getContainer()->get(Server::class);
 		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
 		Config::set('servers.settings.enable_coroutine', true);
 		if ($enable_coroutine != true) {
@@ -76,12 +76,12 @@ class Server extends HttpService
 
 
 	/**
-	 * @return string
+	 * @return void
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
-	 * @throws Exception
+	 * @throws \Swoole\Exception
 	 */
 	public function start(): void
 	{
@@ -89,8 +89,7 @@ class Server extends HttpService
 
 		$rpcService = Config::get('rpc', []);
 		if (!empty($rpcService)) {
-			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'],
-				$rpcService['mode'], $rpcService);
+			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'], $rpcService['mode'], $rpcService);
 		}
 
 		$processes = array_merge($this->process, Config::get('processes', []));
