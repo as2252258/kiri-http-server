@@ -157,8 +157,11 @@ class Http extends Component
 				try {
 					$response->upgrade();
 					$fdCollector->set($response->fd, $response);
-					if (is_callable($open)) {
-						$open($request);
+					if (is_callable($handshake)) {
+						call_user_func($handshake, $request, $response);
+						if (is_callable($open)) {
+							$open($request);
+						}
 					}
 					while (($data = $response->recv()) instanceof Frame) {
 						try {
