@@ -42,7 +42,7 @@ class Server extends HttpService
 	public State $state;
 
 
-	public Server $manager;
+	public ServerManager $manager;
 
 
 	/**
