@@ -247,13 +247,15 @@ class ServerManager extends Component
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
-		$match = match ($type) {
-			Constant::SERVER_TYPE_BASE, Constant::SERVER_TYPE_TCP,
-			Constant::SERVER_TYPE_UDP => Server::class,
-			Constant::SERVER_TYPE_HTTP => HServer::class,
-			Constant::SERVER_TYPE_WEBSOCKET => WServer::class
-		};
-		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
+		$this->server = new Server('0.0.0.0',0,SWOOLE_PROCESS,SOCK_STREAM);
+
+//		$match = match ($type) {
+//			Constant::SERVER_TYPE_BASE, Constant::SERVER_TYPE_TCP,
+//			Constant::SERVER_TYPE_UDP => Server::class,
+//			Constant::SERVER_TYPE_HTTP => HServer::class,
+//			Constant::SERVER_TYPE_WEBSOCKET => WServer::class
+//		};
+//		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
 		$this->getContainer()->setBindings(SwooleServerInterface::class, $this->server);
