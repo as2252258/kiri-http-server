@@ -61,7 +61,7 @@ class ProcessManager
 	/**
 	 * @param string|null $name
 	 * @param string $tag
-	 * @return Process|null
+	 * @return array|Process|null
 	 */
 	public function get(?string $name = null, string $tag = 'default'): array|Process|null
 	{
