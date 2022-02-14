@@ -10,6 +10,7 @@ use Kiri\Server\ProcessManager;
 use Kiri\Server\TraitServer;
 use Kiri\Task\AsyncTaskExecute;
 use Kiri\Task\CoroutineTaskExecute;
+use Kiri\Websocket\FdCollector;
 use Kiri\Websocket\Sender;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -152,21 +153,25 @@ class Http extends Component
 			$this->servers[$value['port']] = $server;
 
 			$server->handle('/', function (Request $request, Response $response) use ($handshake, $open, $close, $message) {
+				$fdCollector = $this->getContainer()->get(FdCollector::class);
 				try {
-					if (is_null($handshake)) {
-						$response->upgrade();
-					} else {
-						call_user_func($handshake, $request, $response);
-					}
-					if ($response->isWritable() && is_callable($open)) {
-						call_user_func($open, $response);
+					$response->upgrade();
+					$fdCollector->set($response->fd, $response);
+					if (is_callable($open)) {
+						$open($request);
 					}
 					while (($data = $response->recv()) instanceof Frame) {
-						call_user_func($message, $data);
+						try {
+							call_user_func($message, $data);
+						} catch (\Throwable $throwable) {
+							$this->logger()->error($throwable->getMessage());
+						}
 					}
 					call_user_func($close, $response->fd);
 				} catch (\Throwable $throwable) {
 					$this->logger()->error($throwable->getMessage());
+				} finally {
+					$fdCollector->remove($response->fd);
 				}
 			});
 		} else {
