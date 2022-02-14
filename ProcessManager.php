@@ -39,7 +39,6 @@ class ProcessManager
 	 */
 	public function add(string|OnProcessInterface|BaseProcess $customProcess, string $tag = 'default')
 	{
-		$server = Kiri::getDi()->get(SwooleServerInterface::class);
 		if (is_string($customProcess)) {
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
@@ -48,9 +47,11 @@ class ProcessManager
 
 		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
 		$process = $this->parse($customProcess, $system);
-		if (Context::inCoroutine()) {
+		if (!Kiri::getDi()->has(SwooleServerInterface::class)) {
 			$process->start();
 		} else {
+			$server = Kiri::getDi()->get(SwooleServerInterface::class);
+
 			$server->addProcess($process = $this->parse($customProcess, $system));
 		}
 		$this->_process[$tag][$customProcess->getName()] = $process;
