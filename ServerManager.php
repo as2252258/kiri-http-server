@@ -247,7 +247,7 @@ class ServerManager extends Component
 	 */
 	private function createBaseServer(string $type, string $host, int $port, int $mode, array $settings = [])
 	{
-		$this->server = new Server('0.0.0.0',0,SWOOLE_PROCESS,SOCK_STREAM);
+		$this->server = new Server('0.0.0.0', 0, SWOOLE_PROCESS, SOCK_STREAM);
 
 //		$match = match ($type) {
 //			Constant::SERVER_TYPE_BASE, Constant::SERVER_TYPE_TCP,
@@ -265,6 +265,8 @@ class ServerManager extends Component
 		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
 
 		$this->addDefaultListener($settings);
+
+		$this->addNewListener($type, $host, $port, $mode, $settings);
 	}
 
 
