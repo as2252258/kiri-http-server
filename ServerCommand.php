@@ -71,7 +71,8 @@ class ServerCommand extends Command
                 return 1;
             }
 		}
-        return (int)$manager->start();
+        $manager->start();
+		return 1;
 	}
 
 }
