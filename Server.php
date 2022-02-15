@@ -17,6 +17,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Coroutine;
+use Kiri\Message\Handler\Router;
 
 
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -81,6 +82,7 @@ class Server extends HttpService
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
+	 * @throws Exception
 	 */
 	public function start(): void
 	{
@@ -96,6 +98,8 @@ class Server extends HttpService
 		$this->getContainer()->get(ProcessManager::class)->batch($processes);
 
 		$this->getEventDispatch()->dispatch(new OnServerBeforeStart());
+
+		$this->getContainer()->get(Router::class)->scan_build_route();
 
 		$this->manager->start();
 	}

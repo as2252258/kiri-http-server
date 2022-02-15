@@ -36,7 +36,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function init()
 	{
-		$this->collector = Kiri::getDi()->get(Router::class);
+//		$this->collector = Kiri::getDi()->get(Router::class);
 	}
 
 
@@ -52,7 +52,6 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 		set_env('environmental_workerId', $workerId);
 		if ($workerId < $server->setting['worker_num']) {
 			$this->setProcessName(sprintf('Worker[%d].%d', $server->worker_pid, $workerId));
-			$this->collector->scan_build_route();
 			$dispatch->dispatch(new OnWorkerStart($server, $workerId));
 			set_env('environmental', Kiri::WORKER);
 		} else {
