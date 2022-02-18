@@ -43,7 +43,7 @@ class ProcessManager
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
 
-		$system = sprintf('[%s].process', Config::get('id', 'system-service'));
+		$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
 
 		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
 		$process = $this->parse($customProcess, $system);
