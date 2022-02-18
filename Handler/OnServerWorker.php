@@ -51,13 +51,13 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 		$dispatch->dispatch(new OnBeforeWorkerStart($workerId));
 		set_env('environmental_workerId', $workerId);
 		if ($workerId < $server->setting['worker_num']) {
+			set_env('environmental', Kiri::WORKER);
 			$this->setProcessName(sprintf('Worker Process[%d].%d', $server->worker_pid, $workerId));
 			$dispatch->dispatch(new OnWorkerStart($server, $workerId));
-			set_env('environmental', Kiri::WORKER);
 		} else {
-			$dispatch->dispatch(new OnTaskStart($server, $workerId));
-			$this->setProcessName(sprintf('Tasker Process[%d].%d', $server->worker_pid, $workerId));
 			set_env('environmental', Kiri::TASK);
+			$this->setProcessName(sprintf('Tasker Process[%d].%d', $server->worker_pid, $workerId));
+			$dispatch->dispatch(new OnTaskStart($server, $workerId));
 		}
 		$dispatch->dispatch(new OnAfterWorkerStart());
 	}
