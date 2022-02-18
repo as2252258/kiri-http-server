@@ -3,7 +3,6 @@
 
 namespace Kiri\Server;
 
-use Database\CreateConnectionPool;
 use Exception;
 use JetBrains\PhpStorm\Pure;
 use Kiri;
@@ -12,13 +11,13 @@ use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Message\Handler\Abstracts\HttpService;
+use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Coroutine;
-use Kiri\Message\Handler\Router;
 
 
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -99,7 +98,6 @@ class Server extends HttpService
 		$this->getContainer()->get(ProcessManager::class)->batch($processes);
 
 		$this->getEventDispatch()->dispatch(new OnServerBeforeStart());
-		$this->getEventDispatch()->dispatch(new CreateConnectionPool());
 
 		$this->getContainer()->get(Router::class)->scan_build_route();
 
