@@ -3,6 +3,7 @@
 
 namespace Kiri\Server;
 
+use Database\CreateConnectionPool;
 use Exception;
 use JetBrains\PhpStorm\Pure;
 use Kiri;
@@ -98,6 +99,7 @@ class Server extends HttpService
 		$this->getContainer()->get(ProcessManager::class)->batch($processes);
 
 		$this->getEventDispatch()->dispatch(new OnServerBeforeStart());
+		$this->getEventDispatch()->dispatch(new CreateConnectionPool());
 
 		$this->getContainer()->get(Router::class)->scan_build_route();
 
