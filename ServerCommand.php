@@ -5,14 +5,11 @@ namespace Kiri\Server;
 
 
 use Exception;
-use Kiri\Abstracts\Config;
-use Kiri\Events\EventDispatch;
-use Kiri\Exception\ConfigException;
 use Kiri;
-use Kiri\Annotation\Inject;
+use Kiri\Abstracts\Config;
+use Kiri\Exception\ConfigException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Swoole\Coroutine;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,7 +25,6 @@ class ServerCommand extends Command
 
 
 	const ACTIONS = ['start', 'stop', 'restart'];
-
 
 
 	/**
@@ -58,8 +54,10 @@ class ServerCommand extends Command
 		$manager = Kiri::app()->getServer();
 		$manager->setDaemon((int)!is_null($input->getOption('daemon')));
 
-        $action = $input->getArgument('action');
-        if (is_null($action)) {
+		$this->scan_file();
+
+		$action = $input->getArgument('action');
+		if (is_null($action)) {
 			throw new Exception('I don\'t know what I want to do.');
 		}
 		if (!in_array($action, self::ACTIONS)) {
@@ -67,12 +65,27 @@ class ServerCommand extends Command
 		}
 		if ($action == 'restart' || $action == 'stop') {
 			$manager->shutdown();
-            if ($action == 'stop') {
-                return 1;
-            }
+			if ($action == 'stop') {
+				return 1;
+			}
 		}
-        $manager->start();
+		$manager->start();
 		return 1;
+	}
+
+
+	/**
+	 * @return void
+	 * @throws ConfigException
+	 * @throws \ReflectionException
+	 */
+	protected function scan_file()
+	{
+		$config = Config::get('scanner', []);
+		if (is_array($config)) foreach ($config as $key => $value) {
+			scan_directory($value, $key);
+		}
+		scan_directory(MODEL_PATH, 'app\Model');
 	}
 
 }
