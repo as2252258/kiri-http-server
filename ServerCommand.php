@@ -85,7 +85,6 @@ class ServerCommand extends Command
 		if (is_array($config)) foreach ($config as $key => $value) {
 			scan_directory($value, $key);
 		}
-		scan_directory(MODEL_PATH, 'app\Model');
 	}
 
 }
