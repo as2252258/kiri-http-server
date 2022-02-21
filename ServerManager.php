@@ -17,6 +17,7 @@ use Kiri\Server\Contract\OnPacketInterface;
 use Kiri\Server\Contract\OnReceiveInterface;
 use Kiri\Server\Handler\OnPipeMessage;
 use Kiri\Server\Handler\OnServer;
+use Kiri\Server\Handler\OnServerManager;
 use Kiri\Server\Handler\OnServerWorker;
 use Kiri\Task\TaskManager;
 use Psr\Container\ContainerExceptionInterface;
@@ -59,12 +60,14 @@ class ServerManager extends Component
 
 
 	const DEFAULT_EVENT = [
-		Constant::WORKER_START => [OnServerWorker::class, 'onWorkerStart'],
-		Constant::WORKER_EXIT  => [OnServerWorker::class, 'onWorkerExit'],
-		Constant::WORKER_STOP  => [OnServerWorker::class, 'onWorkerStop'],
-		Constant::WORKER_ERROR => [OnServerWorker::class, 'onWorkerError'],
-		Constant::START        => [OnServer::class, 'onStart'],
-		Constant::SHUTDOWN     => [OnServer::class, 'onShutdown'],
+		Constant::WORKER_START  => [OnServerWorker::class, 'onWorkerStart'],
+		Constant::WORKER_EXIT   => [OnServerWorker::class, 'onWorkerExit'],
+		Constant::WORKER_STOP   => [OnServerWorker::class, 'onWorkerStop'],
+		Constant::WORKER_ERROR  => [OnServerWorker::class, 'onWorkerError'],
+		Constant::MANAGER_START => [OnServerManager::class, 'onManagerStart'],
+		Constant::MANAGER_STOP  => [OnServerManager::class, 'onManagerStop'],
+		Constant::START         => [OnServer::class, 'onStart'],
+		Constant::SHUTDOWN      => [OnServer::class, 'onShutdown'],
 	];
 
 
