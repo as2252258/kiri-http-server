@@ -2,17 +2,18 @@
 
 namespace Kiri\Server\Contract;
 
-use Swoole\Server;
+
+use Swoole\WebSocket\Server;
 
 interface OnDisconnectInterface
 {
 
 
-
-    /**
-     * @param int $fd
-     */
-    public function onDisconnect(int $fd): void;
+	/**
+	 * @param Server $server
+	 * @param int $fd
+	 */
+    public function onDisconnect(Server $server, int $fd): void;
 
 
 }
