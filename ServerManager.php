@@ -44,12 +44,6 @@ class ServerManager extends Component
 	public int $port = 0;
 
 
-	/**
-	 * @var StdoutLogger
-	 */
-	#[Inject(StdoutLogger::class)]
-	public StdoutLogger $logger;
-
 	/** @var array<string,Port> */
 	public array $ports = [];
 
