@@ -5,8 +5,6 @@ namespace Kiri\Server;
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
-use Kiri\Annotation\Inject;
-use Kiri\Error\StdoutLoggerInterface;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Contract\OnCloseInterface;
 use Kiri\Server\Contract\OnConnectInterface;
