@@ -10,6 +10,10 @@ use Kiri\Abstracts\Config;
 use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
+use Kiri\Message\Constrict\Request;
+use Kiri\Message\Constrict\RequestInterface;
+use Kiri\Message\Constrict\Response;
+use Kiri\Message\Constrict\ResponseInterface;
 use Kiri\Message\Handler\Abstracts\HttpService;
 use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnServerBeforeStart;
@@ -47,13 +51,20 @@ class Server extends HttpService
 
 
 	/**
-	 *
+	 * @return void
+	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 */
 	public function init()
 	{
-		$this->manager = Kiri::getContainer()->get(ServerManager::class);
+		$container = $this->getContainer();
+
+		$container->mapping(ResponseInterface::class, Response::class);
+		$container->mapping(RequestInterface::class, Request::class);
+
+		$this->manager = $container->get(ServerManager::class);
 		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
-		Config::set('servers.settings.enable_coroutine', true);
 		if ($enable_coroutine != true) {
 			return;
 		}
@@ -97,7 +108,7 @@ class Server extends HttpService
 
 		$this->getContainer()->get(ProcessManager::class)->batch($processes);
 
-		$this->getEventDispatch()->dispatch(new OnServerBeforeStart());
+		$this->eventDispatch->dispatch(new OnServerBeforeStart());
 
 		$this->getContainer()->get(Router::class)->scan_build_route();
 
