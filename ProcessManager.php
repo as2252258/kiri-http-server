@@ -100,7 +100,7 @@ class ProcessManager
 	 */
 	private function parse($customProcess, $system): Process
 	{
-		return new Process(function (Process $process) use ($customProcess, $system) {
+		return new Process(static function (Process $process) use ($customProcess, $system) {
 			if (Kiri::getPlatform()->isLinux()) {
 				$process->name($system . '(' . $customProcess->getName() . ')');
 			}
@@ -108,19 +108,19 @@ class ProcessManager
 			Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnProcessStart());
 
 			set_env('environmental', Kiri::PROCESS);
-			$channel = Coroutine::create(function () use ($process, $customProcess) {
-				while (!$customProcess->isStop()) {
-					$message = $process->read();
-					if (!empty($message)) {
-						$message = unserialize($message);
-					}
-					if (is_null($message)) {
-						continue;
-					}
-					$customProcess->onBroadcast($message);
-				}
-			});
-			Context::setContext('waite:process:message', $channel);
+//			$channel = Coroutine::create(function () use ($process, $customProcess) {
+//				while (!$customProcess->isStop()) {
+//					$message = $process->read();
+//					if (!empty($message)) {
+//						$message = unserialize($message);
+//					}
+//					if (is_null($message)) {
+//						continue;
+//					}
+//					$customProcess->onBroadcast($message);
+//				}
+//			});
+//			Context::setContext('waite:process:message', $channel);
 
 			$customProcess->onSigterm()->process($process);
 		},
