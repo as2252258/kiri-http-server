@@ -6,6 +6,8 @@ use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
 use Kiri\Exception\ConfigException;
+use Kiri\Message\Emitter;
+use Kiri\Message\ResponseEmitter;
 use Kiri\Server\Contract\OnCloseInterface;
 use Kiri\Server\Contract\OnConnectInterface;
 use Kiri\Server\Contract\OnDisconnectInterface;
@@ -19,6 +21,7 @@ use Kiri\Server\Handler\OnServerManager;
 use Kiri\Server\Handler\OnServerWorker;
 use Kiri\Task\TaskManager;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Http\Server as HServer;
 use Swoole\Server;
@@ -87,6 +90,17 @@ class ServerManager extends Component
 
 
 	/**
+	 * @param ContainerInterface $container
+	 * @param array $config
+	 * @throws Exception
+	 */
+	public function __construct(public ContainerInterface $container,
+	                            public TaskManager        $manager, array $config = [])
+	{
+		parent::__construct($config);
+	}
+
+	/**
 	 * @param string $type
 	 * @param string $host
 	 * @param int $port
@@ -133,14 +147,13 @@ class ServerManager extends Component
 	 */
 	public function bindPipeMessage(): void
 	{
-		$pipeMessage = $this->getContainer()->get(OnPipeMessage::class);
+		$pipeMessage = $this->container->get(OnPipeMessage::class);
 		$this->server->on(Constant::PIPE_MESSAGE, [$pipeMessage, 'onPipeMessage']);
 
 		if (!isset($this->server->setting['task_worker_num']) || $this->server->setting['task_worker_num'] < 1) {
 			return;
 		}
-
-		$this->getContainer()->get(TaskManager::class)->taskListener($this->server);
+		$this->manager->taskListener($this->server);
 	}
 
 
@@ -215,6 +228,20 @@ class ServerManager extends Component
 		if ($this->ports[$port] === false) {
 			throw new Exception("The port is already in use[$host::$port]");
 		}
+
+		$this->addServiceEvents($settings['events'] ?? [], $this->ports[$port]);
+
+		$this->ports[$port]->set($this->resetSettings($type, $settings));
+	}
+
+
+	/**
+	 * @param string $type
+	 * @param array $settings
+	 * @return array
+	 */
+	private function resetSettings(string $type, array $settings): array
+	{
 		if ($type == Constant::SERVER_TYPE_HTTP && !isset($settings['settings']['open_http_protocol'])) {
 			$settings['settings']['open_http_protocol'] = true;
 			if (in_array($this->server->setting['dispatch_mode'], [2, 4])) {
@@ -224,8 +251,7 @@ class ServerManager extends Component
 		if ($type == Constant::SERVER_TYPE_WEBSOCKET && !isset($settings['settings']['open_websocket_protocol'])) {
 			$settings['settings']['open_websocket_protocol'] = true;
 		}
-		$this->ports[$port]->set($settings['settings'] ?? []);
-		$this->addServiceEvents($settings['events'] ?? [], $this->ports[$port]);
+		return $settings['settings'] ?? [];
 	}
 
 
@@ -251,7 +277,8 @@ class ServerManager extends Component
 		$this->server = new $match($host, $port, SWOOLE_PROCESS, $mode);
 		$this->server->set(array_merge(Config::get('server.settings', []), $settings['settings']));
 
-		$this->getContainer()->setBindings(SwooleServerInterface::class, $this->server);
+		$this->container->setBindings(SwooleServerInterface::class, $this->server);
+		$this->container->setBindings(Emitter::class, ResponseEmitter::class);
 
 		$id = Config::get('id', 'system-service');
 
@@ -285,7 +312,7 @@ class ServerManager extends Component
 	{
 		foreach ($events as $name => $event) {
 			if (is_array($event) && is_string($event[0])) {
-				$event[0] = $this->getContainer()->get($event[0]);
+				$event[0] = $this->container->get($event[0]);
 			}
 			$server->on($name, $event);
 		}
