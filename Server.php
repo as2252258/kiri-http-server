@@ -7,7 +7,6 @@ use Exception;
 use JetBrains\PhpStorm\Pure;
 use Kiri;
 use Kiri\Abstracts\Config;
-use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Message\Constrict\Request;
@@ -19,6 +18,7 @@ use Kiri\Message\Handler\Router;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Coroutine;
@@ -33,21 +33,29 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
 class Server extends HttpService
 {
 
-	private array $process = [
-	];
+	private array $process = [];
 
 
 	private mixed $daemon = 0;
 
 
 	/**
-	 * @var State
+	 * @param State $state
+	 * @param ServerManager $manager
+	 * @param ContainerInterface $container
+	 * @param array $config
+	 * @throws Exception
 	 */
-	#[Inject(State::class)]
-	public State $state;
-
-
-	public ServerManager $manager;
+	public function __construct(public State              $state,
+	                            public ServerManager      $manager,
+	                            public ContainerInterface $container,
+	                            public ProcessManager     $processManager,
+	                            public EventDispatch      $eventDispatch,
+	                            public Router             $router,
+	                            array                     $config = [])
+	{
+		parent::__construct($config);
+	}
 
 
 	/**
@@ -58,12 +66,9 @@ class Server extends HttpService
 	 */
 	public function init()
 	{
-		$container = $this->getContainer();
+		$this->container->mapping(ResponseInterface::class, Response::class);
+		$this->container->mapping(RequestInterface::class, Request::class);
 
-		$container->mapping(ResponseInterface::class, Response::class);
-		$container->mapping(RequestInterface::class, Request::class);
-
-		$this->manager = $container->get(ServerManager::class);
 		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
 		if ($enable_coroutine != true) {
 			return;
@@ -106,11 +111,11 @@ class Server extends HttpService
 
 		$processes = array_merge($this->process, Config::get('processes', []));
 
-		$this->getContainer()->get(ProcessManager::class)->batch($processes);
+		$this->processManager->batch($processes);
 
 		$this->eventDispatch->dispatch(new OnServerBeforeStart());
 
-		$this->getContainer()->get(Router::class)->scan_build_route();
+		$this->router->scan_build_route();
 
 		$this->manager->start();
 	}
@@ -130,7 +135,7 @@ class Server extends HttpService
 		foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
 			$this->state->exit($config['port']);
 		}
-		$this->getContainer()->get(EventDispatch::class)->dispatch(new OnShutdown());
+		$this->eventDispatch->dispatch(new OnShutdown());
 	}
 
 
