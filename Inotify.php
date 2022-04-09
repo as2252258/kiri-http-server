@@ -26,7 +26,7 @@ class Inotify extends BaseProcess
     public array $dirs = [];
 
 
-    protected int $cid;
+    protected int $cid = -1;
 
     const IG_DIR = [APP_PATH . 'commands', APP_PATH . '.git', APP_PATH . '.gitee'];
 
