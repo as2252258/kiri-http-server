@@ -39,13 +39,16 @@ class Server extends HttpService
 	private mixed $daemon = 0;
 
 
-	/**
-	 * @param State $state
-	 * @param ServerManager $manager
-	 * @param ContainerInterface $container
-	 * @param array $config
-	 * @throws Exception
-	 */
+    /**
+     * @param State $state
+     * @param ServerManager $manager
+     * @param ContainerInterface $container
+     * @param ProcessManager $processManager
+     * @param EventDispatch $eventDispatch
+     * @param Router $router
+     * @param array $config
+     * @throws Exception
+     */
 	public function __construct(public State              $state,
 	                            public ServerManager      $manager,
 	                            public ContainerInterface $container,
@@ -97,8 +100,7 @@ class Server extends HttpService
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
-	 * @throws Exception
+     * @throws Exception
 	 */
 	public function start(): void
 	{
@@ -109,13 +111,13 @@ class Server extends HttpService
 			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'], $rpcService['mode'], $rpcService);
 		}
 
+        $this->process[] = Inotify::class;
+
 		$processes = array_merge($this->process, Config::get('processes', []));
 
 		$this->processManager->batch($processes);
 
 		$this->eventDispatch->dispatch(new OnServerBeforeStart());
-
-		$this->router->scan_build_route();
 
 		$this->manager->start();
 	}
@@ -126,8 +128,7 @@ class Server extends HttpService
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
-	 * @throws Exception
+     * @throws Exception
 	 */
 	public function shutdown()
 	{
