@@ -5,7 +5,6 @@ namespace Kiri\Server\Handler;
 use Exception;
 use Kiri;
 use Kiri\Abstracts\Config;
-use Kiri\Annotation\Inject;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Message\Handler\Router;
