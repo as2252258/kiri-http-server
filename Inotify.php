@@ -76,6 +76,7 @@ class Inotify extends BaseProcess
     }
 
 
+
     /**
      * @throws Exception
      */
