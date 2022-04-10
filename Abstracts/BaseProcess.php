@@ -107,7 +107,7 @@ abstract class BaseProcess implements OnProcessInterface
 	{
 		$this->isStop = true;
 		$value = Context::getContext('waite:process:message');
-		if (Coroutine::exists($value)) {
+		if (!empty($value) && Coroutine::exists($value)) {
 			Coroutine::cancel($value);
 		}
 	}
