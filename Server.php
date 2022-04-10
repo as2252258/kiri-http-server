@@ -111,7 +111,7 @@ class Server extends HttpService
 			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'], $rpcService['mode'], $rpcService);
 		}
 
-        $this->process[] = Inotify::class;
+//        $this->process[] = Inotify::class;
 
 		$processes = array_merge($this->process, Config::get('processes', []));
 
