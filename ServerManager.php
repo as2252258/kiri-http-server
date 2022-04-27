@@ -89,11 +89,12 @@ class ServerManager extends Component
 	}
 
 
-	/**
-	 * @param ContainerInterface $container
-	 * @param array $config
-	 * @throws Exception
-	 */
+    /**
+     * @param ContainerInterface $container
+     * @param TaskManager $manager
+     * @param array $config
+     * @throws Exception
+     */
 	public function __construct(public ContainerInterface $container,
 	                            public TaskManager        $manager, array $config = [])
 	{
