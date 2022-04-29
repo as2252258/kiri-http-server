@@ -100,8 +100,8 @@ class Inotify extends BaseProcess
         Event::cycle(function () {
             if ($this->isStop()) {
                 Event::del($this->inotify);
+                Event::exit();
             }
-            Event::exit();
         }, true);
         Event::wait();
     }
