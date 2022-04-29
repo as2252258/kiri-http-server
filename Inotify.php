@@ -11,10 +11,14 @@ use Swoole\Event;
 use Swoole\Process;
 use Swoole\Timer;
 
+
+/**
+ *
+ */
 class Inotify extends BaseProcess
 {
 
-    private mixed $inotify;
+    private mixed $inotify = null;
     private mixed $events;
 
     private array $watchFiles = [];
@@ -81,7 +85,6 @@ class Inotify extends BaseProcess
     }
 
 
-
     /**
      * @throws Exception
      */
@@ -100,6 +103,9 @@ class Inotify extends BaseProcess
 
     public function clear()
     {
+        if (is_null($this->inotify)) {
+            return;
+        }
         Event::del($this->inotify);
         Event::exit();
     }

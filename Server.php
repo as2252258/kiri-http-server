@@ -22,6 +22,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Coroutine;
+use Kiri\Events\EventProvider;
+use Kiri\Server\Events\OnWorkerStart;
 
 
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -33,10 +35,10 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
 class Server extends HttpService
 {
 
-	private array $process = [];
+    private array $process = [];
 
 
-	private mixed $daemon = 0;
+    private mixed $daemon = 0;
 
 
     /**
@@ -45,132 +47,141 @@ class Server extends HttpService
      * @param ContainerInterface $container
      * @param ProcessManager $processManager
      * @param EventDispatch $eventDispatch
+     * @param EventProvider $eventProvider
      * @param Router $router
      * @param array $config
      * @throws Exception
      */
-	public function __construct(public State              $state,
-	                            public ServerManager      $manager,
-	                            public ContainerInterface $container,
-	                            public ProcessManager     $processManager,
-	                            public EventDispatch      $eventDispatch,
-	                            public Router             $router,
-	                            array                     $config = [])
-	{
-		parent::__construct($config);
-	}
+    public function __construct(public State              $state,
+                                public ServerManager      $manager,
+                                public ContainerInterface $container,
+                                public ProcessManager     $processManager,
+                                public EventDispatch      $eventDispatch,
+                                public EventProvider      $eventProvider,
+                                public Router             $router,
+                                array                     $config = [])
+    {
+        parent::__construct($config);
+    }
 
 
-	/**
-	 * @return void
-	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 */
-	public function init()
-	{
-		$this->container->mapping(ResponseInterface::class, Response::class);
-		$this->container->mapping(RequestInterface::class, Request::class);
+    /**
+     * @return void
+     * @throws ConfigException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function init(): void
+    {
+        $this->container->mapping(ResponseInterface::class, Response::class);
+        $this->container->mapping(RequestInterface::class, Request::class);
 
-		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
-		if ($enable_coroutine != true) {
-			return;
-		}
-		Coroutine::set([
-			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
-			'enable_deadlock_check' => FALSE,
-			'exit_condition'        => function () {
-				return Coroutine::stats()['coroutine_num'] === 0;
-			}
-		]);
-	}
-
-
-	/**
-	 * @param $process
-	 */
-	public function addProcess($process)
-	{
-		$this->process[] = $process;
-	}
+        $enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
+        if (!$enable_coroutine) {
+            return;
+        }
+        Coroutine::set([
+            'hook_flags' => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
+            'enable_deadlock_check' => FALSE,
+            'exit_condition' => function () {
+                return Coroutine::stats()['coroutine_num'] === 0;
+            }
+        ]);
+    }
 
 
-	/**
-	 * @return void
-	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+    /**
+     * @param $process
+     */
+    public function addProcess($process)
+    {
+        $this->process[] = $process;
+    }
+
+
+    /**
+     * @return void
+     * @throws ConfigException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws Exception
-	 */
-	public function start(): void
-	{
-		$this->manager->initBaseServer(Config::get('server', [], true), $this->daemon);
+     */
+    public function start(): void
+    {
+        $this->manager->initBaseServer(Config::get('server', [], true), $this->daemon);
 
-		$rpcService = Config::get('rpc', []);
-		if (!empty($rpcService)) {
-			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'], $rpcService['mode'], $rpcService);
-		}
+        $rpcService = Config::get('rpc', []);
+        if (!empty($rpcService)) {
+            $this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'], $rpcService['mode'], $rpcService);
+        }
 
-//        $this->process[] = Inotify::class;
+        $reload = Config::get('reload.hot', false);
+        if ($reload !== false) {
+            $this->eventProvider->on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
 
-		$processes = array_merge($this->process, Config::get('processes', []));
+            $this->process[] = Inotify::class;
+        } else {
+            $this->router->scan_build_route();
+        }
 
-		$this->processManager->batch($processes);
+        $processes = array_merge($this->process, Config::get('processes', []));
 
-		$this->eventDispatch->dispatch(new OnServerBeforeStart());
+        $this->processManager->batch($processes);
 
-		$this->manager->start();
-	}
+        $this->eventDispatch->dispatch(new OnServerBeforeStart());
+
+        $this->manager->start();
+    }
 
 
-	/**
-	 * @return void
-	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+    /**
+     * @return void
+     * @throws ConfigException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws Exception
-	 */
-	public function shutdown()
-	{
-		$configs = Config::get('server', [], true);
-		foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
-			$this->state->exit($config['port']);
-		}
-		$this->eventDispatch->dispatch(new OnShutdown());
-	}
+     */
+    public function shutdown(): void
+    {
+        $configs = Config::get('server', [], true);
+        foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
+            $this->state->exit($config['port']);
+        }
+        $this->eventDispatch->dispatch(new OnShutdown());
+    }
 
 
-	/**
-	 * @return bool
-	 * @throws ConfigException
-	 * @throws Exception
-	 */
-	public function isRunner(): bool
-	{
-		return $this->state->isRunner();
-	}
+    /**
+     * @return bool
+     * @throws ConfigException
+     * @throws Exception
+     */
+    public function isRunner(): bool
+    {
+        return $this->state->isRunner();
+    }
 
 
-	/**
-	 * @param $daemon
-	 * @return Server
-	 */
-	public function setDaemon($daemon): static
-	{
-		if (!in_array($daemon, [0, 1])) {
-			return $this;
-		}
-		$this->daemon = $daemon;
-		return $this;
-	}
+    /**
+     * @param $daemon
+     * @return Server
+     */
+    public function setDaemon($daemon): static
+    {
+        if (!in_array($daemon, [0, 1])) {
+            return $this;
+        }
+        $this->daemon = $daemon;
+        return $this;
+    }
 
 
-	/**
-	 * @return \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
-	 */
-	#[Pure] public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
-	{
-		return $this->manager->getServer();
-	}
+    /**
+     * @return \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
+     */
+    #[Pure] public function getServer(): \Swoole\Http\Server|\Swoole\Server|\Swoole\WebSocket\Server|null
+    {
+        return $this->manager->getServer();
+    }
 
 }

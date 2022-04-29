@@ -59,8 +59,6 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
             set_env('environmental', Kiri::WORKER);
             $this->setProcessName(sprintf('Worker Process[%d].%d', $server->worker_pid, $workerId));
             $dispatch->dispatch(new OnWorkerStart($server, $workerId));
-
-            $this->router->scan_build_route();
         } else {
             set_env('environmental', Kiri::TASK);
             $this->setProcessName(sprintf('Tasker Process[%d].%d', $server->worker_pid, $workerId));
