@@ -27,6 +27,9 @@ class Inotify extends BaseProcess
     public bool $isReloading = FALSE;
 
 
+    public string $name = 'inotify listen';
+
+
     public array $dirs = [];
 
 
