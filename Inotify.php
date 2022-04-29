@@ -96,15 +96,16 @@ class Inotify extends BaseProcess
             $this->watch($dir);
         }
         Event::add($this->inotify, [$this, 'check']);
-        Event::cycle(function () {
-            Event::del($this->inotify);
-        });
+        Event::cycle([$this, 'clear']);
         Event::wait();
     }
 
 
     public function clear()
     {
+        if ($this->isStop()) {
+            Event::del($this->inotify);
+        }
     }
 
 
