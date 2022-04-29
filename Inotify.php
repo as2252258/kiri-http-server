@@ -51,16 +51,15 @@ class Inotify extends BaseProcess
         set_exception_handler([$this, 'error']);
 
         if (!extension_loaded('inotify')) {
-            Timer::tick(1000, function ($cid) {
+            while (true) {
                 if ($this->isStop()) {
-                    Timer::clear($cid);
+                    break;
                 }
-            });
+                sleep(1);
+            }
             return;
         }
-
-        $this->dirs = Config::get('inotify', []);
-
+        $this->dirs = Config::get('reload.inotify', []);
         $this->start();
     }
 
