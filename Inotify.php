@@ -71,8 +71,6 @@ class Inotify extends BaseProcess
     {
         pcntl_signal(SIGTERM, function () {
             $this->isStop = true;
-
-            $this->clear();
         });
         return $this;
     }
