@@ -117,11 +117,11 @@ class Server extends HttpService
 
         $reload = Config::get('reload.hot', false);
         if ($reload !== false) {
-            $this->eventProvider->on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
+            $this->eventProvider->on(OnWorkerStart::class, [$this, 'onWorkerStart']);
 
-            $this->process[] = Inotify::class;
+            $this->process[] = Scaner::class;
         } else {
-            $this->router->scan_build_route();
+            $this->onWorkerStart();
         }
 
         $processes = array_merge($this->process, Config::get('processes', []));
@@ -131,6 +131,19 @@ class Server extends HttpService
         $this->eventDispatch->dispatch(new OnServerBeforeStart());
 
         $this->manager->start();
+    }
+
+
+    /**
+     * @return void
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    public function onWorkerStart(): void
+    {
+        scan_directory(MODEL_PATH, 'app\Model');
+
+        $this->router->scan_build_route();
     }
 
 
