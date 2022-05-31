@@ -22,6 +22,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Coroutine;
+use Kiri\Server\Events\OnBeforeShutdown;
 use Kiri\Events\EventProvider;
 use Kiri\Server\Events\OnWorkerStart;
 
@@ -123,6 +124,15 @@ class Server extends HttpService
         } else {
             $this->onWorkerStart();
         }
+	
+	    pcntl_signal(SIGINT, function () {
+		    try {
+			    $this->eventDispatch->dispatch(new OnBeforeShutdown());
+		    }catch (\Throwable $exception) {
+				$this->logger->error($exception->getMessage());
+		    }
+			$this->manager->getServer()->shutdown();
+		});
 
         $processes = array_merge($this->process, Config::get('processes', []));
 
