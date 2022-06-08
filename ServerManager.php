@@ -222,7 +222,7 @@ class ServerManager extends Component
 	{
 		$id = Config::get('id', 'system-service');
 
-		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
+		$this->logger->alert(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
 
 		/** @var Server\Port $service */
 		$this->ports[$port] = $this->server->addlistener($host, $port, $mode);
@@ -283,7 +283,7 @@ class ServerManager extends Component
 
 		$id = Config::get('id', 'system-service');
 
-		$this->logger->debug(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
+		$this->logger->alert(sprintf('[%s].' . $type . ' service %s::%d start', $id, $host, $port));
 
 		$this->addDefaultListener($settings);
 	}
