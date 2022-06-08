@@ -52,7 +52,7 @@ class ServerCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $manager = Kiri::app()->getServer();
-        $manager->setDaemon((int)$input->hasOption('daemon'));
+        $manager->setDaemon((int)!is_null($input->getOption('daemon')));
 
         $this->scan_file();
 
