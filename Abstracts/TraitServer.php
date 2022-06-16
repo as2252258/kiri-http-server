@@ -4,6 +4,8 @@ namespace Kiri\Server\Abstracts;
 
 use Swoole\Http\Server as HServer;
 use Swoole\Server;
+use Kiri\Server\Constant;
+use Kiri\Server\Config;
 use Swoole\WebSocket\Server as WServer;
 
 trait TraitServer
