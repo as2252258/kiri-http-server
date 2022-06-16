@@ -153,12 +153,12 @@ class Server extends HttpService
 	 * @param OnWorkerStart $onWorkerStart
 	 * @throws ConfigException
 	 */
-	protected function setWorkerName(OnWorkerStart $onWorkerStart): void
+	public function setWorkerName(OnWorkerStart $onWorkerStart): void
 	{
 		$prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
 		set_env('environmental', Kiri::WORKER);
 
-		$this->setProcessName($prefix);
+		Kiri::setProcessName($prefix);
 	}
 
 
@@ -166,35 +166,20 @@ class Server extends HttpService
 	 * @param OnWorkerStart $onWorkerStart
 	 * @throws ConfigException
 	 */
-	protected function setTaskerName(OnWorkerStart $onWorkerStart): void
+	public function setTaskerName(OnWorkerStart $onWorkerStart): void
 	{
 		$prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
 		set_env('environmental', Kiri::WORKER);
 
-		$this->setProcessName($prefix);
+		Kiri::setProcessName($prefix);
 	}
 
-
-	/**
-	 * @param $prefix
-	 * @throws ConfigException
-	 */
-	protected function setProcessName($prefix): void
-	{
-		if (Kiri::getPlatform()->isMac()) {
-			return;
-		}
-		$name = '[' . Config::get('id', 'system-service') . ']';
-		if (!empty($prefix)) {
-			$name .= '.' . $prefix;
-		}
-		swoole_set_process_name($name);
-	}
 
 	/**
 	 * @return void
 	 * @throws ConfigException
 	 * @throws ReflectionException
+	 * @throws Exception
 	 */
 	public function onHotReload(): void
 	{
