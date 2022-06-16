@@ -5,6 +5,7 @@ namespace Kiri\Server;
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
+use Kiri\Server\Abstracts\TraitServer;
 use Swoole\Process;
 
 class State extends Component

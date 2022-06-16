@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiri\Server;
+namespace Kiri\Server\Abstracts;
 
 use Exception;
 use Kiri;

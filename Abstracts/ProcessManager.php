@@ -1,24 +1,20 @@
 <?php
 
-namespace Kiri\Server;
+namespace Kiri\Server\Abstracts;
 
 use Closure;
 use Kiri;
 use Kiri\Abstracts\Config;
-use Kiri\Annotation\Inject;
 use Kiri\Context;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
-use Kiri\Server\Abstracts\BaseProcess;
 use Kiri\Server\Broadcast\Message;
 use Kiri\Server\Contract\OnProcessInterface;
 use Kiri\Server\Events\OnProcessStart;
 use Psr\Log\LoggerInterface;
-use Swoole\Coroutine;
 use Swoole\Process;
 use Kiri\Server\Events\OnProcessStop;
 use Kiri\Di\ContainerInterface;
-use Swoole\Timer;
 
 class ProcessManager
 {

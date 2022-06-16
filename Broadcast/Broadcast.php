@@ -3,8 +3,8 @@
 namespace Kiri\Server\Broadcast;
 
 use Kiri;
-use Kiri\Server\ProcessManager;
 use Kiri\Server\ServerInterface;
+use Kiri\Server\Abstracts\ProcessManager;
 
 class Broadcast
 {
