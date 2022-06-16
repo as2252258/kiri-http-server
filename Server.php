@@ -10,8 +10,12 @@ use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Events\EventProvider;
 use Kiri\Exception\ConfigException;
+use Kiri\Message\Constrict\RequestInterface;
+use Kiri\Message\Constrict\ResponseInterface;
+use Kiri\Message\Emitter;
 use Kiri\Message\Handler\Abstracts\HttpService;
 use Kiri\Message\Handler\Router;
+use Kiri\Message\ResponseEmitter;
 use Kiri\Server\Events\OnBeforeShutdown;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
@@ -27,6 +31,8 @@ use Swoole\WebSocket\Server as WsServer;
 use Swoole\Server as SServer;
 use Swoole\Http\Server as HServer;
 use Swoole\Coroutine;
+use Kiri\Message\Constrict\Response;
+use Kiri\Message\Constrict\Request;
 use Kiri\Server\Abstracts\ProcessManager;
 use Kiri\Server\Abstracts\AsyncServer;
 
@@ -108,6 +114,10 @@ class Server extends HttpService
 	 */
 	public function start(): void
 	{
+		$this->container->mapping(Emitter::class, ResponseEmitter::class);
+		$this->container->mapping(ResponseInterface::class, Response::class);
+		$this->container->mapping(RequestInterface::class, Request::class);
+
 		$this->manager->initCoreServers(Config::get('server', [], true), $this->daemon);
 
 		$rpcService = Config::get('rpc', []);
@@ -129,6 +139,7 @@ class Server extends HttpService
 
 	/**
 	 * @return void
+	 * @throws Exception
 	 */
 	protected function onWorkerListener(): void
 	{
