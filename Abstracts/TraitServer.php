@@ -65,6 +65,7 @@ trait TraitServer
 	public function genConfigService(array $ports): array
 	{
 		$array = [];
+		$ports = $ports['ports'] ?? [];
 		foreach ($ports as $port) {
 			$config = \Kiri::getDi()->create(Config::class, [], $port);
 			if ($port['type'] == Constant::SERVER_TYPE_WEBSOCKET) {
