@@ -97,6 +97,7 @@ class AsyncServer
 		$this->server->set($this->systemConfig($config, $daemon));
 
 		$this->onEventListen($this->server, Config::get('server.events', []));
+		$this->onEventListen($this->server, $config->events);
 
 		$this->container->setBindings(ServerInterface::class, $this->server);
 	}
