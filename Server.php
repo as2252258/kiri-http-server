@@ -20,10 +20,13 @@ use Kiri\Server\Events\OnBeforeShutdown;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Events\OnWorkerStart;
+use Kiri\Server\Events\OnTaskerStart;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
+use Kiri\Di\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Kiri\Server\Events\OnWorkerStop;
 use ReflectionException;
+use Kiri\Reload\Scaner;
 use Swoole\WebSocket\Server as WsServer;
 use Swoole\Server as SServer;
 use Swoole\Http\Server as HServer;
@@ -47,7 +50,7 @@ class Server extends HttpService
 
 	/**
 	 * @param State $state
-	 * @param ServerManager $manager
+	 * @param AsyncServer $manager
 	 * @param ContainerInterface $container
 	 * @param ProcessManager $processManager
 	 * @param EventDispatch $dispatch
@@ -57,7 +60,7 @@ class Server extends HttpService
 	 * @throws Exception
 	 */
 	public function __construct(public State              $state,
-	                            public ServerManager      $manager,
+	                            public AsyncServer        $manager,
 	                            public ContainerInterface $container,
 	                            public ProcessManager     $processManager,
 	                            public EventDispatch      $dispatch,
@@ -72,14 +75,9 @@ class Server extends HttpService
 	/**
 	 * @return void
 	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
 	 */
 	public function init(): void
 	{
-		$this->container->mapping(ResponseInterface::class, Response::class);
-		$this->container->mapping(RequestInterface::class, Request::class);
-
 		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
 		if (!$enable_coroutine) {
 			return;
@@ -112,22 +110,77 @@ class Server extends HttpService
 	 */
 	public function start(): void
 	{
-		$this->manager->initBaseServer(Config::get('server', [], true), $this->daemon);
+		$this->manager->initCoreServers(Config::get('server', [], true), $this->daemon);
 
 		$rpcService = Config::get('rpc', []);
 		if (!empty($rpcService)) {
-			$this->manager->addListener($rpcService['type'], $rpcService['host'], $rpcService['port'], $rpcService['mode'], $rpcService);
+			/** @var \Kiri\Server\Config $create */
+			$create = $this->container->create(\Kiri\Server\Config::class, null, $rpcService);
+			$this->manager->addListener($create);
 		}
+
+		pcntl_signal(SIGINT, [$this, 'onSigint']);
 
 		$this->onHotReload();
 
-		pcntl_signal(SIGINT, [$this, 'onSigint']);
-		$processes = array_merge($this->process, Config::get('processes', []));
-		$this->processManager->batch($processes);
+		$this->processManager->batch($this->process, $this->manager->getServer());
 		$this->dispatch->dispatch(new OnServerBeforeStart());
 		$this->manager->start();
 	}
 
+
+	/**
+	 * @return void
+	 */
+	protected function onWorkerListener(): void
+	{
+		$this->provider->on(OnWorkerStop::class, '\Swoole\Timer::clearAll');
+		$this->provider->on(OnWorkerStart::class, [$this, 'setWorkerName']);
+		$this->provider->on(OnTaskerStart::class, [$this, 'setTaskerName']);
+	}
+
+
+	/**
+	 * @param OnWorkerStart $onWorkerStart
+	 * @throws ConfigException
+	 */
+	protected function setWorkerName(OnWorkerStart $onWorkerStart): void
+	{
+		$prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
+		set_env('environmental', Kiri::WORKER);
+
+		$this->setProcessName($prefix);
+	}
+
+
+	/**
+	 * @param OnWorkerStart $onWorkerStart
+	 * @throws ConfigException
+	 */
+	protected function setTaskerName(OnWorkerStart $onWorkerStart): void
+	{
+		$prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
+		set_env('environmental', Kiri::WORKER);
+
+		$this->setProcessName($prefix);
+	}
+
+
+	/**
+	 * @param $prefix
+	 * @throws ConfigException
+	 */
+	protected function setProcessName($prefix): void
+	{
+		if (Kiri::getPlatform()->isMac()) {
+			return;
+		}
+		$name = '[' . Config::get('id', 'system-service') . ']';
+		if (!empty($prefix)) {
+			$name .= '.' . $prefix;
+		}
+		swoole_set_process_name($name);
+	}
 
 	/**
 	 * @return void
@@ -136,13 +189,14 @@ class Server extends HttpService
 	 */
 	public function onHotReload(): void
 	{
+		$this->onWorkerListener();
 		$reload = Config::get('reload.hot', false);
 		if ($reload !== false) {
-			$this->provider->on(OnWorkerStart::class, [$this, 'onWorkerStart']);
+			$this->provider->on(OnWorkerStart::class, [$this, 'LoadRoutingList']);
 
 			$this->process[] = Scaner::class;
 		} else {
-			$this->onWorkerStart();
+			$this->LoadRoutingList();
 		}
 	}
 
@@ -167,7 +221,7 @@ class Server extends HttpService
 	 * @throws ReflectionException
 	 * @throws Exception
 	 */
-	public function onWorkerStart(): void
+	public function LoadRoutingList(): void
 	{
 		scan_directory(MODEL_PATH, 'app\Model');
 

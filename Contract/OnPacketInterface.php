@@ -12,7 +12,7 @@ interface OnPacketInterface
 	 * @param Server $server
 	 * @param string $data
 	 * @param array $clientInfo
-	 * @return mixed
+	 * @return void
 	 */
 	public function onPacket(Server $server, string $data, array $clientInfo): void;
 

@@ -2,14 +2,18 @@
 
 namespace Kiri\Server\Handler;
 
-use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
+use Kiri\Server\Events\OnAfterReload;
+use Kiri\Server\Events\OnBeforeReload;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Kiri\Server\Abstracts\Server;
 use Kiri\Server\Events\OnBeforeShutdown;
 use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Events\OnStart;
+use Swoole\Server as SServer;
 
 
 /**
@@ -18,39 +22,80 @@ use Kiri\Server\Events\OnStart;
  */
 class OnServer extends Server
 {
-	
+
 
 	/**
-	 * @param \Swoole\Server $server
+	 * @param EventDispatch $dispatch
+	 * @throws \Exception
+	 */
+	public function __construct(public EventDispatch $dispatch)
+	{
+		parent::__construct();
+	}
+
+
+	/**
+	 * @param SServer $server
 	 * @throws ConfigException
 	 * @throws ReflectionException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 */
-	public function onStart(\Swoole\Server $server)
+	public function onStart(SServer $server)
 	{
-		$this->setProcessName(sprintf('start[%d].server', $server->master_pid));
+		\Kiri::setProcessName(sprintf('start[%d].server', $server->master_pid));
 
-		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnStart($server));
+		$this->dispatch->dispatch(new OnStart($server));
 	}
 
 
 	/**
-	 * @param \Swoole\Server $server
+	 * @param SServer $server
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 */
-	public function onBeforeShutdown(\Swoole\Server $server)
+	public function onBeforeShutdown(SServer $server)
 	{
-		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnBeforeShutdown($server));
+		$this->dispatch->dispatch(new OnBeforeShutdown($server));
 	}
 
 
 	/**
-	 * @param \Swoole\Server $server
+	 * @param SServer $server
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 */
-	public function onShutdown(\Swoole\Server $server)
+	public function onShutdown(SServer $server)
 	{
-		\Kiri::getDi()->get(EventDispatch::class)->dispatch(new OnShutdown($server));
+		$this->dispatch->dispatch(new OnShutdown($server));
 	}
+
+
+	/**
+	 * @param SServer $server
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
+	 */
+	public function onBeforeReload(SServer $server)
+	{
+		$this->dispatch->dispatch(new OnBeforeReload($server));
+	}
+
+
+	/**
+	 * @param SServer $server
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
+	 */
+	public function onAfterReload(SServer $server)
+	{
+		$this->dispatch->dispatch(new OnAfterReload($server));
+	}
+
 
 
 }

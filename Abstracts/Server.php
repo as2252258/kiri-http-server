@@ -21,27 +21,10 @@ abstract class Server
 
 
 	/**
-	 * @var LoggerInterface 
+	 * @var LoggerInterface
 	 */
 	#[Inject(LoggerInterface::class)]
 	public LoggerInterface $logger;
-
-
-	/**
-	 * @param $prefix
-	 * @throws ConfigException
-	 */
-	protected function setProcessName($prefix)
-	{
-		if (Kiri::getPlatform()->isMac()) {
-			return;
-		}
-		$name = '[' . Config::get('id', 'system-service') . ']';
-		if (!empty($prefix)) {
-			$name .= '.' . $prefix;
-		}
-		swoole_set_process_name($name);
-	}
 
 
 	/**
