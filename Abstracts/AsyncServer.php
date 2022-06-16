@@ -11,6 +11,8 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
+use Kiri\Server\ServerInterface;
+use Kiri\Server\Constant;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\NotFindClassException;
 use Kiri\Server\Events\OnServerBeforeStart;

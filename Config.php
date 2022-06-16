@@ -11,22 +11,23 @@ class Config
 
 	public string $type;
 
-	public string $host;
+
+	public string $host = '';
 
 
-	public int $port;
+	public int $port = 0;
 
 
-	public string $name;
+	public string $name = '';
 
 
-	public int $mode;
+	public int $mode = SWOOLE_SOCK_TCP;
 
 
-	public array $settings;
+	public array $settings = [];
 
 
-	public array $events;
+	public array $events = [];
 
 	/**
 	 * @return string
