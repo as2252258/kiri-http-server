@@ -27,7 +27,7 @@ abstract class BaseProcess implements OnProcessInterface
 	protected bool $enable_coroutine = true;
 
 
-	public string $name = 'swoole process.';
+	public string $name = '';
 
 
 	/**
@@ -35,6 +35,9 @@ abstract class BaseProcess implements OnProcessInterface
 	 */
 	public function getName(): string
 	{
+		if (empty($this->name)) {
+			return uniqid('p.');
+		}
 		return $this->name;
 	}
 

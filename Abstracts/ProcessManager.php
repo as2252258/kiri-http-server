@@ -46,7 +46,7 @@ class ProcessManager
 
 		$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
 
-		$this->logger->debug($system . ' ' . $customProcess->getName() . ' start.');
+		$this->logger->alert($system . ' ' . $customProcess->getName() . ' start.');
 		if (Context::inCoroutine()) {
 			return [$customProcess, $this->resolve($customProcess, $system)];
 		}

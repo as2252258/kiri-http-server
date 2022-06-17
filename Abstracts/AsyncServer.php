@@ -9,6 +9,7 @@ use Kiri\Di\ContainerInterface;
 use Kiri\Exception\ConfigException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Swoole\Server;
 use Kiri\Server\ServerInterface;
@@ -36,11 +37,13 @@ class AsyncServer
 	 * @param Config $config
 	 * @param ContainerInterface $container
 	 * @param EventDispatch $dispatch
+	 * @param LoggerInterface $logger
 	 * @param ProcessManager $processManager
 	 */
 	public function __construct(public Config             $config,
 	                            public ContainerInterface $container,
 	                            public EventDispatch      $dispatch,
+	                            public LoggerInterface    $logger,
 	                            public ProcessManager     $processManager)
 	{
 	}
@@ -96,6 +99,8 @@ class AsyncServer
 
 		$this->server->set($this->systemConfig($config, $daemon));
 
+		$this->logger->alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
+
 		$this->onEventListen($this->server, Config::get('server.events', []));
 		$this->onEventListen($this->server, $config->events);
 
@@ -136,6 +141,8 @@ class AsyncServer
 		if ($port === false) {
 			throw new Exception('Listen port fail.' . swoole_last_error());
 		}
+
+		$this->logger->alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
 
 		$port->set($this->resetSettings($config->type, $config->settings));
 
