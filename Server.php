@@ -130,7 +130,6 @@ class Server extends HttpService
 		$this->onHotReload();
 
 		$this->processManager->batch($this->process, $this->manager->getServer());
-		$this->processManager->batch(Config::get('processes', []), $this->manager->getServer());
 		$this->dispatch->dispatch(new OnServerBeforeStart());
 		$this->manager->start();
 	}
