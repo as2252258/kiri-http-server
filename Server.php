@@ -163,13 +163,13 @@ class Server extends HttpService
 
 
 	/**
-	 * @param OnWorkerStart $onWorkerStart
+	 * @param OnTaskerStart $onWorkerStart
 	 * @throws ConfigException
 	 */
-	public function setTaskerName(OnWorkerStart $onWorkerStart): void
+	public function setTaskerName(OnTaskerStart $onWorkerStart): void
 	{
-		$prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
-		set_env('environmental', Kiri::WORKER);
+		$prefix = sprintf('Tasker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
+		set_env('environmental', Kiri::TASK);
 
 		Kiri::setProcessName($prefix);
 	}
