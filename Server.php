@@ -122,9 +122,7 @@ class Server extends HttpService
 
 		$rpcService = Config::get('rpc', []);
 		if (!empty($rpcService)) {
-			/** @var \Kiri\Server\Config $create */
-			$create = $this->container->create(\Kiri\Server\Config::class, [], $rpcService);
-			$this->manager->addListener($create);
+			$this->manager->addListener($this->container->create(\Kiri\Server\Config::class, [], $rpcService));
 		}
 
 		pcntl_signal(SIGINT, [$this, 'onSigint']);
