@@ -118,15 +118,16 @@ class ProcessManager
 
 
 	/**
-	 * @param array $processes
+	 * @param array|null $processes
 	 * @param \Swoole\Server|null $server
 	 * @return void
 	 * @throws ConfigException
 	 */
-	public function batch(array $processes, ?\Swoole\Server $server = null): void
+	public function batch(?array $processes, ?\Swoole\Server $server = null): void
 	{
-		$processes = array_merge($processes, Config::get('processes', []));
-
+		if (empty($processes)) {
+			return;
+		}
 		if (Context::inCoroutine()) {
 			$this->poolManager($processes);
 			return;
