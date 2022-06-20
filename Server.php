@@ -154,6 +154,9 @@ class Server extends HttpService
 	 */
 	public function setWorkerName(OnWorkerStart $onWorkerStart): void
 	{
+		if (!property_exists($onWorkerStart->server, 'worker_pid')) {
+			return;
+		}
 		$prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
 		set_env('environmental', Kiri::WORKER);
 
@@ -167,6 +170,9 @@ class Server extends HttpService
 	 */
 	public function setTaskerName(OnTaskerStart $onWorkerStart): void
 	{
+		if (!property_exists($onWorkerStart->server, 'worker_pid')) {
+			return;
+		}
 		$prefix = sprintf('Tasker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
 		set_env('environmental', Kiri::TASK);
 
