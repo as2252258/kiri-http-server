@@ -5,6 +5,7 @@ namespace Kiri\Server\Abstracts;
 use Kiri\Abstracts\Config;
 use Kiri\Di\ContainerInterface;
 use Kiri\Events\EventDispatch;
+use Kiri\Exception\ConfigException;
 use Kiri\Server\Constant;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnWorkerStop;
@@ -78,9 +79,9 @@ class CoroutineServer implements ServerInterface
 	{
 		// TODO: Implement initCoreServers() method.
 		$this->servers = $this->genConfigService($service);
-//		foreach ($service as $value) {
-//			$this->addListener($value);
-//		}
+		foreach ($service as $value) {
+			$this->addListener($value);
+		}
 	}
 
 
@@ -165,19 +166,16 @@ class CoroutineServer implements ServerInterface
 
 	/**
 	 * @return void
+	 * @throws ConfigException
 	 */
 	public function start(): void
 	{
-		// TODO: Implement start() method.
+		$merge = array_merge(Config::get('processes', []), $this->getProcess());
+		$this->processManager->batch($merge);
 		run(function () {
-			$this->processManager->batch(Config::get('processes', []));
-			$this->processManager->batch($this->getProcess());
-
 			foreach ($this->servers as $server) {
 				Coroutine::create(function () use ($server) {
-					$this->addListener($server);
-
-					$this->runServer($this->servers[$server->name]);
+					$this->runServer($server);
 				});
 			}
 		});

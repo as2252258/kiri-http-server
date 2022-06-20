@@ -12,7 +12,6 @@ use Kiri\Server\Broadcast\Message;
 use Kiri\Server\Contract\OnProcessInterface;
 use Kiri\Server\Events\OnProcessStart;
 use Psr\Log\LoggerInterface;
-use Swoole\Coroutine;
 use Swoole\Process;
 use Kiri\Server\Events\OnProcessStop;
 use Kiri\Di\ContainerInterface;
@@ -129,17 +128,16 @@ class ProcessManager
 		if (empty($processes)) {
 			return;
 		}
-		if (Context::inCoroutine()) {
+		if (is_null($server)) {
 			$this->poolManager($processes);
-			return;
-		}
+		} else {
+			foreach ($processes as $process) {
+				[$customProcess, $sProcess] = $this->add($process);
 
-		foreach ($processes as $process) {
-			[$customProcess, $sProcess] = $this->add($process);
+				$this->_process[$customProcess->getName()] = $customProcess;
 
-			$this->_process[$customProcess->getName()] = $customProcess;
-
-			$server->addProcess($sProcess);
+				$server->addProcess($sProcess);
+			}
 		}
 	}
 
@@ -151,16 +149,13 @@ class ProcessManager
 	 */
 	protected function poolManager(array $processes): void
 	{
-
 		foreach ($processes as $process) {
 			/** @var BaseProcess $customProcess */
 			[$customProcess, $sProcess] = $this->add($process);
 
-			$this->_process[$customProcess->getName()] = $customProcess;
+			$this->_process[$customProcess->getName()] = $sProcess;
 
-			Coroutine::create(function () use ($customProcess) {
-				$customProcess->onSigterm()->process(null);
-			});
+			$sProcess->start();
 		}
 	}
 
