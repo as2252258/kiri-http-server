@@ -5,9 +5,7 @@ namespace Kiri\Server\Abstracts;
 use Kiri\Abstracts\Config;
 use Kiri\Di\ContainerInterface;
 use Kiri\Events\EventDispatch;
-use Kiri\Exception\ConfigException;
 use Kiri\Server\Constant;
-use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnWorkerStop;
 use Kiri\Server\ServerInterface;
@@ -55,10 +53,16 @@ class CoroutineServer implements ServerInterface
 
 	/**
 	 * @param string $name
-	 * @return Server|\Swoole\Coroutine\Server|\Swoole\Coroutine\Http\Server|null
+	 * @return Server|Coroutine\Server|Coroutine\Http\Server|null
 	 */
-	public function getServer(string $name): Server|\Swoole\Coroutine\Server|\Swoole\Coroutine\Http\Server|null
+	public function getServer(string $name = ''): Server|Coroutine\Server|Coroutine\Http\Server|null
 	{
+		if (empty($this->servers)) {
+			return null;
+		}
+		if (empty($name)) {
+			return current($this->servers);
+		}
 		return $this->servers[$name] ?? null;
 	}
 

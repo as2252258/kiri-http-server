@@ -35,6 +35,7 @@ use Kiri\Message\Constrict\Response;
 use Kiri\Message\Constrict\Request;
 use Kiri\Server\Abstracts\ProcessManager;
 use Kiri\Server\Abstracts\AsyncServer;
+use Kiri\Server\Abstracts\CoroutineServer;
 
 
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -54,7 +55,7 @@ class Server extends HttpService
 
 	/**
 	 * @param State $state
-	 * @param AsyncServer $manager
+	 * @param Abstracts\CoroutineServer $manager
 	 * @param ContainerInterface $container
 	 * @param ProcessManager $processManager
 	 * @param EventDispatch $dispatch
@@ -64,7 +65,7 @@ class Server extends HttpService
 	 * @throws Exception
 	 */
 	public function __construct(public State              $state,
-	                            public AsyncServer        $manager,
+	                            public CoroutineServer    $manager,
 	                            public ContainerInterface $container,
 	                            public ProcessManager     $processManager,
 	                            public EventDispatch      $dispatch,
@@ -129,7 +130,7 @@ class Server extends HttpService
 
 		$this->onHotReload();
 
-		$this->processManager->batch($this->process, $this->manager->getServer());
+		$this->manager->addProcess($this->process);
 		$this->dispatch->dispatch(new OnServerBeforeStart());
 		$this->manager->start();
 	}
