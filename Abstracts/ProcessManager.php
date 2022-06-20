@@ -126,7 +126,7 @@ class ProcessManager
 	public function stop(): void
 	{
 		foreach ($this->_process as $process) {
-			$process->exit(0);
+			Process::kill($process->pid, 0) && Process::kill($process->pid, 15);
 		}
 	}
 
