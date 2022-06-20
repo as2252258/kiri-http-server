@@ -204,7 +204,7 @@ class Server extends HttpService
 		} catch (\Throwable $exception) {
 			$this->logger->error($exception->getMessage());
 		} finally {
-			$this->manager->getServer()->shutdown();
+			$this->manager->shutdown();
 		}
 	}
 

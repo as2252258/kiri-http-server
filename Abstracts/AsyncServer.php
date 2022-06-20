@@ -7,6 +7,7 @@ use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Di\ContainerInterface;
 use Kiri\Exception\ConfigException;
+use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -78,6 +79,20 @@ class AsyncServer implements ServerInterface
 	public function getServer(string $name = ''): Server|null
 	{
 		return $this->server;
+	}
+
+
+	/**
+	 * @return void
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
+	 */
+	public function shutdown(): void
+	{
+		$this->server->shutdown();
+
+		$this->dispatch->dispatch(new OnShutdown());
 	}
 
 

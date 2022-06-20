@@ -7,6 +7,7 @@ use Kiri\Di\ContainerInterface;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Constant;
+use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnWorkerStop;
 use Kiri\Server\ServerInterface;
@@ -31,6 +32,9 @@ class CoroutineServer implements ServerInterface
 
 
 	use TraitServer;
+
+
+	private bool $isShutdown = false;
 
 
 	/**
@@ -166,6 +170,23 @@ class CoroutineServer implements ServerInterface
 
 	/**
 	 * @return void
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws \ReflectionException
+	 */
+	public function shutdown(): void
+	{
+		$this->isShutdown = true;
+		$this->processManager->shutdown();
+		foreach ($this->servers as $server) {
+			$server->shutdown();
+		}
+		$this->dispatch->dispatch(new OnShutdown());
+	}
+
+
+	/**
+	 * @return void
 	 * @throws ConfigException
 	 */
 	public function start(): void
@@ -195,7 +216,11 @@ class CoroutineServer implements ServerInterface
 
 		$server->start();
 
-		$this->dispatch->dispatch(new OnWorkerStop($server,0));
+		$this->dispatch->dispatch(new OnWorkerStop($server, 0));
+
+		if ($this->isShutdown) {
+			return;
+		}
 
 		$this->runServer($server);
 	}

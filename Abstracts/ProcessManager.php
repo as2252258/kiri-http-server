@@ -62,6 +62,20 @@ class ProcessManager
 
 
 	/**
+	 * @return void
+	 */
+	public function shutdown(): void
+	{
+		foreach ($this->_process as $process) {
+			if (!$process instanceof Process) {
+				continue;
+			}
+			$process->exit(0);
+		}
+	}
+
+
+	/**
 	 * @param $customProcess
 	 * @param $system
 	 * @return Closure
