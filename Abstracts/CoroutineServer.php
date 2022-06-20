@@ -82,7 +82,7 @@ class CoroutineServer implements ServerInterface
 	public function initCoreServers(array $service, int $daemon = 0): void
 	{
 		// TODO: Implement initCoreServers() method.
-		$this->servers = $this->genConfigService($service);
+		$service = $this->genConfigService($service);
 		foreach ($service as $value) {
 			$this->addListener($value);
 		}
