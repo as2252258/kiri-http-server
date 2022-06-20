@@ -98,7 +98,7 @@ class CoroutineServer implements ServerInterface
 		/** @var Coroutine\Server|Coroutine\Http\Server $server */
 		$server = new $class($config->host, $config->port);
 		$server->set($config->settings);
-		if ($server instanceof Server) {
+		if ($server instanceof Coroutine\Server) {
 			$this->onTcpConnection($server, $config);
 		} else {
 			$this->onRequestCallback($server, $config);
