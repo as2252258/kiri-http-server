@@ -11,6 +11,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
+use Swoole\Coroutine;
 use Swoole\Server;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Constant;
@@ -21,7 +22,7 @@ use Kiri\Server\Events\OnServerBeforeStart;
 /**
  *
  */
-class AsyncServer
+class AsyncServer implements ServerInterface
 {
 
 	use TraitServer;

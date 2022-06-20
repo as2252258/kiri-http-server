@@ -2,6 +2,8 @@
 
 namespace Kiri\Server\Events;
 
+use Swoole\Coroutine\Http\Server as CHServer;
+use Swoole\Coroutine\Server as CServer;
 use Swoole\Server;
 
 class OnShutdown
@@ -9,9 +11,9 @@ class OnShutdown
 
 
 	/**
-	 * @param Server|null $server
+	 * @param Server|CHServer|CServer|null $server
 	 */
-	public function __construct(public ?Server $server = null)
+	public function __construct(public Server|null|CHServer|CServer $server = null)
 	{
 	}
 
