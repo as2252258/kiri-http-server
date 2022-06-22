@@ -182,7 +182,6 @@ class AsyncServer implements ServerInterface
 	 */
 	public function onSignal(array $signal): void
 	{
-		pcntl_signal(SIGTERM, [$this, 'onSigint']);
 		pcntl_signal(SIGINT, [$this, 'onSigint']);
 		foreach ($signal as $sig => $value) {
 			if (is_array($value) && is_string($value[0])) {
@@ -197,12 +196,14 @@ class AsyncServer implements ServerInterface
 
 
 	/**
+	 * @param $no
+	 * @param array $signInfo
 	 * @return void
 	 */
-	public function onSigint(): void
+	public function onSigint($no, array $signInfo): void
 	{
 		try {
-			file_put_contents('php://output', Json::encode(func_get_args()));
+			$this->logger->alert('Pid ' . getmypid() . ' get signo ' . $no, $signInfo);
 			$this->shutdown();
 		} catch (\Throwable $exception) {
 			$this->logger->error($exception->getMessage());
