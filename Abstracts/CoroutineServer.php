@@ -212,16 +212,17 @@ class CoroutineServer implements ServerInterface
 	public function runServer(Coroutine\Http\Server|Coroutine\Server $server): void
 	{
 		$this->dispatch->dispatch(new OnWorkerStart($server, 0));
-
-		$server->start();
-
-		$this->dispatch->dispatch(new OnWorkerStop($server, 0));
-
-		if ($this->isShutdown) {
-			return;
+		try {
+			$server->start();
+		} catch (\Throwable $throwable) {
+			$this->logger->error($throwable->getMessage(), [$throwable]);
+		} finally {
+			$this->dispatch->dispatch(new OnWorkerStop($server, 0));
+			if ($this->isShutdown) {
+				return;
+			}
+			$this->runServer($server);
 		}
-
-		$this->runServer($server);
 	}
 
 
