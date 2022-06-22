@@ -92,7 +92,6 @@ class AsyncServer implements ServerInterface
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function shutdown(): void
 	{
@@ -203,7 +202,7 @@ class AsyncServer implements ServerInterface
 	public function onSigint($no, array $signInfo): void
 	{
 		try {
-			$this->logger->alert('Pid ' . getmypid() . ' get signo ' . $no, $signInfo);
+			$this->logger->alert('Pid ' . getmypid() . ' get signo ' . $no);
 			$this->shutdown();
 		} catch (\Throwable $exception) {
 			$this->logger->error($exception->getMessage());
