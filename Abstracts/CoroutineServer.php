@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoole\Process;
 use Swoole\Server;
 use function Swoole\Coroutine\run;
 
@@ -197,6 +198,7 @@ class CoroutineServer implements ServerInterface
 				});
 			}
 		});
+		Process::wait();
 	}
 
 
