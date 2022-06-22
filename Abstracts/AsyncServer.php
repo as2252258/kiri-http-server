@@ -8,7 +8,6 @@ use Kiri\Abstracts\Config;
 use Kiri\Core\Json;
 use Kiri\Di\ContainerInterface;
 use Kiri\Exception\ConfigException;
-use Kiri\Server\Events\OnBeforeShutdown;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
