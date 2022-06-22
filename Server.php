@@ -127,7 +127,7 @@ class Server extends HttpService
 	 */
 	protected function onWorkerListener(): void
 	{
-		$this->provider->on(OnWorkerStop::class, '\Swoole\Timer::clearAll');
+		$this->provider->on(OnWorkerStop::class, '\Swoole\Timer::clearAll', 9999);
 		$this->provider->on(OnWorkerStart::class, [$this, 'setWorkerName']);
 		$this->provider->on(OnTaskerStart::class, [$this, 'setTaskerName']);
 	}
