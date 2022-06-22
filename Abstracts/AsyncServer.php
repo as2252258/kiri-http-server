@@ -182,6 +182,7 @@ class AsyncServer implements ServerInterface
 	 */
 	public function onSignal(array $signal): void
 	{
+		pcntl_signal(SIGTERM, [$this, 'onSigint']);
 		pcntl_signal(SIGINT, [$this, 'onSigint']);
 		foreach ($signal as $sig => $value) {
 			if (is_array($value) && is_string($value[0])) {
