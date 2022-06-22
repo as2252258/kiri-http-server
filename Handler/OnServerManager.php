@@ -33,13 +33,12 @@ class OnServerManager extends Server
 	/**
 	 * @param \Swoole\Server $server
 	 * @throws ConfigException
-	 * @throws ReflectionException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
 	public function onManagerStart(\Swoole\Server $server)
 	{
-		Kiri::setProcessName(sprintf('manger[%d].0', $server->manager_pid));
+		Kiri::setProcessName(sprintf('manger process[%d]', $server->manager_pid));
 
 		$this->dispatch->dispatch(new OnManagerStart($server));
 	}
@@ -49,7 +48,6 @@ class OnServerManager extends Server
 	 * @param \Swoole\Server $server
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function onManagerStop(\Swoole\Server $server)
 	{
