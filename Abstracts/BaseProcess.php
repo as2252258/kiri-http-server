@@ -111,6 +111,9 @@ abstract class BaseProcess implements OnProcessInterface
 	{
 		$this->isStop = true;
 		$value = Context::getContext('waite:process:message');
+
+		\Kiri::getLogger()->alert('Process ' . $this->getName() . ' stop');
+
 		if (!is_null($value) && Coroutine::exists((int)$value)) {
 			Coroutine::cancel((int)$value);
 		}
