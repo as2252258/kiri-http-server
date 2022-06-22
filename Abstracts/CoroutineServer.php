@@ -5,6 +5,7 @@ namespace Kiri\Server\Abstracts;
 use Kiri\Abstracts\Config;
 use Kiri\Di\ContainerInterface;
 use Kiri\Events\EventDispatch;
+use Kiri\Events\EventProvider;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Constant;
 use Kiri\Server\Events\OnShutdown;
@@ -42,6 +43,7 @@ class CoroutineServer implements ServerInterface
 	 * @param Config $config
 	 * @param ContainerInterface $container
 	 * @param EventDispatch $dispatch
+	 * @param EventProvider $provider
 	 * @param LoggerInterface $logger
 	 * @param ProcessManager $processManager
 	 * @param array $params
@@ -49,6 +51,7 @@ class CoroutineServer implements ServerInterface
 	public function __construct(public Config             $config,
 	                            public ContainerInterface $container,
 	                            public EventDispatch      $dispatch,
+	                            public EventProvider      $provider,
 	                            public LoggerInterface    $logger,
 	                            public ProcessManager     $processManager,
 	                            public array              $params = []
@@ -82,6 +85,11 @@ class CoroutineServer implements ServerInterface
 	 */
 	public function initCoreServers(array $service, int $daemon = 0): void
 	{
+		$this->provider->on(OnShutdown::class, function () {
+			$process = $this->container->get(ProcessManager::class);
+			$process->shutdown();
+		});
+
 		// TODO: Implement initCoreServers() method.
 		$service = $this->genConfigService($service);
 		foreach ($service as $value) {
@@ -189,11 +197,16 @@ class CoroutineServer implements ServerInterface
 	 */
 	public function start(): void
 	{
-		$merge = array_merge(Config::get('processes', []), $this->getProcess());
-		$this->processManager->batch($merge);
 		run(function () {
+			$provider = $this->container->get(EventProvider::class);
+
+
+			$merge = array_merge(Config::get('processes', []), $this->getProcess());
+			$this->processManager->batch($merge);
 			foreach ($this->servers as $server) {
 				Coroutine::create(function () use ($server) {
+
+
 					$this->runServer($server);
 				});
 			}
