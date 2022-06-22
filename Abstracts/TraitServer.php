@@ -2,7 +2,6 @@
 
 namespace Kiri\Server\Abstracts;
 
-use Kiri\Exception\ConfigException;
 use Swoole\Http\Server as HServer;
 use Swoole\Server;
 use Kiri\Server\Constant;
@@ -19,11 +18,12 @@ trait TraitServer
 	/**
 	 * @param array $class
 	 * @return void
-	 * @throws ConfigException
 	 */
 	public function addProcess(array $class): void
 	{
-		$this->processManager->batch($class);
+		foreach ($class as $item) {
+			$this->_process[] = $item;
+		}
 	}
 
 
