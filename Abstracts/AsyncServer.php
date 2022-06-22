@@ -197,18 +197,13 @@ class AsyncServer implements ServerInterface
 
 	/**
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function onSigint(): void
 	{
 		try {
-			$this->dispatch->dispatch(new OnBeforeShutdown());
+			$this->shutdown();
 		} catch (\Throwable $exception) {
 			$this->logger->error($exception->getMessage());
-		} finally {
-			$this->shutdown();
 		}
 	}
 
