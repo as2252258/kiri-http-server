@@ -103,12 +103,11 @@ class CoroutineServer implements ServerInterface
 		/** @var Coroutine\Server|Coroutine\Http\Server $server */
 		$server = new $class($config->host, $config->port);
 		$server->set($config->settings);
-		if ($server instanceof Coroutine\Server) {
-			$this->onTcpConnection($server, $config);
-		} else {
+		if (!($server instanceof Coroutine\Server)) {
 			$this->onRequestCallback($server, $config);
+		} else {
+			$this->onTcpConnection($server, $config);
 		}
-
 		$this->servers[$config->name] = $server;
 	}
 
@@ -129,9 +128,7 @@ class CoroutineServer implements ServerInterface
 		if (is_array($requestCallback) && is_string($requestCallback[0])) {
 			$requestCallback[0] = $this->container->get($requestCallback[0]);
 		}
-		$server->handle('/', function (Request $request, Response $response) use ($requestCallback) {
-			call_user_func($requestCallback, $request, $response);
-		});
+		$server->handle('/', $requestCallback);
 	}
 
 
