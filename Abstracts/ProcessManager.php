@@ -139,34 +139,12 @@ class ProcessManager
 		if (empty($processes)) {
 			return;
 		}
-		if (is_null($server)) {
-			$this->poolManager($processes);
-		} else {
-			foreach ($processes as $process) {
-				[$customProcess, $sProcess] = $this->add($process);
-
-				$this->_process[$customProcess->getName()] = $customProcess;
-
-				$server->addProcess($sProcess);
-			}
-		}
-	}
-
-
-	/**
-	 * @param array $processes
-	 * @return void
-	 * @throws ConfigException
-	 */
-	protected function poolManager(array $processes): void
-	{
 		foreach ($processes as $process) {
-			/** @var BaseProcess $customProcess */
 			[$customProcess, $sProcess] = $this->add($process);
 
-			$this->_process[$customProcess->getName()] = $sProcess;
+			$this->_process[$customProcess->getName()] = $customProcess;
 
-			$sProcess->start();
+			$server->addProcess($sProcess);
 		}
 	}
 

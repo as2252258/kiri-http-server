@@ -28,11 +28,15 @@ class ServerCommand extends Command
 	const ACTIONS = ['start', 'stop', 'restart'];
 
 
+	private Server $server;
+
+
 	/**
 	 * @return void
 	 */
 	protected function configure(): void
 	{
+		$this->server = Kiri::getDi()->get(Server::class);
 		$this->setName('sw:server')
 			->setDescription('server start|stop|reload|restart')
 			->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
@@ -85,8 +89,7 @@ class ServerCommand extends Command
 	 */
 	protected function stop(): int
 	{
-		$manager = Kiri::app()->getServer();
-		$manager->shutdown();
+		$this->server->shutdown();
 		return 1;
 	}
 
@@ -101,9 +104,8 @@ class ServerCommand extends Command
 	protected function start(InputInterface $input): int
 	{
 		$this->scan_file();
-		$manager = Kiri::app()->getServer();
-		$manager->setDaemon((int)!is_null($input->getOption('daemon')));
-		$manager->start();
+		$this->server->setDaemon((int)!is_null($input->getOption('daemon')));
+		$this->server->start();
 		return 1;
 	}
 

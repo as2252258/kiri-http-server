@@ -7,12 +7,14 @@ use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Di\ContainerInterface;
 use Kiri\Exception\ConfigException;
+use Kiri\Server\Events\OnBeforeShutdown;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
-use Swoole\Coroutine;
+use Kiri\Server\Config as SConfig;
+use Kiri\Di\LocalService;
 use Swoole\Server;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Constant;
@@ -67,6 +69,10 @@ class AsyncServer implements ServerInterface
 		foreach ($service as $value) {
 			$this->addListener($value);
 		}
+		$rpcService = Config::get('rpc', []);
+		if (!empty($rpcService)) {
+			$this->addListener(instance(SConfig::class, [], $rpcService));
+		}
 		$this->processManager->batch(Config::get('processes', []), $this->server);
 		$this->processManager->batch($this->getProcess(), $this->server);
 	}
@@ -97,7 +103,7 @@ class AsyncServer implements ServerInterface
 
 
 	/**
-	 * @param \Kiri\Server\Config $config
+	 * @param SConfig $config
 	 * @param int $daemon
 	 * @return void
 	 * @throws ConfigException
@@ -105,7 +111,7 @@ class AsyncServer implements ServerInterface
 	 * @throws NotFindClassException
 	 * @throws NotFoundExceptionInterface
 	 */
-	private function createBaseServer(\Kiri\Server\Config $config, int $daemon = 0): void
+	private function createBaseServer(SConfig $config, int $daemon = 0): void
 	{
 		$match = $this->getServerClass($config->type);
 		if (is_null($match)) {
@@ -125,13 +131,13 @@ class AsyncServer implements ServerInterface
 
 
 	/**
-	 * @param \Kiri\Server\Config $config
+	 * @param SConfig $config
 	 * @param int $daemon
 	 * @return array
 	 * @throws Exception
 	 * @throws ConfigException
 	 */
-	protected function systemConfig(\Kiri\Server\Config $config, int $daemon): array
+	protected function systemConfig(SConfig $config, int $daemon): array
 	{
 		$settings = array_merge(Config::get('server.settings', []), $config->settings);
 		$settings[Constant::OPTION_DAEMONIZE] = (bool)$daemon;
@@ -145,13 +151,13 @@ class AsyncServer implements ServerInterface
 
 
 	/**
-	 * @param \Kiri\Server\Config $config
+	 * @param SConfig $config
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
 	 */
-	public function addListener(\Kiri\Server\Config $config): void
+	public function addListener(SConfig $config): void
 	{
 		$port = $this->server->addlistener($config->host, $config->port, $config->mode);
 		if ($port === false) {
@@ -163,7 +169,47 @@ class AsyncServer implements ServerInterface
 		$port->set($this->resetSettings($config->type, $config->settings));
 
 		$this->onEventListen($port, $config->getEvents());
-		Kiri::app()->set($config->getName(), $port);
+		$this->container->get(LocalService::class)->set($config->getName(), $port);
+	}
+
+
+	/**
+	 * @param array $signal
+	 * @return void
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws Exception
+	 */
+	public function onSignal(array $signal): void
+	{
+		pcntl_signal(SIGINT, [$this, 'onSigint']);
+		foreach ($signal as $sig => $value) {
+			if (is_array($value) && is_string($value[0])) {
+				$value[0] = $this->container->get($value[0]);
+			}
+			if (!is_callable($value, true)) {
+				throw new Exception('Register signal callback must can exec.');
+			}
+			pcntl_signal($sig, $value);
+		}
+	}
+
+
+	/**
+	 * @return void
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
+	 */
+	public function onSigint(): void
+	{
+		try {
+			$this->dispatch->dispatch(new OnBeforeShutdown());
+		} catch (\Throwable $exception) {
+			$this->logger->error($exception->getMessage());
+		} finally {
+			$this->shutdown();
+		}
 	}
 
 

@@ -55,7 +55,7 @@ class Server extends HttpService
 
 	/**
 	 * @param State $state
-	 * @param Abstracts\CoroutineServer $manager
+	 * @param AsyncServer $manager
 	 * @param ContainerInterface $container
 	 * @param ProcessManager $processManager
 	 * @param EventDispatch $dispatch
@@ -65,7 +65,7 @@ class Server extends HttpService
 	 * @throws Exception
 	 */
 	public function __construct(public State              $state,
-	                            public CoroutineServer    $manager,
+	                            public AsyncServer        $manager,
 	                            public ContainerInterface $container,
 	                            public ProcessManager     $processManager,
 	                            public EventDispatch      $dispatch,
@@ -115,18 +115,9 @@ class Server extends HttpService
 	 */
 	public function start(): void
 	{
-		$this->container->mapping(Emitter::class, ResponseEmitter::class);
-		$this->container->mapping(ResponseInterface::class, Response::class);
-		$this->container->mapping(RequestInterface::class, Request::class);
-
 		$this->manager->initCoreServers(Config::get('server', [], true), $this->daemon);
 
-		$rpcService = Config::get('rpc', []);
-		if (!empty($rpcService)) {
-			$this->manager->addListener($this->container->create(\Kiri\Server\Config::class, [], $rpcService));
-		}
-
-		pcntl_signal(SIGINT, [$this, 'onSigint']);
+		$this->manager->onSignal(Config::get('signal', []));
 
 		$this->onHotReload();
 

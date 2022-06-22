@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace Kiri\Server;
 
 
-use Exception;
 use Kiri\Abstracts\Providers;
-use Kiri\Application;
+use Kiri\Di\LocalService;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\Console\Application;
 use Kiri;
 
 /**
@@ -18,14 +20,15 @@ class ServerProviders extends Providers
 
 
 	/**
-	 * @param Application $application
-	 * @throws Exception
+	 * @param LocalService $application
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 */
-	public function onImport(Application $application)
+	public function onImport(LocalService $application)
 	{
-		$container = Kiri::getDi();
+		$server = $this->container->get(ServerCommand::class);
 
-		$console = $container->get(\Symfony\Component\Console\Application::class);
-		$console->add($container->get(ServerCommand::class));
+		$console = $this->container->get(Application::class);
+		$console->add($server);
 	}
 }
