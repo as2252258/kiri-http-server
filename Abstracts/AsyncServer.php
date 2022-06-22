@@ -5,6 +5,7 @@ namespace Kiri\Server\Abstracts;
 use Exception;
 use Kiri;
 use Kiri\Abstracts\Config;
+use Kiri\Core\Json;
 use Kiri\Di\ContainerInterface;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Events\OnBeforeShutdown;
@@ -202,6 +203,7 @@ class AsyncServer implements ServerInterface
 	public function onSigint(): void
 	{
 		try {
+			file_put_contents('php://output', Json::encode(func_get_args()));
 			$this->shutdown();
 		} catch (\Throwable $exception) {
 			$this->logger->error($exception->getMessage());
