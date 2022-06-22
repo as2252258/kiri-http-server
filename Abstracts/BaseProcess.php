@@ -90,10 +90,10 @@ abstract class BaseProcess implements OnProcessInterface
 	public function onSigterm(): static
 	{
 		if (!Context::inCoroutine()) {
-			Process::signal(SIGTERM | SIGINT, fn($data) => $this->onShutdown($data));
+			Process::signal(SIGTERM, fn($data) => $this->onShutdown($data));
 		} else {
 			$listen = function () {
-				$data = Coroutine::waitSignal(SIGTERM | SIGINT, -1);
+				$data = Coroutine::waitSignal(SIGTERM, -1);
 				if ($data) {
 					$this->onShutdown($data);
 				}

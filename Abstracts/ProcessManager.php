@@ -36,7 +36,6 @@ class ProcessManager
 	/**
 	 * @param string|OnProcessInterface|BaseProcess $customProcess
 	 * @return array
-	 * @throws ConfigException
 	 */
 	public function add(string|OnProcessInterface|BaseProcess $customProcess): array
 	{
@@ -44,14 +43,11 @@ class ProcessManager
 			$customProcess = Kiri::getDi()->get($customProcess);
 		}
 
-		$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
-
-		$this->logger->alert($system . ' ' . $customProcess->getName() . ' start.');
 		if (Context::inCoroutine()) {
-			return [$customProcess, $this->resolve($customProcess, $system)];
+			return [$customProcess, $this->resolve($customProcess)];
 		}
 
-		$process = new Process($this->resolve($customProcess, $system),
+		$process = new Process($this->resolve($customProcess),
 			$customProcess->getRedirectStdinAndStdout(),
 			$customProcess->getPipeType(),
 			$customProcess->isEnableCoroutine()
@@ -73,25 +69,19 @@ class ProcessManager
 
 
 	/**
-	 * @param $customProcess
-	 * @param $system
+	 * @param BaseProcess $customProcess
 	 * @return Closure
 	 */
-	public function resolve($customProcess, $system): Closure
+	public function resolve(BaseProcess $customProcess): Closure
 	{
-		return static function () use ($customProcess, $system) {
-			$process = func_get_arg(0);
-			if ($process instanceof Process\Pool) {
-				$process = $process->getProcess(func_get_arg(1));
-			}
+		return static function (Process $process) use ($customProcess) {
 			set_env('environmental', Kiri::PROCESS);
+			$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
+			Kiri::getLogger()->alert($system . ' ' . $customProcess->getName() . ' start.');
 			if (Kiri::getPlatform()->isLinux()) {
 				$process->name($system . '(' . $customProcess->getName() . ')');
 			}
-			$dispatcher = Kiri::getDi()->get(EventDispatch::class);
-			$dispatcher->dispatch(new OnProcessStart());
 			$customProcess->onSigterm()->process($process);
-			$dispatcher->dispatch(new OnProcessStop($process));
 		};
 	}
 
