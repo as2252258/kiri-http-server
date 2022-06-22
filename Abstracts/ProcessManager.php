@@ -79,7 +79,7 @@ class ProcessManager
 			$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
 			Kiri::getLogger()->alert($system . ' ' . $customProcess->getName() . ' start.');
 			if (Kiri::getPlatform()->isLinux()) {
-				$process->name($system . '(' . $customProcess->getName() . ')');
+				$process->name($system .'['.$process->pid.'].'.  $customProcess->getName());
 			}
 			$customProcess->onSigterm()->process($process);
 		};
