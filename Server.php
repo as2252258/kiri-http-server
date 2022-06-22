@@ -199,8 +199,6 @@ class Server extends HttpService
 	 */
 	public function LoadRoutingList(): void
 	{
-		scan_directory(MODEL_PATH, 'app\Model');
-
 		$this->router->scan_build_route();
 	}
 
