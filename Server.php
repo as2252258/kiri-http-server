@@ -193,21 +193,6 @@ class Server extends HttpService
 
 	/**
 	 * @return void
-	 */
-	public function onSigint(): void
-	{
-		try {
-			$this->dispatch->dispatch(new OnBeforeShutdown());
-		} catch (\Throwable $exception) {
-			$this->logger->error($exception->getMessage());
-		} finally {
-			$this->manager->shutdown();
-		}
-	}
-
-
-	/**
-	 * @return void
 	 * @throws ReflectionException
 	 * @throws Exception
 	 */
