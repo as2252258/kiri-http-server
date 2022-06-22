@@ -36,7 +36,7 @@ abstract class BaseProcess implements OnProcessInterface
 	public function getName(): string
 	{
 		if (empty($this->name)) {
-			return uniqid('p.');
+			$this->name = uniqid('p.');
 		}
 		return $this->name;
 	}
