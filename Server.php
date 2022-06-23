@@ -175,7 +175,7 @@ class Server extends HttpService
 		$reload = Config::get('reload.hot', false);
 		if ($reload !== false) {
 			$this->provider->on(OnWorkerStart::class, [$this, 'LoadRoutingList']);
-			$this->processManager->add(Scaner::class);
+			$this->manager->addProcess(Scaner::class);
 		} else {
 			$this->LoadRoutingList();
 		}

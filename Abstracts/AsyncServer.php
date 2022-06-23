@@ -91,7 +91,7 @@ class AsyncServer implements ServerInterface
 	/**
 	 * @return void
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
 	public function shutdown(): void
 	{

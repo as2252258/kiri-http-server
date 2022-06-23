@@ -16,13 +16,17 @@ trait TraitServer
 
 
 	/**
-	 * @param array $class
+	 * @param string|array $class
 	 * @return void
 	 */
-	public function addProcess(array $class): void
+	public function addProcess(string|array $class): void
 	{
-		foreach ($class as $item) {
-			$this->_process[] = $item;
+		if (is_string($class)) {
+			$this->_process[] = $class;
+		} else {
+			foreach ($class as $name) {
+				$this->_process[] = $name;
+			}
 		}
 	}
 
