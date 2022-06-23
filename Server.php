@@ -108,12 +108,9 @@ class Server extends HttpService
 	public function start(): void
 	{
 		$this->onHotReload();
-
 		$this->manager->addProcess($this->process);
 		$this->manager->initCoreServers(Config::get('server', [], true), $this->daemon);
-
 		$this->manager->onSignal(Config::get('signal', []));
-
 		$this->dispatch->dispatch(new OnServerBeforeStart());
 		$this->manager->start();
 	}
