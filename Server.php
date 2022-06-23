@@ -114,8 +114,6 @@ class Server extends HttpService
 
 		$this->manager->onSignal(Config::get('signal', []));
 
-
-
 		$this->dispatch->dispatch(new OnServerBeforeStart());
 		$this->manager->start();
 	}
