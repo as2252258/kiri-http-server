@@ -21,7 +21,7 @@ use Kiri\Di\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Kiri\Server\Events\OnWorkerStop;
 use ReflectionException;
-use Kiri\Reload\Scaner;
+use Kiri\Reload\Scanner;
 use Swoole\WebSocket\Server as WsServer;
 use Swoole\Server as SServer;
 use Swoole\Http\Server as HServer;
@@ -172,7 +172,7 @@ class Server extends HttpService
 		$reload = Config::get('reload.hot', false);
 		if ($reload !== false) {
 			$this->provider->on(OnWorkerStart::class, [$this, 'LoadRoutingList']);
-			$this->manager->addProcess(Scaner::class);
+			$this->manager->addProcess(Scanner::class);
 		} else {
 			$this->LoadRoutingList();
 		}
