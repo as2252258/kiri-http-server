@@ -19,7 +19,10 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
+use Kiri\Server\Abstracts\StatusEnum;
+use Kiri\Server\WorkerStatus;
 use Swoole\Timer;
+use Kiri\Annotation\Inject;
 
 
 /**
@@ -32,10 +35,11 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 
 	/**
 	 * @param EventDispatch $dispatch
+	 * @param WorkerStatus $status
 	 * @param Router $router
 	 * @throws Exception
 	 */
-	public function __construct(public EventDispatch $dispatch, public Router $router)
+	public function __construct(public EventDispatch $dispatch, public WorkerStatus $status, public Router $router)
 	{
 		parent::__construct();
 	}
@@ -53,6 +57,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	{
 		$this->dispatch->dispatch(new OnBeforeWorkerStart($workerId));
 		set_env('environmental_workerId', $workerId);
+		$this->status->setEnum(StatusEnum::START);
 		if ($workerId < $server->setting['worker_num']) {
 			$this->dispatch->dispatch(new OnWorkerStart($server, $workerId));
 		} else {
@@ -70,6 +75,8 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerStop(Server $server, int $workerId)
 	{
+		$this->status->setEnum(StatusEnum::STOP);
+
 		$this->dispatch->dispatch(new OnWorkerStop($server, $workerId));
 	}
 
@@ -82,6 +89,8 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerExit(Server $server, int $workerId)
 	{
+		$this->status->setEnum(StatusEnum::EXIT);
+
 		$this->dispatch->dispatch(new OnWorkerExit($server, $workerId));
 	}
 
@@ -98,6 +107,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
 	{
+		$this->status->setEnum(StatusEnum::ERROR);
 		$this->dispatch->dispatch(new OnWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal));
 
 		$message = sprintf('Worker#%d::%d error stop. signal %d, exit_code %d, msg %s',
