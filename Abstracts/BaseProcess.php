@@ -24,7 +24,7 @@ abstract class BaseProcess implements OnProcessInterface
 	protected int $pipe_type = SOCK_DGRAM;
 
 
-	protected bool $enable_coroutine = true;
+	protected bool $enable_coroutine = false;
 
 
 	public string $name = '';
