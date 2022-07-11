@@ -49,9 +49,7 @@ class State extends Component
 			return;
 		}
 		while (checkPortIsAlready($port)) {
-            if (Process::kill($pid, 0)) {
-                Process::kill($pid, SIGTERM);
-            }
+            Process::kill($pid, 0) && Process::kill($pid, SIGTERM);
 			usleep(300);
 		}
 	}
