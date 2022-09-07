@@ -172,7 +172,7 @@ class Server extends HttpService
 		$reload = Config::get('reload.hot', false);
 		if ($reload !== false) {
 			$this->provider->on(OnWorkerStart::class, [$this, 'LoadRoutingList']);
-			$this->manager->addProcess(Scanner::class);
+			$this->manager->addProcess(Kiri\Reload\Inotify::class);
 		} else {
 			$this->LoadRoutingList();
 		}
