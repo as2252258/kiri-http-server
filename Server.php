@@ -21,7 +21,6 @@ use Kiri\Di\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Kiri\Server\Events\OnWorkerStop;
 use ReflectionException;
-use Kiri\Reload\Scanner;
 use Swoole\WebSocket\Server as WsServer;
 use Swoole\Server as SServer;
 use Swoole\Http\Server as HServer;
