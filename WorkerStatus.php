@@ -8,7 +8,7 @@ class WorkerStatus
 {
 
 
-	public StatusEnum $enum;
+	public StatusEnum $enum = StatusEnum::START;
 
 
 	/**
