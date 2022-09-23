@@ -89,15 +89,17 @@ class AsyncServer implements ServerInterface
 
 
 	/**
-	 * @return void
+	 * @return bool
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
-	public function shutdown(): void
+	public function shutdown(): bool
 	{
 		$this->server->shutdown();
 
 		$this->dispatch->dispatch(new OnShutdown());
+
+		return true;
 	}
 
 

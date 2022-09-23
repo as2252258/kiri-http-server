@@ -19,7 +19,7 @@ interface OnReceiveInterface
 	 * @param string $data
 	 * @return void
 	 */
-	public function onReceive(Server $server, int $fd, int $reactor_id, string $data): void;
+	public function onReceive(Server $server, int $fd, int $reactor_id, string $data): bool;
 
 
 }

@@ -34,7 +34,7 @@ class OnServerManager extends Server
 	 * @param \Swoole\Server $server
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
 	public function onManagerStart(\Swoole\Server $server)
 	{
@@ -46,10 +46,12 @@ class OnServerManager extends Server
 
 	/**
 	 * @param \Swoole\Server $server
+	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
-	public function onManagerStop(\Swoole\Server $server)
+	public function onManagerStop(\Swoole\Server $server): void
 	{
 		$this->dispatch->dispatch(new OnManagerStop($server));
 	}
