@@ -13,13 +13,13 @@ trait TraitServer
 
 
 	private array $_process = [];
-
-
+	
+	
 	/**
-	 * @param string|array $class
+	 * @param string|array|BaseProcess $class
 	 * @return void
 	 */
-	public function addProcess(string|array $class): void
+	public function addProcess(string|array|BaseProcess $class): void
 	{
 		if (is_string($class)) {
 			$this->_process[] = $class;

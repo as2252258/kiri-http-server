@@ -91,7 +91,7 @@ class AsyncServer implements ServerInterface
 	/**
 	 * @return bool
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface|ReflectionException
+	 * @throws NotFoundExceptionInterface
 	 */
 	public function shutdown(): bool
 	{
@@ -254,7 +254,6 @@ class AsyncServer implements ServerInterface
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function start(): void
 	{
