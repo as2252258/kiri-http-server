@@ -21,7 +21,9 @@ trait TraitServer
 	 */
 	public function addProcess(string|array|BaseProcess $class): void
 	{
-		if (is_string($class)) {
+		if (is_object($class)) {
+			$this->_process[] = $class;
+		} else if (is_string($class)) {
 			$this->_process[] = $class;
 		} else {
 			foreach ($class as $name) {
