@@ -10,10 +10,9 @@ interface OnMessageInterface
 
 
 	/**
-	 * @param Server|\Swoole\Coroutine\Http\Server $server
 	 * @param Frame $frame
 	 * @return void
 	 */
-	public function onMessage(Server|\Swoole\Coroutine\Http\Server $server, Frame $frame): void;
+	public function OnMessage(Frame $frame): void;
 
 }
