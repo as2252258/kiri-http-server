@@ -2,6 +2,7 @@
 
 namespace Kiri\Server\Abstracts;
 
+use Exception;
 use Swoole\Http\Server as HServer;
 use Swoole\Server;
 use Kiri\Server\Constant;
@@ -13,22 +14,22 @@ trait TraitServer
 
 
 	private array $_process = [];
-	
-	
+
+
 	/**
 	 * @param string|array|BaseProcess $class
 	 * @return void
+	 * @throws Exception
 	 */
 	public function addProcess(string|array|BaseProcess $class): void
 	{
-		if (is_object($class)) {
-			$this->_process[] = $class;
-		} else if (is_string($class)) {
-			$this->_process[] = $class;
-		} else {
-			foreach ($class as $name) {
-				$this->_process[] = $name;
-			}
+		$container = \Kiri::getDi()->get(ProcessManager::class);
+
+		if (!is_array($class)) {
+			$class = [$class];
+		}
+		foreach ($class as $name) {
+			$container->add($name);
 		}
 	}
 

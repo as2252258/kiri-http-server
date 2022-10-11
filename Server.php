@@ -39,9 +39,6 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
 class Server extends HttpService
 {
 
-	private array $process = [];
-
-
 	private mixed $daemon = 0;
 
 
@@ -91,10 +88,11 @@ class Server extends HttpService
 
 	/**
 	 * @param $process
+	 * @throws Exception
 	 */
 	public function addProcess($process)
 	{
-		$this->process[] = $process;
+		$this->processManager->add($process);
 	}
 
 
@@ -108,7 +106,6 @@ class Server extends HttpService
 	public function start(): void
 	{
 		$this->onHotReload();
-		$this->manager->addProcess($this->process);
 		$this->manager->initCoreServers(Config::get('server', [], true), $this->daemon);
 		$this->manager->onSignal(Config::get('signal', []));
 		$this->dispatch->dispatch(new OnServerBeforeStart());

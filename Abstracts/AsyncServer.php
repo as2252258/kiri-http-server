@@ -61,6 +61,7 @@ class AsyncServer implements ServerInterface
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFindClassException
 	 * @throws NotFoundExceptionInterface
+	 * @throws Exception
 	 */
 	public function initCoreServers(array $service, int $daemon = 0): void
 	{
@@ -73,8 +74,7 @@ class AsyncServer implements ServerInterface
 		if (!empty($rpcService)) {
 			$this->addListener(instance(SConfig::class, [], $rpcService));
 		}
-		$this->processManager->batch(Config::get('processes', []), $this->server);
-		$this->processManager->batch($this->getProcess(), $this->server);
+		$this->processManager->batch(Config::get('processes', []));
 	}
 
 
@@ -254,6 +254,7 @@ class AsyncServer implements ServerInterface
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	public function start(): void
 	{
