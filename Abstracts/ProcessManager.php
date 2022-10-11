@@ -69,7 +69,7 @@ class ProcessManager extends Component
 		if (is_string($custom)) {
 			$custom = Kiri::getDi()->get($custom);
 		}
-		if (isset($this->process[$custom->getName()])) {
+		if (isset($this->_process[$custom->getName()])) {
 			throw new Exception('Process(' . $custom->getName() . ') is exists.');
 		}
 		$this->_process[$custom->getName()] = new Process(function (Process $process) use ($custom) {
