@@ -73,13 +73,7 @@ class ProcessManager extends Component
 			throw new Exception('Process(' . $custom->getName() . ') is exists.');
 		}
 		$this->_process[$custom->getName()] = new Process(function (Process $process) use ($custom) {
-			set_env('environmental', Kiri::PROCESS);
-			$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
-			Kiri::getLogger()->alert($system . ' ' . $custom->getName() . ' start.');
-			if (Kiri::getPlatform()->isLinux()) {
-				$process->name($system . '[' . $process->pid . '].' . $custom->getName());
-			}
-			$custom->onSigterm()->process($process);
+			$this->extracted($custom, $process);
 		},
 			$custom->getRedirectStdinAndStdout(),
 			$custom->getPipeType(),
@@ -106,13 +100,7 @@ class ProcessManager extends Component
 	public function resolve(BaseProcess $customProcess): Closure
 	{
 		return static function (Process $process) use ($customProcess) {
-			set_env('environmental', Kiri::PROCESS);
-			$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
-			Kiri::getLogger()->alert($system . ' ' . $customProcess->getName() . ' start.');
-			if (Kiri::getPlatform()->isLinux()) {
-				$process->name($system . '[' . $process->pid . '].' . $customProcess->getName());
-			}
-			$customProcess->onSigterm()->process($process);
+			$this->extracted($customProcess, $process);
 		};
 	}
 
@@ -178,6 +166,23 @@ class ProcessManager extends Component
 		$process = $this->_process[$name];
 		$process->write($message);
 	}
-
-
+	
+	/**
+	 * @param mixed $custom
+	 * @param Process $process
+	 * @return void
+	 * @throws Kiri\Exception\ConfigException
+	 */
+	public function extracted(mixed $custom, Process $process): void
+	{
+		set_env('environmental', Kiri::PROCESS);
+		$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
+		Kiri::getLogger()->alert($system . ' ' . $custom->getName() . ' start.');
+		if (Kiri::getPlatform()->isLinux()) {
+			$process->name($system . '[' . $process->pid . '].' . $custom->getName());
+		}
+		$custom->onSigterm()->process($process);
+	}
+	
+	
 }
