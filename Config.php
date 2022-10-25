@@ -21,7 +21,10 @@ class Config
 	public string $name = '';
 
 
-	public int $mode = SWOOLE_SOCK_TCP;
+
+	public int $mode = SWOOLE_PROCESS;
+
+	public int $socket = SWOOLE_SOCK_TCP;
 
 
 	public array $settings = [];
@@ -139,6 +142,22 @@ class Config
 	public function setEvents(array $events): void
 	{
 		$this->events = $events;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getSocket(): int
+	{
+		return $this->socket;
+	}
+
+	/**
+	 * @param int $socket
+	 */
+	public function setSocket(int $socket): void
+	{
+		$this->socket = $socket;
 	}
 
 }

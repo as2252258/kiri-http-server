@@ -5,7 +5,6 @@ namespace Kiri\Server\Abstracts;
 use Exception;
 use Kiri;
 use Kiri\Abstracts\Config;
-use Kiri\Core\Json;
 use Kiri\Di\ContainerInterface;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Events\OnShutdown;
@@ -118,7 +117,7 @@ class AsyncServer implements ServerInterface
 		if (is_null($match)) {
 			throw new NotFindClassException('Unknown server type ' . $config->type);
 		}
-		$this->server = new $match($config->host, $config->port, SWOOLE_PROCESS, $config->mode);
+		$this->server = new $match($config->host, $config->port, $config->mode, $config->socket);
 
 		$this->server->set($this->systemConfig($config, $daemon));
 
