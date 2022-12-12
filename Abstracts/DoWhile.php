@@ -2,7 +2,7 @@
 
 namespace Kiri\Server\Abstracts;
 
-use Kiri\Context;
+use Kiri\Di\Context;
 
 class DoWhile
 {
