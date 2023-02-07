@@ -90,7 +90,7 @@ class AsyncServer implements ServerInterface
 	/**
 	 * @return bool
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
 	public function shutdown(): bool
 	{
