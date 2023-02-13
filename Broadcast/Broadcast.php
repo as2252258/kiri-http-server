@@ -14,10 +14,15 @@ class Broadcast
 	 * @param $message
 	 * @return void
 	 */
-	public function broadcast($message)
+	public function broadcast($message): void
 	{
 		$di = Kiri::getDi();
-		$di->get(ProcessManager::class)->push($message);
+		$message = serialize(new Message($message));
+
+		$processes = $di->get(ProcessManager::class)->getProcesses();
+		foreach ($processes as $process) {
+			$process->write($message);
+		}
 
 		$server = $di->get(ServerInterface::class);
 
@@ -26,7 +31,7 @@ class Broadcast
 			if ($i == env('environmental_workerId')) {
 				continue;
 			}
-			$server->sendMessage(serialize(new Message($message)), $i);
+			$server->sendMessage($message, $i);
 		}
 	}
 

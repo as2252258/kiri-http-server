@@ -61,6 +61,15 @@ class ProcessManager extends Component
 
 
 	/**
+	 * @return Process[]
+	 */
+	public function getProcesses(): array
+	{
+		return $this->_process;
+	}
+
+
+	/**
 	 * @param string|OnProcessInterface|BaseProcess $custom
 	 * @throws Exception
 	 */
@@ -166,7 +175,7 @@ class ProcessManager extends Component
 		$process = $this->_process[$name];
 		$process->write($message);
 	}
-	
+
 	/**
 	 * @param mixed $custom
 	 * @param Process $process
@@ -183,6 +192,6 @@ class ProcessManager extends Component
 		}
 		$custom->onSigterm()->process($process);
 	}
-	
-	
+
+
 }
