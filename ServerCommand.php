@@ -99,28 +99,13 @@ class ServerCommand extends Command
 	 * @return int
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface|ReflectionException
+	 * @throws NotFoundExceptionInterface
 	 */
 	protected function start(InputInterface $input): int
 	{
-		$this->scan_file();
 		$this->server->setDaemon((int)!is_null($input->getOption('daemon')));
 		$this->server->start();
 		return 1;
-	}
-
-
-	/**
-	 * @return void
-	 * @throws ConfigException
-	 * @throws ReflectionException
-	 */
-	protected function scan_file(): void
-	{
-//		$config = Config::get('reload.scanner', []);
-//		if (is_array($config)) foreach ($config as $key => $value) {
-//			scan_directory($value, $key);
-//		}
 	}
 
 }
