@@ -159,7 +159,6 @@ class Server extends HttpService
 	/**
 	 * @return void
 	 * @throws ConfigException
-	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	public function onHotReload(): void
@@ -167,22 +166,11 @@ class Server extends HttpService
 		$this->onWorkerListener();
 		$reload = Config::get('reload.hot', false);
 		if ($reload !== false) {
-			$this->provider->on(OnWorkerStart::class, [$this, 'LoadRoutingList']);
+			$this->provider->on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
 			$this->manager->addProcess(Kiri\Reload\Inotify::class);
 		} else {
-			$this->LoadRoutingList();
+			$this->router->scan_build_route();
 		}
-	}
-
-
-	/**
-	 * @return void
-	 * @throws ReflectionException
-	 * @throws Exception
-	 */
-	public function LoadRoutingList(): void
-	{
-		$this->router->scan_build_route();
 	}
 
 
