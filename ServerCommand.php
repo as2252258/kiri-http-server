@@ -117,10 +117,10 @@ class ServerCommand extends Command
 	 */
 	protected function scan_file(): void
 	{
-		$config = Config::get('reload.scanner', []);
-		if (is_array($config)) foreach ($config as $key => $value) {
-			scan_directory($value, $key);
-		}
+//		$config = Config::get('reload.scanner', []);
+//		if (is_array($config)) foreach ($config as $key => $value) {
+//			scan_directory($value, $key);
+//		}
 	}
 
 }
