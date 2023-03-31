@@ -8,6 +8,7 @@ use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Message\Handler\Router;
+use Kiri\Server\Constant;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
 use Kiri\Server\Events\OnTaskerStart as OnTaskStart;
@@ -18,6 +19,7 @@ use Kiri\Server\Events\OnWorkerStop;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use Swoole\Runtime;
 use Swoole\Server;
 use Kiri\Server\Abstracts\StatusEnum;
 use Kiri\Server\WorkerStatus;
@@ -55,6 +57,9 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerStart(Server $server, int $workerId): void
 	{
+		if ($server->setting[Constant::OPTION_ENABLE_COROUTINE] ?? false) {
+			Runtime::enableCoroutine();
+		}
 		$this->dispatch->dispatch(new OnBeforeWorkerStart($workerId));
 		set_env('environmental_workerId', $workerId);
 		$this->status->setEnum(StatusEnum::START);

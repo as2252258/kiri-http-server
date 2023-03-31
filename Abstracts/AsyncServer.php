@@ -144,9 +144,6 @@ class AsyncServer implements ServerInterface
 		$settings[Constant::OPTION_DAEMONIZE] = (bool)$daemon;
 		$settings[Constant::OPTION_ENABLE_REUSE_PORT] = true;
 		$settings[Constant::OPTION_PID_FILE] = storage('.swoole.pid');
-		if ($settings[Constant::OPTION_ENABLE_COROUTINE] ?? false) {
-			Runtime::enableCoroutine();
-		}
 		if (!isset($settings[Constant::OPTION_PID_FILE])) {
 			$settings[Constant::OPTION_LOG_FILE] = storage('system.log');
 		}
