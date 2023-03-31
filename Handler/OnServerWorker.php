@@ -57,9 +57,6 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerStart(Server $server, int $workerId): void
 	{
-		if ($server->setting[Constant::OPTION_ENABLE_COROUTINE] ?? false) {
-			Runtime::enableCoroutine();
-		}
 		$this->dispatch->dispatch(new OnBeforeWorkerStart($workerId));
 		set_env('environmental_workerId', $workerId);
 		$this->status->setEnum(StatusEnum::START);

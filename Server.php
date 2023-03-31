@@ -77,7 +77,7 @@ class Server extends HttpService
 			return;
 		}
 		Coroutine::set([
-			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
+			'hook_flags'            => (SWOOLE_HOOK_ALL | SWOOLE_HOOK_CURL) ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
 			'enable_deadlock_check' => FALSE,
 			'exit_condition'        => function () {
 				return Coroutine::stats()['coroutine_num'] === 0;
