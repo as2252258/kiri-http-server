@@ -75,6 +75,8 @@ class AsyncServer implements ServerInterface
 			$this->addListener(instance(SConfig::class, [], $rpcService));
 		}
 		$this->processManager->batch(Config::get('processes', []));
+
+		$this->onSignal(Config::get('signal', []));
 	}
 
 

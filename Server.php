@@ -38,13 +38,13 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
  */
 class Server extends HttpService
 {
-	
+
 	private mixed $daemon = 0;
-	
-	
+
+
 	/**
 	 * @param State $state
-	 * @param CoroutineServer $manager
+	 * @param AsyncServer $manager
 	 * @param ContainerInterface $container
 	 * @param ProcessManager $processManager
 	 * @param EventDispatch $dispatch
@@ -54,7 +54,7 @@ class Server extends HttpService
 	 * @throws Exception
 	 */
 	public function __construct(public State              $state,
-	                            public CoroutineServer    $manager,
+	                            public AsyncServer        $manager,
 	                            public ContainerInterface $container,
 	                            public ProcessManager     $processManager,
 	                            public EventDispatch      $dispatch,
@@ -64,8 +64,8 @@ class Server extends HttpService
 	{
 		parent::__construct($config);
 	}
-	
-	
+
+
 	/**
 	 * @return void
 	 * @throws ConfigException
@@ -77,15 +77,15 @@ class Server extends HttpService
 			return;
 		}
 		Coroutine::set([
-			'hook_flags' => (SWOOLE_HOOK_ALL | SWOOLE_HOOK_CURL) ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
+			'hook_flags'            => (SWOOLE_HOOK_ALL | SWOOLE_HOOK_CURL) ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
 			'enable_deadlock_check' => FALSE,
-			'exit_condition' => function () {
+			'exit_condition'        => function () {
 				return Coroutine::stats()['coroutine_num'] === 0;
 			}
 		]);
 	}
-	
-	
+
+
 	/**
 	 * @param $process
 	 * @throws Exception
@@ -94,8 +94,8 @@ class Server extends HttpService
 	{
 		$this->processManager->add($process);
 	}
-	
-	
+
+
 	/**
 	 * @return void
 	 * @throws ConfigException
@@ -109,8 +109,8 @@ class Server extends HttpService
 		$this->manager->initCoreServers(Config::get('server', [], true), $this->daemon);
 		$this->manager->start();
 	}
-	
-	
+
+
 	/**
 	 * @return void
 	 * @throws Exception
@@ -121,8 +121,8 @@ class Server extends HttpService
 		$this->provider->on(OnWorkerStart::class, [$this, 'setWorkerName']);
 		$this->provider->on(OnTaskerStart::class, [$this, 'setTaskerName']);
 	}
-	
-	
+
+
 	/**
 	 * @param OnWorkerStart $onWorkerStart
 	 * @throws ConfigException
@@ -134,11 +134,11 @@ class Server extends HttpService
 		}
 		$prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
 		set_env('environmental', Kiri::WORKER);
-		
+
 		Kiri::setProcessName($prefix);
 	}
-	
-	
+
+
 	/**
 	 * @param OnTaskerStart $onWorkerStart
 	 * @throws ConfigException
@@ -150,11 +150,11 @@ class Server extends HttpService
 		}
 		$prefix = sprintf('Tasker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
 		set_env('environmental', Kiri::TASK);
-		
+
 		Kiri::setProcessName($prefix);
 	}
-	
-	
+
+
 	/**
 	 * @return void
 	 * @throws ConfigException
@@ -171,8 +171,8 @@ class Server extends HttpService
 			$this->router->scan_build_route();
 		}
 	}
-	
-	
+
+
 	/**
 	 * @return void
 	 * @throws ConfigException
@@ -188,8 +188,8 @@ class Server extends HttpService
 		}
 		$this->dispatch->dispatch(new OnShutdown());
 	}
-	
-	
+
+
 	/**
 	 * @return bool
 	 * @throws ConfigException
@@ -199,8 +199,8 @@ class Server extends HttpService
 	{
 		return $this->state->isRunner();
 	}
-	
-	
+
+
 	/**
 	 * @param $daemon
 	 * @return Server
