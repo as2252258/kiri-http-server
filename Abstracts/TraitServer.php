@@ -70,7 +70,7 @@ trait TraitServer
 		if (get_called_class() != CoroutineServer::class) {
 			pcntl_signal(SIGINT, [$this, 'onSigint']);
 		} else {
-			Coroutine::create(function () use ($signal, $callback) {
+			Coroutine::create(static function () use ($signal, $callback) {
 				$data = Coroutine::waitSignal($signal);
 				if ($data) {
 					$callback($signal, [true]);

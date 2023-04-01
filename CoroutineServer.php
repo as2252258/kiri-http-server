@@ -176,7 +176,7 @@ class CoroutineServer implements ServerInterface
 			
 			$this->onTasker();
 			foreach ($this->servers as $server) {
-				Coroutine::create(function () use ($server) {
+				Coroutine::create(static function () use ($server) {
 					$server->start();
 				});
 			}
@@ -216,7 +216,7 @@ class CoroutineServer implements ServerInterface
 		
 		$this->channel = new Coroutine\Channel($config[Constant::OPTION_TASK_WORKER_NUM]);
 		for ($i = 0; $i < $config[Constant::OPTION_TASK_WORKER_NUM]; $i++) {
-			Coroutine::create(fn() => $this->taskRunner($i, $taskEvents, $finishEvents));
+			Coroutine::create(static fn() => $this->taskRunner($i, $taskEvents, $finishEvents));
 		}
 	}
 	
