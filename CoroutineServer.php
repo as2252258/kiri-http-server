@@ -89,7 +89,7 @@ class CoroutineServer implements ServerInterface
 	 */
 	public function addListener(SConfig $config): void
 	{
-		$server = new Coroutine\Http\Server($config->getHost(), $config->getPort(), false, true);
+		$server = new SchServer($config->getHost(), $config->getPort(), false, true);
 		
 		$events = $config->getEvents()[Constant::REQUEST] ?? null;
 		if (is_null($events)) {
