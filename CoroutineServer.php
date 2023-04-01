@@ -172,6 +172,8 @@ class CoroutineServer implements ServerInterface
 		Coroutine\run(function () {
 			$this->dispatch->dispatch(new OnServerBeforeStart());
 			
+			$this->onSignal(Config::get('signal', []));
+			
 			$this->onTasker();
 			foreach ($this->servers as $server) {
 				Coroutine::create(function () use ($server) {

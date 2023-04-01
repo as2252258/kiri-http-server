@@ -3,8 +3,10 @@
 namespace Kiri\Server\Abstracts;
 
 use Exception;
+use Kiri\Server\CoroutineServer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Swoole\Coroutine;
 use Swoole\Http\Server as HServer;
 use Swoole\Server;
 use Kiri\Server\Constant;
@@ -13,11 +15,11 @@ use Swoole\WebSocket\Server as WServer;
 
 trait TraitServer
 {
-
-
+	
+	
 	private array $_process = [];
-
-
+	
+	
 	/**
 	 * @param string|array|BaseProcess $class
 	 * @return void
@@ -26,7 +28,7 @@ trait TraitServer
 	public function addProcess(string|array|BaseProcess $class): void
 	{
 		$container = \Kiri::getDi()->get(ProcessManager::class);
-
+		
 		if (!is_array($class)) {
 			$class = [$class];
 		}
@@ -34,8 +36,6 @@ trait TraitServer
 			$container->add($name);
 		}
 	}
-	
-	
 	
 	
 	/**
@@ -47,7 +47,7 @@ trait TraitServer
 	 */
 	public function onSignal(array $signal): void
 	{
-		pcntl_signal(SIGINT, [$this, 'onSigint']);
+		$this->onPcntlSignal(SIGINT, [$this, 'onSigint']);
 		foreach ($signal as $sig => $value) {
 			if (is_array($value) && is_string($value[0])) {
 				$value[0] = $this->container->get($value[0]);
@@ -55,11 +55,31 @@ trait TraitServer
 			if (!is_callable($value, true)) {
 				throw new Exception('Register signal callback must can exec.');
 			}
-			pcntl_signal($sig, $value);
+			$this->onPcntlSignal($sig, $value);
 		}
 	}
-
-
+	
+	
+	/**
+	 * @param $signal
+	 * @param $callback
+	 * @return void
+	 */
+	private function onPcntlSignal($signal, $callback): void
+	{
+		if (get_called_class() == CoroutineServer::class) {
+			pcntl_signal(SIGINT, [$this, 'onSigint']);
+		} else {
+			Coroutine::create(function () use ($signal, $callback) {
+				$data = Coroutine::waitSignal($signal);
+				if ($data) {
+					$callback($signal, [true]);
+				}
+			});
+		}
+	}
+	
+	
 	/**
 	 * @return array
 	 */
@@ -67,8 +87,8 @@ trait TraitServer
 	{
 		return $this->_process;
 	}
-
-
+	
+	
 	/**
 	 * @param array $ports
 	 * @return array
@@ -91,8 +111,8 @@ trait TraitServer
 		}
 		return $array;
 	}
-
-
+	
+	
 	/**
 	 * @param array $ports
 	 * @return array<Config>
@@ -117,8 +137,8 @@ trait TraitServer
 		}
 		return $array;
 	}
-
-
+	
+	
 	/**
 	 * @param $type
 	 * @return string|null
@@ -133,8 +153,8 @@ trait TraitServer
 			default => null
 		};
 	}
-
-
+	
+	
 	/**
 	 * @param $type
 	 * @return string|null
@@ -147,6 +167,6 @@ trait TraitServer
 			default => null
 		};
 	}
-
-
+	
+	
 }
