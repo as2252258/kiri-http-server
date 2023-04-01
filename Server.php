@@ -72,12 +72,12 @@ class Server extends HttpService
 	 */
 	public function init(): void
 	{
-		$enable_coroutine = Config::get('servers.settings.enable_coroutine', false);
+		$enable_coroutine = Config::get('server.settings.enable_coroutine', false);
 		if (!$enable_coroutine) {
 			return;
 		}
 		Coroutine::set([
-			'hook_flags'            => (SWOOLE_HOOK_ALL | SWOOLE_HOOK_CURL) ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
+			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
 			'enable_deadlock_check' => FALSE,
 			'exit_condition'        => function () {
 				return Coroutine::stats()['coroutine_num'] === 0;
