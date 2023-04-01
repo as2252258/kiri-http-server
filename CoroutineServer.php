@@ -70,7 +70,7 @@ class CoroutineServer implements ServerInterface
 	{
 		$service = $this->genConfigService($service);
 		foreach ($service as $value) {
-			if ($value['type'] == Constant::SERVER_TYPE_HTTP) {
+			if ($value->getType() == Constant::SERVER_TYPE_HTTP) {
 				$this->addListener($value);
 			}
 		}
