@@ -173,29 +173,6 @@ class AsyncServer implements ServerInterface
 		$this->container->get(LocalService::class)->set($config->getName(), $port);
 	}
 
-
-	/**
-	 * @param array $signal
-	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws Exception
-	 */
-	public function onSignal(array $signal): void
-	{
-		pcntl_signal(SIGINT, [$this, 'onSigint']);
-		foreach ($signal as $sig => $value) {
-			if (is_array($value) && is_string($value[0])) {
-				$value[0] = $this->container->get($value[0]);
-			}
-			if (!is_callable($value, true)) {
-				throw new Exception('Register signal callback must can exec.');
-			}
-			pcntl_signal($sig, $value);
-		}
-	}
-
-
 	/**
 	 * @param $no
 	 * @param array $signInfo
@@ -254,7 +231,6 @@ class AsyncServer implements ServerInterface
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 */
 	public function start(): void
 	{
