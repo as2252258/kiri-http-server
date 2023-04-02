@@ -54,7 +54,7 @@ class Server extends HttpService
 	 * @throws Exception
 	 */
 	public function __construct(public State              $state,
-	                            public AsyncServer        $manager,
+	                            public CoroutineServer        $manager,
 	                            public ContainerInterface $container,
 	                            public ProcessManager     $processManager,
 	                            public EventDispatch      $dispatch,

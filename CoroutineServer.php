@@ -78,6 +78,9 @@ class CoroutineServer implements ServerInterface
 		if (!empty($rpcService)) {
 			$this->addListener(instance(SConfig::class, [], $rpcService));
 		}
+
+		$this->container->setBindings(ServerInterface::class, $this);
+
 //		$this->processManager->batch(Config::get('processes', []));
 	}
 	
