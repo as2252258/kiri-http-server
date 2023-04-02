@@ -14,6 +14,8 @@ use Kiri\Server\Abstracts\TraitServer;
 use Kiri\Server\Config as SConfig;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
+use Kiri\Server\Events\OnWorkerExit;
+use Kiri\Server\Events\OnWorkerStart;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -180,7 +182,12 @@ class CoroutineServer implements ServerInterface
 			$this->onTasker();
 			foreach ($this->servers as $server) {
 				Coroutine::create(static function () use ($server) {
+
+					$this->dispatch->dispatch(new OnWorkerStart($server, 0));
+
 					$server->start();
+
+					$this->dispatch->dispatch(new OnWorkerExit($server, 0));
 				});
 			}
 		});
