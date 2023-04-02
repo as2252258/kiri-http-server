@@ -25,24 +25,25 @@ use Swoole\Coroutine\Server as ScServer;
 use Swoole\Coroutine\Http\Server as SchServer;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoole\Process;
 use Swoole\Server;
 
 class CoroutineServer implements ServerInterface
 {
-	
+
 	use TraitServer;
-	
-	
+
+
 	/** @var array<SchServer|ScServer> */
 	private array $servers = [];
-	
-	
+
+
 	/**
 	 * @var Server|null
 	 */
 	private Server|null $server = null;
-	
-	
+
+
 	/**
 	 * @param Config $config
 	 * @param ContainerInterface $container
@@ -57,8 +58,8 @@ class CoroutineServer implements ServerInterface
 	                            public ProcessManager     $processManager)
 	{
 	}
-	
-	
+
+
 	/**
 	 * @param array $service
 	 * @param int $daemon
@@ -85,8 +86,8 @@ class CoroutineServer implements ServerInterface
 
 //		$this->processManager->batch(Config::get('processes', []));
 	}
-	
-	
+
+
 	/**
 	 * @param SConfig $config
 	 * @throws ContainerExceptionInterface
@@ -95,19 +96,19 @@ class CoroutineServer implements ServerInterface
 	public function addListener(SConfig $config): void
 	{
 		$server = new SchServer($config->getHost(), $config->getPort(), false, true);
-		
+
 		$events = $config->getEvents()[Constant::REQUEST] ?? null;
 		if (is_null($events)) {
 			$events = [\Kiri\Message\Server::class, 'onRequest'];
 		}
-		
+
 		$events[0] = $this->container->get($events[0]);
 		$server->handle('/', $events);
-		
+
 		$this->servers[] = $server;
 	}
-	
-	
+
+
 	/**
 	 * @param string $name
 	 * @return ScServer|SchServer|null
@@ -116,8 +117,8 @@ class CoroutineServer implements ServerInterface
 	{
 		return $this->servers[$name] ?? null;
 	}
-	
-	
+
+
 	/**
 	 * @return bool
 	 * @throws ContainerExceptionInterface
@@ -128,13 +129,13 @@ class CoroutineServer implements ServerInterface
 		foreach ($this->servers as $server) {
 			$server->shutdown();
 		}
-		
+
 		$this->dispatch->dispatch(new OnShutdown());
-		
+
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * @param $no
 	 * @param array $signInfo
@@ -149,8 +150,8 @@ class CoroutineServer implements ServerInterface
 			$this->logger->error($exception->getMessage());
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param Server\Port|Server $base
 	 * @param array $events
@@ -167,8 +168,8 @@ class CoroutineServer implements ServerInterface
 			$base->on($name, $event);
 		}
 	}
-	
-	
+
+
 	/**
 	 * @return void
 	 */
@@ -176,9 +177,9 @@ class CoroutineServer implements ServerInterface
 	{
 		Coroutine\run(function () {
 			$this->dispatch->dispatch(new OnServerBeforeStart());
-			
+
 			$this->onSignal(Config::get('signal', []));
-			
+
 			$this->onTasker();
 			foreach ($this->servers as $server) {
 				Coroutine::create(static function () use ($server) {
@@ -192,10 +193,10 @@ class CoroutineServer implements ServerInterface
 			}
 		});
 	}
-	
-	
+
+
 	private Coroutine\Channel $channel;
-	
+
 	/**
 	 * @return void
 	 * @throws ConfigException
@@ -205,32 +206,32 @@ class CoroutineServer implements ServerInterface
 	private function onTasker(): void
 	{
 		$config = Config::get('server.settings', []);
-		
+
 		if (isset($config[Constant::OPTION_TASK_WORKER_NUM])) {
 			if ($config[Constant::OPTION_TASK_WORKER_NUM] < 1) {
 				return;
 			}
 		}
-		
+
 		$taskEvents = $config['events'][Constant::TASK] ?? null;
 		$finishEvents = $config['events'][Constant::FINISH] ?? null;
-		
+
 		if (is_null($taskEvents)) {
 			return;
 		}
-		
+
 		$taskEvents[0] = $this->container->get($taskEvents[0]);
 		if (!is_null($finishEvents)) {
 			$finishEvents[0] = $this->container->get($finishEvents[0]);
 		}
-		
+
 		$this->channel = new Coroutine\Channel($config[Constant::OPTION_TASK_WORKER_NUM]);
 		for ($i = 0; $i < $config[Constant::OPTION_TASK_WORKER_NUM]; $i++) {
 			Coroutine::create(static fn() => $this->taskRunner($i, $taskEvents, $finishEvents));
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param $taskId
 	 * @param $callback
@@ -248,5 +249,5 @@ class CoroutineServer implements ServerInterface
 		}
 		$this->taskRunner($taskId, $callback, $finishEvents);
 	}
-	
+
 }

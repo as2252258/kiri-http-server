@@ -16,9 +16,9 @@ interface OnProcessInterface
 
 
 	/**
-	 * @param Process $process
+	 * @param ?Process $process
 	 */
-	public function process(Process $process): void;
+	public function process(?Process $process): void;
 
 
 
