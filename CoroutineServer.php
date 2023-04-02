@@ -184,11 +184,11 @@ class CoroutineServer implements ServerInterface
 			foreach ($this->servers as $server) {
 				Coroutine::create(static function () use ($server) {
 
-					$this->dispatch->dispatch(new OnWorkerStart($server, 0));
+//					$this->dispatch->dispatch(new OnWorkerStart($server, 0));
 
 					$server->start();
 
-					$this->dispatch->dispatch(new OnWorkerExit($server, 0));
+//					$this->dispatch->dispatch(new OnWorkerExit($server, 0));
 				});
 			}
 		});
