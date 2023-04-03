@@ -54,7 +54,7 @@ class Server extends HttpService
 	 * @throws Exception
 	 */
 	public function __construct(public State              $state,
-	                            public AsyncServer        $manager,
+	                            public CoroutineServer        $manager,
 	                            public ContainerInterface $container,
 	                            public ProcessManager     $processManager,
 	                            public EventDispatch      $dispatch,
@@ -72,10 +72,10 @@ class Server extends HttpService
 	 */
 	public function init(): void
 	{
-		$enable_coroutine = Config::get('server.settings.enable_coroutine', false);
-		if (!$enable_coroutine) {
-			return;
-		}
+//		$enable_coroutine = Config::get('server.settings.enable_coroutine', false);
+//		if (!$enable_coroutine) {
+//			return;
+//		}
 		Coroutine::set([
 			'hook_flags'            => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_BLOCKING_FUNCTION,
 			'enable_deadlock_check' => FALSE,
