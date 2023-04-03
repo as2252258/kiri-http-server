@@ -94,7 +94,7 @@ abstract class BaseProcess implements OnProcessInterface
 	protected function onShutdown($data): void
 	{
 		$this->isStop = true;
-		$value = Context::getContext('waite:process:message');
+		$value = Context::get('waite:process:message');
 
 		\Kiri::getLogger()->alert('Process ' . $this->getName() . ' stop');
 

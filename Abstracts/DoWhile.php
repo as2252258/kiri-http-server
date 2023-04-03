@@ -16,7 +16,7 @@ class DoWhile
 	 */
 	public static function waite(array|\Closure $handler): void
 	{
-		if (Context::hasContext('stop')) {
+		if (Context::exists('stop')) {
 			return;
 		}
 		$handler();
@@ -29,7 +29,7 @@ class DoWhile
 	 */
 	public static function stop(): void
 	{
-		Context::setContext('stop', 1);
+		Context::set('stop', 1);
 	}
 
 
