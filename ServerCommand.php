@@ -71,7 +71,7 @@ class ServerCommand extends Command
 	 * @return int
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface|ReflectionException
+	 * @throws NotFoundExceptionInterface
 	 */
 	protected function restart(InputInterface $input): int
 	{
