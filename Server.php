@@ -42,12 +42,11 @@ class Server extends HttpService
 	private mixed $daemon = 0;
 
 
-	public AsyncServer $manager;
+	public AsyncServer|CoroutineServer $manager;
 
 
 	/**
 	 * @param State $state
-	 * @param AsyncServer $manager
 	 * @param ContainerInterface $container
 	 * @param ProcessManager $processManager
 	 * @param EventDispatch $dispatch
