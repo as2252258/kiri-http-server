@@ -51,7 +51,6 @@ class ServerCommand extends Command
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	public function execute(InputInterface $input, OutputInterface $output): int
