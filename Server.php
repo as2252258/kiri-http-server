@@ -76,7 +76,7 @@ class Server extends HttpService
 	 */
 	public function init(): void
 	{
-		$this->manager = $this->container->get(Config::get('server.class',AsyncServer::class));
+		$this->manager = $this->container->get(Config::get('server.type',AsyncServer::class));
 
 		$enable_coroutine = Config::get('server.settings.enable_coroutine', false);
 		if (!$enable_coroutine) {
