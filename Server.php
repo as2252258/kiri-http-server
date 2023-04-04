@@ -42,6 +42,9 @@ class Server extends HttpService
 	private mixed $daemon = 0;
 
 
+	public AsyncServer $manager;
+
+
 	/**
 	 * @param State $state
 	 * @param AsyncServer $manager
@@ -54,7 +57,6 @@ class Server extends HttpService
 	 * @throws Exception
 	 */
 	public function __construct(public State              $state,
-	                            public AsyncServer        $manager,
 	                            public ContainerInterface $container,
 	                            public ProcessManager     $processManager,
 	                            public EventDispatch      $dispatch,
@@ -69,9 +71,13 @@ class Server extends HttpService
 	/**
 	 * @return void
 	 * @throws ConfigException
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
 	 */
 	public function init(): void
 	{
+		$this->manager = $this->container->get(Config::get('server.class',AsyncServer::class));
+
 		$enable_coroutine = Config::get('server.settings.enable_coroutine', false);
 		if (!$enable_coroutine) {
 			return;
