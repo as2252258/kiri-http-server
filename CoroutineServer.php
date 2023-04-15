@@ -144,10 +144,10 @@ class CoroutineServer implements ServerInterface
 	public function onSigint($no, array $signInfo): void
 	{
 		try {
-			$this->logger->alert('Pid ' . getmypid() . ' get signo ' . $no);
+			\Kiri::getLogger()->alert('Pid ' . getmypid() . ' get signo ' . $no);
 			$this->shutdown();
 		} catch (\Throwable $exception) {
-			$this->logger->error($exception->getMessage());
+			\Kiri::getLogger()->error($exception->getMessage());
 		}
 	}
 

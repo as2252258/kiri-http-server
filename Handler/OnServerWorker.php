@@ -112,7 +112,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 			$worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), 9)
 		);
 
-		$this->logger->error($message);
+		\Kiri::getLogger()->error($message);
 
 		$this->system_mail($message);
 	}

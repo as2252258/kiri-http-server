@@ -128,7 +128,7 @@ class AsyncServer implements ServerInterface
 
 		$this->server->set($this->systemConfig($config, $daemon));
 
-		$this->logger->alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
+		\Kiri::getLogger()->alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
 
 		$this->onEventListen($this->server, Config::get('server.events', []));
 		$this->onEventListen($this->server, $config->events);
@@ -171,7 +171,7 @@ class AsyncServer implements ServerInterface
 			throw new Exception('Listen port fail.' . swoole_last_error());
 		}
 
-		$this->logger->alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
+		\Kiri::getLogger()->alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
 
 		$port->set($this->resetSettings($config->type, $config->settings));
 
@@ -187,10 +187,10 @@ class AsyncServer implements ServerInterface
 	public function onSigint($no, array $signInfo): void
 	{
 		try {
-			$this->logger->alert('Pid ' . getmypid() . ' get signo ' . $no);
+			\Kiri::getLogger()->alert('Pid ' . getmypid() . ' get signo ' . $no);
 			$this->shutdown();
 		} catch (\Throwable $exception) {
-			$this->logger->error($exception->getMessage());
+			\Kiri::getLogger()->error($exception->getMessage());
 		}
 	}
 
