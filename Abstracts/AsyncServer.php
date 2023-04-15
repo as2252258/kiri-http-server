@@ -133,7 +133,7 @@ class AsyncServer implements ServerInterface
 		$this->onEventListen($this->server, Config::get('server.events', []));
 		$this->onEventListen($this->server, $config->events);
 
-		$this->container->set(ServerInterface::class, $this->server);
+//		$this->container->set(ServerInterface::class, $this->server);
 	}
 
 
