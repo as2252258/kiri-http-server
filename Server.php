@@ -172,7 +172,6 @@ class Server
 
 	/**
 	 * @return void
-	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
