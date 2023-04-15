@@ -4,15 +4,12 @@
 namespace Kiri\Server;
 
 use Exception;
-use JetBrains\PhpStorm\Pure;
 use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Events\EventProvider;
 use Kiri\Exception\ConfigException;
-use Kiri\Message\Handler\Abstracts\HttpService;
-use Kiri\Message\Handler\Router;
-use Kiri\Server\Events\OnServerBeforeStart;
+use Kiri\Router\Router;
 use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnTaskerStart;
@@ -20,10 +17,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Kiri\Di\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Kiri\Server\Events\OnWorkerStop;
-use ReflectionException;
-use Swoole\WebSocket\Server as WsServer;
-use Swoole\Server as SServer;
-use Swoole\Http\Server as HServer;
 use Swoole\Coroutine;
 use Kiri\Server\Abstracts\ProcessManager;
 use Kiri\Server\Abstracts\AsyncServer;
@@ -36,7 +29,7 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
  * Class Server
  * @package Http
  */
-class Server extends HttpService
+class Server
 {
 
 	private mixed $daemon = 0;
@@ -69,7 +62,6 @@ class Server extends HttpService
 
 	/**
 	 * @return void
-	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
@@ -95,7 +87,7 @@ class Server extends HttpService
 	 * @param $process
 	 * @throws Exception
 	 */
-	public function addProcess($process)
+	public function addProcess($process): void
 	{
 		$this->processManager->add($process);
 	}
