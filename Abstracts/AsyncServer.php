@@ -37,20 +37,20 @@ class AsyncServer implements ServerInterface
 	private Server|null $server = null;
 
 
-	/**
-	 * @param Config $config
-	 * @param ContainerInterface $container
-	 * @param EventDispatch $dispatch
-	 * @param LoggerInterface $logger
-	 * @param ProcessManager $processManager
-	 */
-	public function __construct(#[Container(Config::class)] public Config                         $config,
-	                            #[Container(ContainerInterface::class)] public ContainerInterface $container,
-	                            #[Container(EventDispatch::class)] public EventDispatch           $dispatch,
-	                            #[Container(LoggerInterface::class)] public LoggerInterface       $logger,
-	                            #[Container(ProcessManager::class)] public ProcessManager         $processManager)
-	{
-	}
+	#[Container(Config::class)]
+	public Config $config;
+
+	#[Container(ContainerInterface::class)]
+	public ContainerInterface $container;
+
+	#[Container(EventDispatch::class)]
+	public EventDispatch $dispatch;
+
+	#[Container(LoggerInterface::class)]
+	public LoggerInterface $logger;
+
+	#[Container(ProcessManager::class)]
+	public ProcessManager $processManager;
 
 
 	/**
