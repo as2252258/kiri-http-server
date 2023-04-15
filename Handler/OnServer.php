@@ -2,6 +2,7 @@
 
 namespace Kiri\Server\Handler;
 
+use Kiri\Di\Inject\Container;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Events\OnAfterReload;
@@ -24,14 +25,8 @@ class OnServer extends Server
 {
 
 
-	/**
-	 * @param EventDispatch $dispatch
-	 * @throws \Exception
-	 */
-	public function __construct(public EventDispatch $dispatch)
-	{
-		parent::__construct();
-	}
+	#[Container(EventDispatch::class)]
+	public EventDispatch $dispatch;
 
 
 	/**
