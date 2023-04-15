@@ -14,13 +14,13 @@ use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Kiri\Server\Config as SConfig;
 use Kiri\Di\LocalService;
-use Swoole\Runtime;
 use Swoole\Server;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Constant;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\NotFindClassException;
 use Kiri\Server\Events\OnServerBeforeStart;
+use Kiri\Di\Inject\Container;
 
 /**
  *
@@ -44,11 +44,11 @@ class AsyncServer implements ServerInterface
 	 * @param LoggerInterface $logger
 	 * @param ProcessManager $processManager
 	 */
-	public function __construct(public Config             $config,
-	                            public ContainerInterface $container,
-	                            public EventDispatch      $dispatch,
-	                            public LoggerInterface    $logger,
-	                            public ProcessManager     $processManager)
+	public function __construct(#[Container(Config::class)] public Config                         $config,
+	                            #[Container(ContainerInterface::class)] public ContainerInterface $container,
+	                            #[Container(EventDispatch::class)] public EventDispatch           $dispatch,
+	                            #[Container(LoggerInterface::class)] public LoggerInterface       $logger,
+	                            #[Container(ProcessManager::class)] public ProcessManager         $processManager)
 	{
 	}
 

@@ -12,10 +12,10 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
-use Kiri\Annotation\Inject;
 use Psr\Container\ContainerInterface;
 use Kiri\Events\EventProvider;
 use Kiri\Server\ServerInterface;
+use Kiri\Di\Inject\Container;
 use Kiri\Server\Events\OnServerBeforeStart;
 
 class ProcessManager extends Component
@@ -29,11 +29,11 @@ class ProcessManager extends Component
 	/**
 	 * @var ContainerInterface
 	 */
-	#[Inject(ContainerInterface::class)]
+	#[Container(ContainerInterface::class)]
 	public ContainerInterface $container;
 
 
-	#[Inject(EventProvider::class)]
+	#[Container(EventProvider::class)]
 	public EventProvider $provider;
 
 	/**

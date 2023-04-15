@@ -20,6 +20,7 @@ use Kiri\Server\Events\OnWorkerStop;
 use Swoole\Coroutine;
 use Kiri\Server\Abstracts\ProcessManager;
 use Kiri\Server\Abstracts\AsyncServer;
+use Kiri\Di\Inject\Container;
 
 
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -37,27 +38,23 @@ class Server
 
 	public AsyncServer|CoroutineServer $manager;
 
+	#[Container(State::class)]
+	public State $state;
 
-	/**
-	 * @param State $state
-	 * @param ContainerInterface $container
-	 * @param ProcessManager $processManager
-	 * @param EventDispatch $dispatch
-	 * @param EventProvider $provider
-	 * @param Router $router
-	 * @param array $config
-	 * @throws Exception
-	 */
-	public function __construct(public State              $state,
-	                            public ContainerInterface $container,
-	                            public ProcessManager     $processManager,
-	                            public EventDispatch      $dispatch,
-	                            public EventProvider      $provider,
-	                            public Router             $router,
-	                            array                     $config = [])
-	{
-		parent::__construct($config);
-	}
+	#[Container(ContainerInterface::class)]
+	public ContainerInterface $container;
+
+	#[Container(ProcessManager::class)]
+	public ProcessManager $processManager;
+
+	#[Container(EventDispatch::class)]
+	public EventDispatch $dispatch;
+
+	#[Container(EventProvider::class)]
+	public EventProvider $provider;
+
+	#[Container(Router::class)]
+	public Router $router;
 
 
 	/**
@@ -67,7 +64,7 @@ class Server
 	 */
 	public function init(): void
 	{
-		$this->manager = $this->container->get(Config::get('server.type',AsyncServer::class));
+		$this->manager = $this->container->get(Config::get('server.type', AsyncServer::class));
 
 		$enable_coroutine = Config::get('server.settings.enable_coroutine', false);
 		if (!$enable_coroutine) {
@@ -160,13 +157,7 @@ class Server
 	public function onHotReload(): void
 	{
 		$this->onWorkerListener();
-		$reload = Config::get('reload.hot', false);
-		if ($reload !== false) {
-			$this->provider->on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
-			$this->manager->addProcess(Kiri\Reload\Inotify::class);
-		} else {
-			$this->router->scan_build_route();
-		}
+		$this->router->scan_build_route();
 	}
 
 

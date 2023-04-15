@@ -7,8 +7,6 @@ use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
-use Kiri\Message\Handler\Router;
-use Kiri\Server\Constant;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
 use Kiri\Server\Events\OnTaskerStart as OnTaskStart;
@@ -19,12 +17,9 @@ use Kiri\Server\Events\OnWorkerStop;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
-use Swoole\Runtime;
 use Swoole\Server;
 use Kiri\Server\Abstracts\StatusEnum;
 use Kiri\Server\WorkerStatus;
-use Swoole\Timer;
-use Kiri\Annotation\Inject;
 
 
 /**
@@ -134,7 +129,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 				Help::sendEmail($email, 'Service Error', $messageContent);
 			}
 		} catch (\Throwable $e) {
-			error($e, 'email');
+			error($e, ['email']);
 		}
 	}
 

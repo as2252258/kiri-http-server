@@ -4,6 +4,7 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri\Abstracts\Config;
+use Kiri\Di\Inject\Container;
 use Psr\Container\ContainerInterface;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
@@ -50,11 +51,11 @@ class CoroutineServer implements ServerInterface
 	 * @param LoggerInterface $logger
 	 * @param ProcessManager $processManager
 	 */
-	public function __construct(public Config             $config,
-	                            public ContainerInterface $container,
-	                            public EventDispatch      $dispatch,
-	                            public LoggerInterface    $logger,
-	                            public ProcessManager     $processManager)
+	public function __construct(#[Container(Config::class)] public Config                         $config,
+	                            #[Container(ContainerInterface::class)] public ContainerInterface $container,
+	                            #[Container(EventDispatch::class)] public EventDispatch           $dispatch,
+	                            #[Container(LoggerInterface::class)] public LoggerInterface       $logger,
+	                            #[Container(ProcessManager::class)] public ProcessManager         $processManager)
 	{
 	}
 

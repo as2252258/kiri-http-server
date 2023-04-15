@@ -3,7 +3,6 @@
 namespace Kiri\Server\Handler;
 
 use Kiri;
-use Kiri\Annotation\Inject;
 use Kiri\Events\EventDispatch;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;

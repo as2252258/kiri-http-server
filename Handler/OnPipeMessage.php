@@ -3,8 +3,6 @@
 namespace Kiri\Server\Handler;
 
 use Exception;
-use Kiri\Annotation\Inject;
-use Kiri\Events\EventDispatch;
 use Kiri\Server\Abstracts\Server;
 use Kiri\Server\Contract\OnPipeMessageInterface;
 
