@@ -6,6 +6,7 @@ use Exception;
 use Kiri\Server\CoroutineServer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Http\Server as HServer;
 use Swoole\Server;
@@ -111,18 +112,19 @@ trait TraitServer
 		}
 		return $array;
 	}
-	
-	
+
+
 	/**
 	 * @param array $ports
 	 * @return array<Config>
+	 * @throws ReflectionException
 	 */
 	public function genConfigService(array $ports): array
 	{
 		$array = [];
 		$ports = $ports['ports'] ?? [];
 		foreach ($ports as $port) {
-			$config = \Kiri::getDi()->create(Config::class, [], $port);
+			$config = \Kiri::getDi()->make(Config::class, [], $port);
 			if ($port['type'] == Constant::SERVER_TYPE_WEBSOCKET) {
 				array_unshift($array, $config);
 			} else if ($port['type'] == Constant::SERVER_TYPE_HTTP) {
