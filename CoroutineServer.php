@@ -4,8 +4,7 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri\Abstracts\Config;
-use Kiri\Di\ContainerInterface;
-use Kiri\Di\LocalService;
+use Psr\Container\ContainerInterface;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Exception\NotFindClassException;

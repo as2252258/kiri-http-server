@@ -14,7 +14,7 @@ use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnTaskerStart;
 use Psr\Container\ContainerExceptionInterface;
-use Kiri\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Kiri\Server\Events\OnWorkerStop;
 use Swoole\Coroutine;

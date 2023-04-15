@@ -5,7 +5,7 @@ namespace Kiri\Server\Abstracts;
 use Exception;
 use Kiri;
 use Kiri\Abstracts\Config;
-use Kiri\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;

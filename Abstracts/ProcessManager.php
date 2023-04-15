@@ -13,7 +13,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Coroutine;
 use Swoole\Process;
 use Kiri\Annotation\Inject;
-use Kiri\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Kiri\Events\EventProvider;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Events\OnServerBeforeStart;
