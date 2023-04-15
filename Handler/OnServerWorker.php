@@ -6,6 +6,7 @@ use Exception;
 use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
+use Kiri\Di\Inject\Container;
 use Kiri\Events\EventDispatch;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
@@ -20,6 +21,7 @@ use ReflectionException;
 use Swoole\Server;
 use Kiri\Server\Abstracts\StatusEnum;
 use Kiri\Server\WorkerStatus;
+use Kiri\Router\Router;
 
 
 /**
@@ -30,16 +32,15 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 {
 
 
-	/**
-	 * @param EventDispatch $dispatch
-	 * @param WorkerStatus $status
-	 * @param Router $router
-	 * @throws Exception
-	 */
-	public function __construct(public EventDispatch $dispatch, public WorkerStatus $status, public Router $router)
-	{
-		parent::__construct();
-	}
+	#[Container(EventDispatch::class)]
+	public EventDispatch $dispatch;
+
+	#[Container(WorkerStatus::class)]
+	public WorkerStatus $status;
+
+	#[Container(Router::class)]
+	public Router $router;
+
 
 
 	/**
