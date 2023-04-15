@@ -40,6 +40,10 @@ class AsyncServer implements ServerInterface
 	#[Container(Config::class)]
 	public Config $config;
 
+
+	/**
+	 * @var Kiri\Di\Container
+	 */
 	#[Container(ContainerInterface::class)]
 	public ContainerInterface $container;
 
@@ -129,7 +133,7 @@ class AsyncServer implements ServerInterface
 		$this->onEventListen($this->server, Config::get('server.events', []));
 		$this->onEventListen($this->server, $config->events);
 
-		$this->container->setBindings(ServerInterface::class, $this->server);
+		$this->container->set(ServerInterface::class, $this->server);
 	}
 
 
