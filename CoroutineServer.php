@@ -82,9 +82,9 @@ class CoroutineServer implements ServerInterface
 			$this->addListener(instance(SConfig::class, [], $rpcService));
 		}
 
-		$this->container->setBindings(ServerInterface::class, $this);
+		\Kiri::service()->set('server', $this);
 
-//		$this->processManager->batch(Config::get('processes', []));
+		$this->processManager->batch(Config::get('processes', []));
 	}
 
 
