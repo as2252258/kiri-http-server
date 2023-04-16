@@ -177,7 +177,7 @@ class Server
 			$state->exit($config['port']);
 		}
 
-		$manager = Kiri::getDi()->get(EventProvider::class);
+		$manager = Kiri::getDi()->get(EventDispatch::class);
 		$manager->dispatch(new OnShutdown());
 	}
 
