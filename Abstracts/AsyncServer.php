@@ -37,24 +37,9 @@ class AsyncServer implements ServerInterface
 	private Server|null $server = null;
 
 
-	#[Container(Config::class)]
-	public Config $config;
-
-
-	/**
-	 * @var Kiri\Di\Container
-	 */
-	#[Container(ContainerInterface::class)]
-	public ContainerInterface $container;
-
-	#[Container(EventDispatch::class)]
-	public EventDispatch $dispatch;
-
 	#[Container(LoggerInterface::class)]
 	public LoggerInterface $logger;
 
-	#[Container(ProcessManager::class)]
-	public ProcessManager $processManager;
 
 
 	/**
@@ -78,7 +63,9 @@ class AsyncServer implements ServerInterface
 		if (!empty($rpcService)) {
 			$this->addListener(instance(SConfig::class, [], $rpcService));
 		}
-		$this->processManager->batch(Config::get('processes', []));
+
+		$processManager = Kiri::getDi()->get(ProcessManager::class);
+		$processManager->batch(Config::get('processes', []));
 
 		$this->onSignal(Config::get('signal', []));
 	}
@@ -103,7 +90,8 @@ class AsyncServer implements ServerInterface
 	{
 		$this->server->shutdown();
 
-		$this->dispatch->dispatch(new OnShutdown());
+		$processManager = Kiri::getDi()->get(EventDispatch::class);
+		$processManager->dispatch(new OnShutdown());
 
 		return true;
 	}
@@ -117,6 +105,7 @@ class AsyncServer implements ServerInterface
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFindClassException
 	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	private function createBaseServer(SConfig $config, int $daemon = 0): void
 	{
@@ -132,8 +121,6 @@ class AsyncServer implements ServerInterface
 
 		$this->onEventListen($this->server, Config::get('server.events', []));
 		$this->onEventListen($this->server, $config->events);
-
-//		$this->container->set(ServerInterface::class, $this->server);
 	}
 
 
@@ -176,13 +163,14 @@ class AsyncServer implements ServerInterface
 		$port->set($this->resetSettings($config->type, $config->settings));
 
 		$this->onEventListen($port, $config->getEvents());
-		$this->container->get(LocalService::class)->set($config->getName(), $port);
+		Kiri::getDi()->get(LocalService::class)->set($config->getName(), $port);
 	}
 
 	/**
 	 * @param $no
 	 * @param array $signInfo
 	 * @return void
+	 * @throws ReflectionException
 	 */
 	public function onSigint($no, array $signInfo): void
 	{
@@ -219,14 +207,13 @@ class AsyncServer implements ServerInterface
 	 * @param Server\Port|Server $base
 	 * @param array $events
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	private function onEventListen(Server\Port|Server $base, array $events): void
 	{
 		foreach ($events as $name => $event) {
 			if (is_array($event) && is_string($event[0])) {
-				$event[0] = $this->container->get($event[0]);
+				$event[0] = Kiri::getDi()->get($event[0]);
 			}
 			$base->on($name, $event);
 		}
@@ -237,10 +224,12 @@ class AsyncServer implements ServerInterface
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	public function start(): void
 	{
-		$this->dispatch->dispatch(new OnServerBeforeStart());
+		$processManager = Kiri::getDi()->get(EventDispatch::class);
+		$processManager->dispatch(new OnServerBeforeStart());
 		$this->server->start();
 	}
 
