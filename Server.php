@@ -184,7 +184,6 @@ class Server
 
 	/**
 	 * @return bool
-	 * @throws ConfigException
 	 * @throws Exception
 	 */
 	public function isRunner(): bool
