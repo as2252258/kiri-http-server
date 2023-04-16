@@ -50,11 +50,11 @@ class ProcessManager extends Component
 	 * @param OnServerBeforeStart $beforeStart
 	 * @return void
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws NotFoundExceptionInterface|Exception
 	 */
 	public function OnServerBeforeStart(OnServerBeforeStart $beforeStart): void
 	{
-		$server = $this->container->get(ServerInterface::class);
+		$server = Kiri::service()->get('server');
 		foreach ($this->_process as $custom) {
 			if (Kiri\Di\Context::inCoroutine()) {
 				Coroutine::create(function () use ($custom) {
