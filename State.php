@@ -17,7 +17,10 @@ class State extends Component
 	public array $servers = [];
 
 
-	public function init()
+	/**
+	 * @return void
+	 */
+	public function init(): void
 	{
 		$this->servers = Config::get('server.ports');
 	}
@@ -49,7 +52,7 @@ class State extends Component
 			return;
 		}
 		while (checkPortIsAlready($port)) {
-            Process::kill($pid, 0) && Process::kill($pid, SIGTERM);
+			Process::kill($pid, 0) && Process::kill($pid, SIGTERM);
 			usleep(300);
 		}
 	}
