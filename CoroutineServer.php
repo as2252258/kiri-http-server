@@ -84,14 +84,14 @@ class CoroutineServer implements ServerInterface
 
 		\Kiri::service()->set('server', $this);
 
-		$this->processManager->batch(Config::get('processes', []));
+		$processManager = \Kiri::getDi()->get(ProcessManager::class);
+		$processManager->batch(Config::get('processes', []));
 	}
 
 
 	/**
 	 * @param SConfig $config
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	public function addListener(SConfig $config): void
 	{
@@ -99,10 +99,10 @@ class CoroutineServer implements ServerInterface
 
 		$events = $config->getEvents()[Constant::REQUEST] ?? null;
 		if (is_null($events)) {
-			$events = [\Kiri\Message\Server::class, 'onRequest'];
+			$events = [\Kiri\Router\Server::class, 'onRequest'];
 		}
 
-		$events[0] = $this->container->get($events[0]);
+		$events[0] = \Kiri::getDi()->get($events[0]);
 		$server->handle('/', $events);
 
 		$this->servers[] = $server;
@@ -130,7 +130,8 @@ class CoroutineServer implements ServerInterface
 			$server->shutdown();
 		}
 
-		$this->dispatch->dispatch(new OnShutdown());
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnShutdown());
 
 		return true;
 	}
@@ -156,14 +157,13 @@ class CoroutineServer implements ServerInterface
 	 * @param Server\Port|Server $base
 	 * @param array $events
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	private function onEventListen(Server\Port|Server $base, array $events): void
 	{
 		foreach ($events as $name => $event) {
 			if (is_array($event) && is_string($event[0])) {
-				$event[0] = $this->container->get($event[0]);
+				$event[0] = \Kiri::getDi()->get($event[0]);
 			}
 			$base->on($name, $event);
 		}
@@ -176,7 +176,8 @@ class CoroutineServer implements ServerInterface
 	public function start(): void
 	{
 		Coroutine\run(function () {
-			$this->dispatch->dispatch(new OnServerBeforeStart());
+			$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+			$dispatch->dispatch(new OnServerBeforeStart());
 
 			$this->onSignal(Config::get('signal', []));
 
@@ -199,9 +200,7 @@ class CoroutineServer implements ServerInterface
 
 	/**
 	 * @return void
-	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws ReflectionException
 	 */
 	private function onTasker(): void
 	{
@@ -220,9 +219,10 @@ class CoroutineServer implements ServerInterface
 			return;
 		}
 
-		$taskEvents[0] = $this->container->get($taskEvents[0]);
+		$container = \Kiri::getDi();
+		$taskEvents[0] = $container->get($taskEvents[0]);
 		if (!is_null($finishEvents)) {
-			$finishEvents[0] = $this->container->get($finishEvents[0]);
+			$finishEvents[0] = $container->get($finishEvents[0]);
 		}
 
 		$this->channel = new Coroutine\Channel($config[Constant::OPTION_TASK_WORKER_NUM]);

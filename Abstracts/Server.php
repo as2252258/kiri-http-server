@@ -17,14 +17,6 @@ use Kiri\Di\Inject\Container;
 abstract class Server
 {
 
-
-	/**
-	 * @var LoggerInterface
-	 */
-	#[Container(LoggerInterface::class)]
-	public LoggerInterface $logger;
-
-
 	/**
 	 * Server constructor.
 	 * @throws Exception

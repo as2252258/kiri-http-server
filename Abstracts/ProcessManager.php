@@ -27,22 +27,13 @@ class ProcessManager extends Component
 
 
 	/**
-	 * @var ContainerInterface
-	 */
-	#[Container(ContainerInterface::class)]
-	public ContainerInterface $container;
-
-
-	#[Container(EventProvider::class)]
-	public EventProvider $provider;
-
-	/**
 	 * @return void
 	 * @throws Exception
 	 */
 	public function init(): void
 	{
-		$this->provider->on(OnServerBeforeStart::class, [$this, 'OnServerBeforeStart']);
+		$provider = Kiri::getDi()->get(EventProvider::class);
+		$provider->on(OnServerBeforeStart::class, [$this, 'OnServerBeforeStart']);
 	}
 
 
@@ -190,6 +181,7 @@ class ProcessManager extends Component
 	 * @param Process $process
 	 * @return void
 	 * @throws Kiri\Exception\ConfigException
+	 * @throws \ReflectionException
 	 */
 	public function extracted(mixed $custom, Process $process): void
 	{

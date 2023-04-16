@@ -37,11 +37,6 @@ class AsyncServer implements ServerInterface
 	private Server|null $server = null;
 
 
-	#[Container(LoggerInterface::class)]
-	public LoggerInterface $logger;
-
-
-
 	/**
 	 * @param array $service
 	 * @param int $daemon

@@ -6,7 +6,6 @@ use Exception;
 use Kiri;
 use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
-use Kiri\Di\Inject\Container;
 use Kiri\Events\EventDispatch;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
@@ -19,9 +18,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
-use Kiri\Server\Abstracts\StatusEnum;
-use Kiri\Server\WorkerStatus;
-use Kiri\Router\Router;
 
 
 /**
@@ -30,17 +26,6 @@ use Kiri\Router\Router;
  */
 class OnServerWorker extends \Kiri\Server\Abstracts\Server
 {
-
-
-	#[Container(EventDispatch::class)]
-	public EventDispatch $dispatch;
-
-	#[Container(WorkerStatus::class)]
-	public WorkerStatus $status;
-
-	#[Container(Router::class)]
-	public Router $router;
-
 
 
 	/**
@@ -53,15 +38,17 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerStart(Server $server, int $workerId): void
 	{
-		$this->dispatch->dispatch(new OnBeforeWorkerStart($workerId));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnBeforeWorkerStart($workerId));
 		set_env('environmental_workerId', $workerId);
-		$this->status->setEnum(StatusEnum::START);
+
 		if ($workerId < $server->setting['worker_num']) {
-			$this->dispatch->dispatch(new OnWorkerStart($server, $workerId));
+			$dispatch->dispatch(new OnWorkerStart($server, $workerId));
 		} else {
-			$this->dispatch->dispatch(new OnTaskStart($server, $workerId));
+			$dispatch->dispatch(new OnTaskStart($server, $workerId));
 		}
-		$this->dispatch->dispatch(new OnAfterWorkerStart());
+
+		$dispatch->dispatch(new OnAfterWorkerStart());
 	}
 
 
@@ -73,9 +60,8 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerStop(Server $server, int $workerId)
 	{
-		$this->status->setEnum(StatusEnum::STOP);
-
-		$this->dispatch->dispatch(new OnWorkerStop($server, $workerId));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnWorkerStop($server, $workerId));
 	}
 
 
@@ -87,9 +73,8 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerExit(Server $server, int $workerId)
 	{
-		$this->status->setEnum(StatusEnum::EXIT);
-
-		$this->dispatch->dispatch(new OnWorkerExit($server, $workerId));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnWorkerExit($server, $workerId));
 	}
 
 
@@ -105,8 +90,8 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
 	{
-		$this->status->setEnum(StatusEnum::ERROR);
-		$this->dispatch->dispatch(new OnWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal));
 
 		$message = sprintf('Worker#%d::%d error stop. signal %d, exit_code %d, msg %s',
 			$worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), 9)

@@ -21,22 +21,19 @@ use Kiri\Server\Events\OnManagerStop;
 class OnServerManager extends Server
 {
 
-	#[Container(EventDispatch::class)]
-	public EventDispatch $dispatch;
-
-
 
 	/**
 	 * @param \Swoole\Server $server
 	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
 	public function onManagerStart(\Swoole\Server $server)
 	{
 		Kiri::setProcessName(sprintf('manger process[%d]', $server->manager_pid));
 
-		$this->dispatch->dispatch(new OnManagerStart($server));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnManagerStart($server));
 	}
 
 
@@ -44,11 +41,12 @@ class OnServerManager extends Server
 	 * @param \Swoole\Server $server
 	 * @return void
 	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
 	public function onManagerStop(\Swoole\Server $server): void
 	{
-		$this->dispatch->dispatch(new OnManagerStop($server));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnManagerStop($server));
 	}
 
 

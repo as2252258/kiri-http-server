@@ -25,10 +25,6 @@ class OnServer extends Server
 {
 
 
-	#[Container(EventDispatch::class)]
-	public EventDispatch $dispatch;
-
-
 	/**
 	 * @param SServer $server
 	 * @throws ConfigException
@@ -40,7 +36,8 @@ class OnServer extends Server
 	{
 		\Kiri::setProcessName(sprintf('start[%d].server', $server->master_pid));
 
-		$this->dispatch->dispatch(new OnStart($server));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnStart($server));
 	}
 
 
@@ -52,7 +49,8 @@ class OnServer extends Server
 	 */
 	public function onBeforeShutdown(SServer $server)
 	{
-		$this->dispatch->dispatch(new OnBeforeShutdown($server));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnBeforeShutdown($server));
 	}
 
 
@@ -64,7 +62,8 @@ class OnServer extends Server
 	 */
 	public function onShutdown(SServer $server)
 	{
-		$this->dispatch->dispatch(new OnShutdown($server));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnShutdown($server));
 	}
 
 
@@ -76,7 +75,8 @@ class OnServer extends Server
 	 */
 	public function onBeforeReload(SServer $server)
 	{
-		$this->dispatch->dispatch(new OnBeforeReload($server));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnBeforeReload($server));
 	}
 
 
@@ -88,7 +88,8 @@ class OnServer extends Server
 	 */
 	public function onAfterReload(SServer $server)
 	{
-		$this->dispatch->dispatch(new OnAfterReload($server));
+		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
+		$dispatch->dispatch(new OnAfterReload($server));
 	}
 
 
