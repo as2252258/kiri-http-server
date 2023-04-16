@@ -17,6 +17,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Kiri\Server\Events\OnWorkerStop;
+use ReflectionException;
 use Swoole\Coroutine;
 use Kiri\Server\Abstracts\ProcessManager;
 use Kiri\Server\Abstracts\AsyncServer;
@@ -33,39 +34,35 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
 class Server
 {
 
-	private mixed $daemon = 0;
+	private string $class;
+
+	private int $daemon = 0;
 
 
-	public AsyncServer|CoroutineServer $manager;
+	/**
+	 *
+	 */
+	public function __construct()
+	{
+		$this->class = Config::get('server.type', AsyncServer::class);
+	}
 
-	#[Container(State::class)]
-	public State $state;
 
-	#[Container(ContainerInterface::class)]
-	public ContainerInterface $container;
-
-	#[Container(ProcessManager::class)]
-	public ProcessManager $processManager;
-
-	#[Container(EventDispatch::class)]
-	public EventDispatch $dispatch;
-
-	#[Container(EventProvider::class)]
-	public EventProvider $provider;
-
-	#[Container(Router::class)]
-	public Router $router;
+	/**
+	 * @return AsyncServer|CoroutineServer
+	 * @throws ReflectionException
+	 */
+	private function manager(): AsyncServer|CoroutineServer
+	{
+		return Kiri::getDi()->get($this->class);
+	}
 
 
 	/**
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
 	 */
 	public function init(): void
 	{
-		$this->manager = $this->container->get(Config::get('server.type', AsyncServer::class));
-
 		$enable_coroutine = Config::get('server.settings.enable_coroutine', false);
 		if (!$enable_coroutine) {
 			return;
@@ -86,7 +83,8 @@ class Server
 	 */
 	public function addProcess($process): void
 	{
-		$this->processManager->add($process);
+		$manager = Kiri::getDi()->get(ProcessManager::class);
+		$manager->add($process);
 	}
 
 
@@ -100,8 +98,9 @@ class Server
 	public function start(): void
 	{
 		$this->onHotReload();
-		$this->manager->initCoreServers(Config::get('server', [], true), $this->daemon);
-		$this->manager->start();
+		$manager = $this->manager();
+		$manager->initCoreServers(Config::get('server', [], true), $this->daemon);
+		$manager->start();
 	}
 
 
@@ -111,9 +110,10 @@ class Server
 	 */
 	protected function onWorkerListener(): void
 	{
-		$this->provider->on(OnWorkerStop::class, '\Swoole\Timer::clearAll', 9999);
-		$this->provider->on(OnWorkerStart::class, [$this, 'setWorkerName']);
-		$this->provider->on(OnTaskerStart::class, [$this, 'setTaskerName']);
+		$manager = Kiri::getDi()->get(EventProvider::class);
+		$manager->on(OnWorkerStop::class, '\Swoole\Timer::clearAll', 9999);
+		$manager->on(OnWorkerStart::class, [$this, 'setWorkerName']);
+		$manager->on(OnTaskerStart::class, [$this, 'setTaskerName']);
 	}
 
 
@@ -157,7 +157,8 @@ class Server
 	public function onHotReload(): void
 	{
 		$this->onWorkerListener();
-		$this->router->scan_build_route();
+		$manager = Kiri::getDi()->get(Router::class);
+		$manager->scan_build_route();
 	}
 
 
@@ -170,10 +171,14 @@ class Server
 	public function shutdown(): void
 	{
 		$configs = Config::get('server', [], true);
-		foreach ($this->manager->sortService($configs['ports'] ?? []) as $config) {
-			$this->state->exit($config['port']);
+
+		$state = Kiri::getDi()->get(State::class);
+		foreach ($this->manager()->sortService($configs['ports'] ?? []) as $config) {
+			$state->exit($config['port']);
 		}
-		$this->dispatch->dispatch(new OnShutdown());
+
+		$manager = Kiri::getDi()->get(EventProvider::class);
+		$manager->dispatch(new OnShutdown());
 	}
 
 
@@ -184,7 +189,8 @@ class Server
 	 */
 	public function isRunner(): bool
 	{
-		return $this->state->isRunner();
+		$state = Kiri::getDi()->get(State::class);
+		return $state->isRunner();
 	}
 
 
