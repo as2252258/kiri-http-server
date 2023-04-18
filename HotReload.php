@@ -21,7 +21,7 @@ class HotReload extends Command
 	/**
 	 * @var Process
 	 */
-	private ?Process $process;
+	private Process $process;
 	/**
 	 * @var array|mixed
 	 */
