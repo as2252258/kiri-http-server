@@ -21,7 +21,7 @@ class HotReload extends Command
 	/**
 	 * @var Process
 	 */
-	private Process $process;
+	private ?Process $process;
 	/**
 	 * @var array|mixed
 	 */
@@ -38,7 +38,7 @@ class HotReload extends Command
 	}
 
 
-	private array $dirs = [APP_PATH . 'app/', APP_PATH . 'config/', APP_PATH . 'router/'];
+	private array $dirs = [APP_PATH . 'app/', APP_PATH . 'config/', APP_PATH . 'routes/'];
 
 
 	/**
@@ -50,11 +50,15 @@ class HotReload extends Command
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$this->startProcess();
+		pcntl_signal(SIGINT | SIGQUIT | SIGTERM, function () {
+			Process::wait();
+		});
 		if (extension_loaded('inotify')) {
 			$this->onInotifyReload();
 		} else {
 			$this->onCrontabReload();
 		}
+		Process::wait();
 	}
 
 
@@ -63,10 +67,11 @@ class HotReload extends Command
 	 */
 	private function startProcess(): void
 	{
-		$this->process = new Process(function (Process $process) {
-			$process->exec(PHP_BINARY . ' ' . APP_PATH . 'kiri.php', ['sw:server', 'start']);
-		});
-		$this->process->start();
+		$process = new Process(function (Process $process) {
+			$process->exec(PHP_BINARY, [APP_PATH . 'kiri.php', 'sw:server', 'start']);
+		},);
+		$process->start();
+		$this->process = $process;
 	}
 
 
@@ -266,7 +271,9 @@ class HotReload extends Command
 	 */
 	public function trigger_reload(): void
 	{
-		$this->process->exit(0);
+		echo 'tigger server Reload' . PHP_EOL;
+		Process::kill($this->process->pid, SIGTERM);
+		$this->process = null;
 		$this->startProcess();
 	}
 
@@ -280,7 +287,7 @@ class HotReload extends Command
 			try {
 				inotify_rm_watch($inotify, $wd);
 			} catch (\Throwable $exception) {
-				error($exception);
+				logger()->addError($exception, 'throwable');
 			}
 		}
 		$this->watchFiles = [];
