@@ -173,7 +173,7 @@ class AsyncServer implements ServerInterface
 			\Kiri::getLogger()->alert('Pid ' . getmypid() . ' get signo ' . $no);
 			$this->shutdown();
 		} catch (\Throwable $exception) {
-			\Kiri::getLogger()->error($exception->getMessage());
+			error($exception);
 		}
 	}
 

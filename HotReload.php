@@ -280,7 +280,7 @@ class HotReload extends Command
 			try {
 				inotify_rm_watch($inotify, $wd);
 			} catch (\Throwable $exception) {
-				logger()->addError($exception, 'throwable');
+				error($exception);
 			}
 		}
 		$this->watchFiles = [];
