@@ -49,10 +49,13 @@ class HotReload extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		pcntl_signal(SIGINT | SIGQUIT | SIGTERM, function () {
-			$this->stopProcess();
-		});
 		$this->startProcess();
+		$signal = SIGINT | SIGQUIT | SIGTERM;
+		$bool = Process::signal($signal, function () {
+			$this->stopProcess();
+			Process::wait();
+		});
+		echo 'Listen signal ' . ($bool ? 'success' : 'fail') . PHP_EOL;
 		if (extension_loaded('inotify')) {
 			$this->onInotifyReload();
 		} else {
