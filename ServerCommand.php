@@ -33,6 +33,7 @@ class ServerCommand extends Command
 
 	/**
 	 * @return void
+	 * @throws ReflectionException
 	 */
 	protected function configure(): void
 	{
@@ -55,13 +56,15 @@ class ServerCommand extends Command
 	 */
 	public function execute(InputInterface $input, OutputInterface $output): int
 	{
-		return match ($input->getArgument('action')) {
+		$value = match ($input->getArgument('action')) {
 			'restart' => $this->restart($input),
 			'stop' => $this->stop(),
 			'start' => $this->start($input),
 			default =>
 			throw new Exception('I don\'t know what I want to do.')
 		};
+		file_put_contents(storage('.swoole.pid'), 0);
+		return $value;
 	}
 
 
