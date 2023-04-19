@@ -23,7 +23,6 @@ class State extends Component
 	 */
 	public function init(): void
 	{
-		Logger::emergency();
 		$this->servers = Config::get('server.ports');
 	}
 
