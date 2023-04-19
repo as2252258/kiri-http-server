@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1, ticks=1);
 
 namespace Kiri\Server;
 
@@ -28,6 +29,9 @@ class HotReload extends Command
 	private array $watchFiles = [];
 
 
+	private bool $isExit = false;
+
+
 	/**
 	 * @return void
 	 */
@@ -44,24 +48,19 @@ class HotReload extends Command
 	/**
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
-	 * @return void
+	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
+	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$this->startProcess();
-		$bool = pcntl_signal(SIGINT | SIGQUIT | SIGTERM, function () {
-			$this->stopProcess();
-
-			$pid = (int)file_get_contents(storage('.swoole.pid'));
-			pcntl_waitpid($pid, $status);
-		});
-		echo 'Listen signal ' . ($bool ? 'success' : 'fail') . PHP_EOL;
+		sleep(3);
 		if (extension_loaded('inotify')) {
 			$this->onInotifyReload();
 		} else {
 			$this->onCrontabReload();
 		}
+		return 1;
 	}
 
 
@@ -148,6 +147,11 @@ class HotReload extends Command
 			return;
 		}
 
+		$pid = (int)file_get_contents(storage('.swoole.pid'));
+		if ($pid <= 0 || !Process::kill($pid, 0)) {
+			return;
+		}
+
 		$this->loadDirs(true);
 
 		sleep(2);
@@ -162,7 +166,7 @@ class HotReload extends Command
 	 * @return void
 	 * @throws Exception
 	 */
-	private function loadByDir($path, $isReload = false): void
+	private function loadByDir($path, bool $isReload = false): void
 	{
 		if (!is_string($path)) {
 			return;
@@ -211,7 +215,7 @@ class HotReload extends Command
 	/**
 	 * 开始监听
 	 */
-	public function check($inotify)
+	public function check($inotify): void
 	{
 		if (!($events = inotify_read($inotify))) {
 			return;
