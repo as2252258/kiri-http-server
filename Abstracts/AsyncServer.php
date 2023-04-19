@@ -109,7 +109,7 @@ class AsyncServer implements ServerInterface
 		$this->server = new $match($config->host, $config->port, $config->mode, $config->socket);
 		$this->server->set($this->systemConfig($config, $daemon));
 
-		Logger::alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
+		Logger::_alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
 		if (!isset($config->events[Constant::SHUTDOWN])) {
 			$config->events[Constant::SHUTDOWN] = [OnServer::class, 'onShutdown'];
 		}
