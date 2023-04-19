@@ -82,7 +82,7 @@ class HotReload extends Command
 	 */
 	private function startProcess(): void
 	{
-		$this->process = proc_open([PHP_BINARY, APP_PATH . 'kiri.php', 'sw:server', 'start'], [], $pipes);
+		$this->process = proc_open([PHP_BINARY, APP_PATH . 'kiri.php', 'sw:server', 'restart'], [], $pipes);
 	}
 
 	/**
@@ -283,7 +283,7 @@ class HotReload extends Command
 	/**
 	 * @throws Exception
 	 */
-	public function timerReload()
+	public function timerReload(): void
 	{
 		Context::set('isReloading', true);
 		$this->trigger_reload();
