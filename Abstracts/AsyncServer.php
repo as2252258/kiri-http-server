@@ -5,12 +5,11 @@ namespace Kiri\Server\Abstracts;
 use Exception;
 use Kiri;
 use Kiri\Abstracts\Config;
-use Psr\Container\ContainerInterface;
+use Kiri\Server\Handler\OnServer;
 use Kiri\Exception\ConfigException;
 use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Kiri\Server\Config as SConfig;
 use Kiri\Di\LocalService;
@@ -20,7 +19,7 @@ use Kiri\Server\Constant;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\NotFindClassException;
 use Kiri\Server\Events\OnServerBeforeStart;
-use Kiri\Di\Inject\Container;
+use Kiri\Abstracts\Logger;
 
 /**
  *
@@ -98,9 +97,7 @@ class AsyncServer implements ServerInterface
 	 * @param int $daemon
 	 * @return void
 	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
 	 * @throws NotFindClassException
-	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 */
 	private function createBaseServer(SConfig $config, int $daemon = 0): void
@@ -110,11 +107,12 @@ class AsyncServer implements ServerInterface
 			throw new NotFindClassException('Unknown server type ' . $config->type);
 		}
 		$this->server = new $match($config->host, $config->port, $config->mode, $config->socket);
-
 		$this->server->set($this->systemConfig($config, $daemon));
 
-		\Kiri::getLogger()->alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
-
+		Logger::alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
+		if (!isset($config->events[Constant::SHUTDOWN])) {
+			$config->events[Constant::SHUTDOWN] = [OnServer::class, 'onShutdown'];
+		}
 		$this->onEventListen($this->server, Config::get('server.events', []));
 		$this->onEventListen($this->server, $config->events);
 	}
