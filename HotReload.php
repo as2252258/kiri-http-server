@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1, ticks=1);
+declare(strict_types=1);
 
 namespace Kiri\Server;
 
