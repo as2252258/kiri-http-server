@@ -128,6 +128,12 @@ class HotReload extends Command
 			$this->watch($init, $dir);
 		}
 		Event::add($init, fn() => $this->check($init));
+		Event::cycle(function () use ($init) {
+			$pid = (int)file_get_contents(storage('.swoole.pid'));
+			if ($pid <= 0 || !Process::kill($pid, 0)) {
+				Event::del($init);
+			}
+		}, true);
 		Event::wait();
 	}
 
