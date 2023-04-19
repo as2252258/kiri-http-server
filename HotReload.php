@@ -57,11 +57,11 @@ class HotReload extends Command
 		Process::signal(SIGINT, fn() => $this->exit());
 		Process::signal(SIGTERM, fn() => $this->exit());
 		sleep(3);
-		if (extension_loaded('inotify')) {
-			$this->onInotifyReload();
-		} else {
-			$this->onCrontabReload();
-		}
+//		if (extension_loaded('inotify')) {
+//			$this->onInotifyReload();
+//		} else {
+		$this->onCrontabReload();
+//		}
 		return 1;
 	}
 
