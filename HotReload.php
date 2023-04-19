@@ -50,10 +50,11 @@ class HotReload extends Command
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$this->startProcess();
-		$signal = SIGINT | SIGQUIT | SIGTERM;
-		$bool = Process::signal($signal, function () {
+		$bool = pcntl_signal(SIGINT | SIGQUIT | SIGTERM, function () {
 			$this->stopProcess();
-			Process::wait();
+
+			$pid = (int)file_get_contents(storage('.swoole.pid'));
+			pcntl_waitpid($pid, $status);
 		});
 		echo 'Listen signal ' . ($bool ? 'success' : 'fail') . PHP_EOL;
 		if (extension_loaded('inotify')) {
@@ -61,7 +62,6 @@ class HotReload extends Command
 		} else {
 			$this->onCrontabReload();
 		}
-		Process::wait();
 	}
 
 

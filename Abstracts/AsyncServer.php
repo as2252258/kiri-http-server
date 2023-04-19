@@ -50,11 +50,7 @@ class AsyncServer implements ServerInterface
 	public function initCoreServers(array $service, int $daemon = 0): void
 	{
 		$service = $this->genConfigService($service);
-		$pid = (int)file_get_contents(storage('.swoole.pid'));
-		if (posix_kill($pid, 0)) {
-			posix_kill($pid, SIGTERM);
-		}
-		
+
 		$this->createBaseServer(array_shift($service), $daemon);
 		foreach ($service as $value) {
 			$this->addListener($value);
