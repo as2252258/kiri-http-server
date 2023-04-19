@@ -121,7 +121,7 @@ class HotReload extends Command
 	private function onInotifyReload(): void
 	{
 		$init = inotify_init();
-		foreach ([APP_PATH . 'app/'] as $dir) {
+		foreach ($this->dirs as $dir) {
 			if (!is_dir($dir)) {
 				continue;
 			}
