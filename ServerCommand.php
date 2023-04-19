@@ -63,7 +63,9 @@ class ServerCommand extends Command
 			default =>
 			throw new Exception('I don\'t know what I want to do.')
 		};
-		file_put_contents(storage('.swoole.pid'), 0);
+		if ($input->getOption('daemon') != 1) {
+			file_put_contents(storage('.swoole.pid'), 0);
+		}
 		return $value;
 	}
 
@@ -85,7 +87,6 @@ class ServerCommand extends Command
 
 	/**
 	 * @return int
-	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
