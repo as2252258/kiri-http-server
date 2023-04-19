@@ -60,8 +60,9 @@ class OnServer extends Server
 	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 */
-	public function onShutdown(SServer $server)
+	public function onShutdown(SServer $server): void
 	{
+		@unlink(storage('.swoole.pid'));
 		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
 		$dispatch->dispatch(new OnShutdown($server));
 	}
