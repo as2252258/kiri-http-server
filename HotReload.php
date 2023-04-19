@@ -49,10 +49,10 @@ class HotReload extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$this->startProcess();
 		pcntl_signal(SIGINT | SIGQUIT | SIGTERM, function () {
-			Process::wait();
+			$this->stopProcess();
 		});
+		$this->startProcess();
 		if (extension_loaded('inotify')) {
 			$this->onInotifyReload();
 		} else {
@@ -68,6 +68,23 @@ class HotReload extends Command
 	private function startProcess(): void
 	{
 		$this->process = proc_open([PHP_BINARY, APP_PATH . 'kiri.php', 'sw:server', 'start'], [], $pipes);
+	}
+
+	/**
+	 * @return void
+	 * @throws Exception
+	 */
+	private function stopProcess(): void
+	{
+		if (!is_resource($this->process)) {
+			return;
+		}
+		$pid = (int)file_get_contents(storage('.swoole.pid'));
+		if (posix_kill($pid, 0)) {
+			posix_kill($pid, SIGTERM);
+		}
+		proc_close($this->process);
+		$this->process = null;
 	}
 
 
@@ -268,14 +285,7 @@ class HotReload extends Command
 	public function trigger_reload(): void
 	{
 		echo 'tigger server Reload' . PHP_EOL;
-		if (is_resource($this->process)) {
-			$pid = (int)file_get_contents(storage('.swoole.pid'));
-			if (posix_kill($pid, 0)) {
-				posix_kill($pid, SIGTERM);
-			}
-			proc_close($this->process);
-		}
-		$this->process = null;
+		$this->stopProcess();
 		$this->startProcess();
 	}
 

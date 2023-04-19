@@ -142,8 +142,6 @@ class AsyncServer implements ServerInterface
 	/**
 	 * @param SConfig $config
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
 	 */
 	public function addListener(SConfig $config): void
@@ -217,12 +215,14 @@ class AsyncServer implements ServerInterface
 
 	/**
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
+	 * @throws
 	 */
 	public function start(): void
 	{
+		$pid = (int)file_get_contents(storage('.swoole.pid'));
+		if (posix_kill($pid, 0)) {
+			posix_kill($pid, SIGTERM);
+		}
 		$processManager = Kiri::getDi()->get(EventDispatch::class);
 		$processManager->dispatch(new OnServerBeforeStart());
 		$this->server->start();

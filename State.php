@@ -5,6 +5,7 @@ namespace Kiri\Server;
 use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Abstracts\Config;
+use Kiri\Abstracts\Logger;
 use Kiri\Server\Abstracts\TraitServer;
 use Swoole\Process;
 
@@ -22,6 +23,7 @@ class State extends Component
 	 */
 	public function init(): void
 	{
+		Logger::emergency();
 		$this->servers = Config::get('server.ports');
 	}
 
@@ -46,7 +48,7 @@ class State extends Component
 	 * @param $port
 	 * @throws Exception
 	 */
-	public function exit($port)
+	public function exit($port): void
 	{
 		if (!($pid = checkPortIsAlready($port))) {
 			return;

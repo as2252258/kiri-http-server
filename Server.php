@@ -135,7 +135,6 @@ class Server
 
 	/**
 	 * @param OnTaskerStart $onWorkerStart
-	 * @throws ConfigException
 	 */
 	public function setTaskerName(OnTaskerStart $onWorkerStart): void
 	{
@@ -151,7 +150,6 @@ class Server
 
 	/**
 	 * @return void
-	 * @throws ConfigException
 	 * @throws Exception
 	 */
 	public function onHotReload(): void
