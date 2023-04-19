@@ -21,7 +21,7 @@ class HotReload extends Command
 	/**
 	 * @var Process
 	 */
-	private Process $process;
+	private mixed $process;
 	/**
 	 * @var array|mixed
 	 */
@@ -67,11 +67,7 @@ class HotReload extends Command
 	 */
 	private function startProcess(): void
 	{
-		$process = new Process(function (Process $process) {
-			$process->exec(PHP_BINARY, [APP_PATH . 'kiri.php', 'sw:server', 'start']);
-		},);
-		$process->start();
-		$this->process = $process;
+		$this->process = proc_open([PHP_BINARY, APP_PATH . 'kiri.php', 'sw:server', 'start'], [], $pipes);
 	}
 
 
@@ -272,7 +268,13 @@ class HotReload extends Command
 	public function trigger_reload(): void
 	{
 		echo 'tigger server Reload' . PHP_EOL;
-		Process::kill($this->process->pid, SIGTERM);
+		if (is_resource($this->process)) {
+			$pid = (int)file_get_contents(storage('.swoole.pid'));
+			if (posix_kill($pid, 0)) {
+				posix_kill($pid, SIGTERM);
+			}
+			proc_close($this->process);
+		}
 		$this->process = null;
 		$this->startProcess();
 	}
@@ -281,7 +283,7 @@ class HotReload extends Command
 	/**
 	 * @throws Exception
 	 */
-	public function clearWatch($inotify)
+	public function clearWatch($inotify): void
 	{
 		foreach ($this->watchFiles as $wd) {
 			try {
@@ -291,22 +293,6 @@ class HotReload extends Command
 			}
 		}
 		$this->watchFiles = [];
-	}
-
-
-	/**
-	 * @param $code
-	 * @param $message
-	 * @param $file
-	 * @param $line
-	 * @throws Exception
-	 */
-	protected function onErrorHandler($code, $message, $file, $line)
-	{
-		if (str_contains($message, 'The file descriptor is not an inotify instance')) {
-			return;
-		}
-		debug('Error:' . $message . ' at ' . $file . ':' . $line);
 	}
 
 
