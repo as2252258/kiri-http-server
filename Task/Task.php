@@ -65,19 +65,25 @@ class Task implements TaskInterface
 
 
 	/**
-	 * @param array $handler
+	 * @param array|string|object $handler
 	 * @param int|null $workerId
 	 * @return void
-	 * @throws
+	 * @throws ReflectionException
 	 */
-	public function dispatch(array $handler, ?int $workerId = null): void
+	public function dispatch(array|string|object $handler, ?int $workerId = null): void
 	{
 		/** @var Server $server */
 		$server = \Kiri::service()->get('server');
 		if (is_null($workerId)) {
 			$workerId = rand(0, $server->setting[Constant::OPTION_TASK_WORKER_NUM] - 1);
 		}
-		$server->task(json_encode($handler), $workerId);
+		if (is_string($handler)) {
+			$server->task(serialize([di($handler), 'handle']), $workerId);
+		} else if (is_string($handler[0])) {
+			$server->task(serialize($handler), $workerId);
+		} else {
+			$server->task(serialize([$handler, 'handle']), $workerId);
+		}
 	}
 
 
