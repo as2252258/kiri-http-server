@@ -39,7 +39,7 @@ class Task implements TaskInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 */
-	private function onFinish(Server $server, int $task_id, mixed $data): void
+	public function onFinish(Server $server, int $task_id, mixed $data): void
 	{
 		event(new OnTaskFinish($task_id, $data));
 	}
@@ -53,7 +53,7 @@ class Task implements TaskInterface
 	 * @return mixed
 	 * @throws ReflectionException
 	 */
-	private function onTask(Server $server, int $task_id, int $src_worker_id, mixed $data): mixed
+	public function onTask(Server $server, int $task_id, int $src_worker_id, mixed $data): mixed
 	{
 		$data = json_decode($data, true);
 		if (is_null($data)) {
