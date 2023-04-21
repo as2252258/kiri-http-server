@@ -193,12 +193,12 @@ class AsyncServer implements ServerInterface
 	 */
 	public function addListener(SConfig $config): void
 	{
-		$port = $this->server->addlistener($config->host, $config->port, $config->mode);
+		$port = $this->server->addlistener($config->host, $config->port, $config->socket);
 		if ($port === false) {
 			throw new Exception('Listen port fail.' . swoole_last_error());
 		}
 
-		Logger::_warning('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
+		Logger::_alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
 
 		$port->set($this->resetSettings($config->type, $config->settings));
 
