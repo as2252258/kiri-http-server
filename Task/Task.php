@@ -79,7 +79,10 @@ class Task implements TaskInterface
 		}
 		if (is_string($handler)) {
 			$server->task(serialize([di($handler), 'handle']), $workerId);
-		} else if (is_string($handler[0])) {
+		} else if (is_array($handler)) {
+			if (is_string($handler[0])) {
+				$handler[0] = di($handler[0]);
+			}
 			$server->task(serialize($handler), $workerId);
 		} else {
 			$server->task(serialize([$handler, 'handle']), $workerId);
