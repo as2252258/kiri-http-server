@@ -29,9 +29,6 @@ class HotReload extends Command
 	private array $watchFiles = [];
 
 
-	private bool $isExit = false;
-
-
 	/**
 	 * @return void
 	 */
@@ -73,7 +70,6 @@ class HotReload extends Command
 	public function exit(): void
 	{
 		$this->stopProcess();
-		$this->isExit = true;
 	}
 
 
