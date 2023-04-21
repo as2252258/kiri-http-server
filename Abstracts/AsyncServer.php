@@ -198,7 +198,7 @@ class AsyncServer implements ServerInterface
 			throw new Exception('Listen port fail.' . swoole_last_error());
 		}
 
-		Logger::_waring('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
+		Logger::_warning('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
 
 		$port->set($this->resetSettings($config->type, $config->settings));
 
