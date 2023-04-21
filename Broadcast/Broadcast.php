@@ -5,6 +5,7 @@ namespace Kiri\Server\Broadcast;
 use Kiri;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Abstracts\ProcessManager;
+use ReflectionException;
 
 class Broadcast
 {
@@ -13,6 +14,7 @@ class Broadcast
 	/**
 	 * @param $message
 	 * @return void
+	 * @throws ReflectionException
 	 */
 	public function broadcast($message): void
 	{

@@ -218,8 +218,7 @@ class AsyncServer implements ServerInterface
 	 */
 	public function start(): void
 	{
-		$processManager = Kiri::getDi()->get(EventDispatch::class);
-		$processManager->dispatch(new OnServerBeforeStart());
+		event(new OnServerBeforeStart());
 		$this->server->start();
 	}
 

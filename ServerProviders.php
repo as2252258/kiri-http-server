@@ -24,7 +24,7 @@ class ServerProviders extends Providers
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function onImport(LocalService $application)
+	public function onImport(LocalService $application): void
 	{
 		$server = $this->container->get(ServerCommand::class);
 

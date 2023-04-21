@@ -32,12 +32,11 @@ class OnServer extends Server
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function onStart(SServer $server)
+	public function onStart(SServer $server): void
 	{
 		\Kiri::setProcessName(sprintf('start[%d].server', $server->master_pid));
 
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnStart($server));
+		event(new OnStart($server));
 	}
 
 
@@ -47,52 +46,20 @@ class OnServer extends Server
 	 * @throws NotFoundExceptionInterface
 	 * @throws ReflectionException
 	 */
-	public function onBeforeShutdown(SServer $server)
+	public function onBeforeShutdown(SServer $server): void
 	{
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnBeforeShutdown($server));
+		event(new OnBeforeShutdown($server));
 	}
 
 
 	/**
 	 * @param SServer $server
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
+	 * @throws
 	 */
 	public function onShutdown(SServer $server): void
 	{
 		@unlink(storage('.swoole.pid'));
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnShutdown($server));
+		event(new OnShutdown($server));
 	}
-
-
-	/**
-	 * @param SServer $server
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
-	 */
-	public function onBeforeReload(SServer $server)
-	{
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnBeforeReload($server));
-	}
-
-
-	/**
-	 * @param SServer $server
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws ReflectionException
-	 */
-	public function onAfterReload(SServer $server)
-	{
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnAfterReload($server));
-	}
-
-
 
 }

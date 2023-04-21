@@ -164,8 +164,8 @@ trait TraitServer
 	public function getCoroutineServerClass($type): ?string
 	{
 		return match ($type) {
-			Constant::SERVER_TYPE_BASE, Constant::SERVER_TYPE_TCP, Constant::SERVER_TYPE_UDP => \Swoole\Coroutine\Server::class,
-			Constant::SERVER_TYPE_HTTP, Constant::SERVER_TYPE_WEBSOCKET => \Swoole\Coroutine\Http\Server::class,
+			Constant::SERVER_TYPE_BASE, Constant::SERVER_TYPE_TCP, Constant::SERVER_TYPE_UDP => Coroutine\Server::class,
+			Constant::SERVER_TYPE_HTTP, Constant::SERVER_TYPE_WEBSOCKET => Coroutine\Http\Server::class,
 			default => null
 		};
 	}

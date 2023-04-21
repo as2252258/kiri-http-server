@@ -58,10 +58,9 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
-	public function onWorkerStop(Server $server, int $workerId)
+	public function onWorkerStop(Server $server, int $workerId): void
 	{
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnWorkerStop($server, $workerId));
+		event(new OnWorkerStop($server, $workerId));
 	}
 
 
@@ -71,10 +70,9 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface|ReflectionException
 	 */
-	public function onWorkerExit(Server $server, int $workerId)
+	public function onWorkerExit(Server $server, int $workerId): void
 	{
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnWorkerExit($server, $workerId));
+		event(new OnWorkerExit($server, $workerId));
 	}
 
 
@@ -88,7 +86,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
 	 */
-	public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
+	public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
 	{
 		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
 		$dispatch->dispatch(new OnWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal));
@@ -97,7 +95,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 			$worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), 9)
 		);
 
-		\Kiri::getLogger()->error($message);
+		error($message);
 
 		$this->system_mail($message);
 	}
@@ -107,7 +105,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 * @param $messageContent
 	 * @throws Exception
 	 */
-	protected function system_mail($messageContent)
+	protected function system_mail($messageContent): void
 	{
 		try {
 			$email = Config::get('email', ['enable' => false]);

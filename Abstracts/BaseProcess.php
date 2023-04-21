@@ -90,6 +90,7 @@ abstract class BaseProcess implements OnProcessInterface
 
 	/**
 	 * @param $data
+	 * @throws \ReflectionException
 	 */
 	protected function onShutdown($data): void
 	{

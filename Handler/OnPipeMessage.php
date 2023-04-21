@@ -20,7 +20,7 @@ class OnPipeMessage extends Server
 	 * @param mixed $message
 	 * @throws Exception
 	 */
-	public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message)
+	public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message): void
 	{
 		if (is_string($message)) {
 			$message = unserialize($message);

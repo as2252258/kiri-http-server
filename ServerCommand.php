@@ -6,7 +6,6 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri;
-use Kiri\Abstracts\Config;
 use Kiri\Exception\ConfigException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -56,17 +55,13 @@ class ServerCommand extends Command
 	 */
 	public function execute(InputInterface $input, OutputInterface $output): int
 	{
-		$value = match ($input->getArgument('action')) {
+		return match ($input->getArgument('action')) {
 			'restart' => $this->restart($input),
 			'stop' => $this->stop(),
 			'start' => $this->start($input),
 			default =>
 			throw new Exception('I don\'t know what I want to do.')
 		};
-		if ($input->getOption('daemon') != 1) {
-			file_put_contents(storage('.swoole.pid'), 0);
-		}
-		return $value;
 	}
 
 
