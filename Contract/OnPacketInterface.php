@@ -2,7 +2,7 @@
 
 namespace Kiri\Server\Contract;
 
-use Kiri\Server\Abstracts\Server;
+use Swoole\Server;
 
 interface OnPacketInterface
 {
