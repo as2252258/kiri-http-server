@@ -18,21 +18,8 @@ use Swoole\Server;
 use Swoole\WebSocket\Frame;
 
 
-class WebSocketServer extends Component implements OnHandshakeInterface, OnMessageInterface, OnDisconnectInterface, OnCloseInterface
+class WebSocket extends Component implements OnHandshakeInterface, OnMessageInterface, OnDisconnectInterface, OnCloseInterface
 {
-
-
-	public string $host = '127.0.0.1';
-
-
-	public int $port = 6086;
-
-
-	public array $events = [];
-
-	public array $settings = [];
-
-	public int $socket_type = SWOOLE_SOCK_TCP6;
 
 
 	public Handler $handler;
@@ -50,21 +37,6 @@ class WebSocketServer extends Component implements OnHandshakeInterface, OnMessa
 	 */
 	public function init(): void
 	{
-		/** @var Server $server */
-		$application = \Kiri::service();
-		if (!$application->has('server')) {
-			$server = new \Swoole\WebSocket\Server($this->host, $this->port, SWOOLE_PROCESS);
-			$application->set('server', $server);
-		} else {
-			$server = $application->get('server');
-		}
-
-		$socket = $server->addlistener($this->host, $this->port, $this->socket_type);
-		$socket->set($this->settings);
-		$socket->on('handshake', [$this, 'onHandshake']);
-		$socket->on('message', [$this, 'onMessage']);
-		$socket->on('disconnect', [$this, 'onDisconnect']);
-
 		$this->collector = \Kiri::getDi()->get(DataGrip::class)->get('wss');
 
 		$this->handler = $this->collector->query('/', 'GET');
