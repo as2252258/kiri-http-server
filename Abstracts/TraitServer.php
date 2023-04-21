@@ -3,12 +3,11 @@
 namespace Kiri\Server\Abstracts;
 
 use Exception;
-use Kiri\Server\CoroutineServer;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
+use Kiri;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Http\Server as HServer;
+use Swoole\Process;
 use Swoole\Server;
 use Kiri\Server\Constant;
 use Kiri\Server\Config;
@@ -16,11 +15,11 @@ use Swoole\WebSocket\Server as WServer;
 
 trait TraitServer
 {
-	
-	
+
+
 	private array $_process = [];
-	
-	
+
+
 	/**
 	 * @param string|array|BaseProcess $class
 	 * @return void
@@ -28,30 +27,48 @@ trait TraitServer
 	 */
 	public function addProcess(string|array|BaseProcess $class): void
 	{
-		$container = \Kiri::getDi()->get(ProcessManager::class);
-		
 		if (!is_array($class)) {
 			$class = [$class];
 		}
 		foreach ($class as $name) {
-			$container->add($name);
+			if (is_string($name)) {
+				$name = Kiri::getDi()->get($name);
+			}
+			if (isset($this->_process[$name->getName()])) {
+				throw new Exception('Process(' . $name->getName() . ') is exists.');
+			}
+			$this->_process[$name->getName()] = $this->genProcess($name);
 		}
 	}
-	
-	
+
+
 	/**
-	 * @param array $signal
+	 * @param BaseProcess $name
+	 * @return Process
+	 */
+	private function genProcess(BaseProcess $name): Process
+	{
+		return new Process(function (Process $process) use ($name) {
+			$process->name($name->getName());
+			$name->onSigterm()->process($process);
+		},
+			$name->getRedirectStdinAndStdout(),
+			$name->getPipeType(),
+			$name->isEnableCoroutine());
+	}
+
+
+	/**
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
 	 */
-	public function onSignal(array $signal): void
+	public function onSignal(): void
 	{
+		$signal = \Kiri\Abstracts\Config::get('signal', []);
 		$this->onPcntlSignal(SIGINT, [$this, 'onSigint']);
 		foreach ($signal as $sig => $value) {
 			if (is_array($value) && is_string($value[0])) {
-				$value[0] = $this->container->get($value[0]);
+				$value[0] = \Kiri::getDi()->get($value[0]);
 			}
 			if (!is_callable($value, true)) {
 				throw new Exception('Register signal callback must can exec.');
@@ -59,8 +76,8 @@ trait TraitServer
 			$this->onPcntlSignal($sig, $value);
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param $signal
 	 * @param $callback
@@ -68,19 +85,19 @@ trait TraitServer
 	 */
 	private function onPcntlSignal($signal, $callback): void
 	{
-		if (get_called_class() != CoroutineServer::class) {
-			pcntl_signal(SIGINT, [$this, 'onSigint']);
-		} else {
-			Coroutine::create(static function () use ($signal, $callback) {
-				$data = Coroutine::waitSignal($signal);
-				if ($data) {
-					$callback($signal, [true]);
-				}
-			});
-		}
+//		if (get_called_class() != CoroutineServer::class) {
+		pcntl_signal(SIGINT, [$this, 'onSigint']);
+//		} else {
+//			Coroutine::create(static function () use ($signal, $callback) {
+//				$data = Coroutine::waitSignal($signal);
+//				if ($data) {
+//					$callback($signal, [true]);
+//				}
+//			});
+//		}
 	}
-	
-	
+
+
 	/**
 	 * @return array
 	 */
@@ -88,8 +105,8 @@ trait TraitServer
 	{
 		return $this->_process;
 	}
-	
-	
+
+
 	/**
 	 * @param array $ports
 	 * @return array
@@ -139,8 +156,8 @@ trait TraitServer
 		}
 		return $array;
 	}
-	
-	
+
+
 	/**
 	 * @param $type
 	 * @return string|null
@@ -155,8 +172,8 @@ trait TraitServer
 			default => null
 		};
 	}
-	
-	
+
+
 	/**
 	 * @param $type
 	 * @return string|null
@@ -169,6 +186,6 @@ trait TraitServer
 			default => null
 		};
 	}
-	
-	
+
+
 }

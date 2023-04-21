@@ -11,14 +11,6 @@ use Swoole\Server;
 interface ServerInterface
 {
 
-
-	/**
-	 * @param string $name
-	 * @return Server|\Swoole\Coroutine\Server|\Swoole\Coroutine\Http\Server|null
-	 */
-	public function getServer(string $name = ''): Server|\Swoole\Coroutine\Server|\Swoole\Coroutine\Http\Server|null;
-
-
 	/**
 	 * @param array $service
 	 * @param int $daemon
