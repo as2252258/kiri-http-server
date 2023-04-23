@@ -48,7 +48,6 @@ class ServerCommand extends Command
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 * @return int
-	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
@@ -68,7 +67,6 @@ class ServerCommand extends Command
 	/**
 	 * @param InputInterface $input
 	 * @return int
-	 * @throws ConfigException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
