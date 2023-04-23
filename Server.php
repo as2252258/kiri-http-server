@@ -66,9 +66,6 @@ class Server
 
 	/**
 	 * @return void
-	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
 	 */
 	public function start(): void
