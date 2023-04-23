@@ -95,9 +95,7 @@ class ServerCommand extends Command
 	/**
 	 * @param InputInterface $input
 	 * @return int
-	 * @throws ConfigException
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @throws
 	 */
 	protected function start(InputInterface $input): int
 	{
