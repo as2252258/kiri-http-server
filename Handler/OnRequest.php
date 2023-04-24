@@ -84,14 +84,8 @@ class OnRequest implements OnRequestInterface
 		$uri = new Uri();
 		$uri->withQuery($request->server['query_string'] ?? '')
 			->withPath($request->server['path_info'])
+			->withHost($request->header['host'] ?? '127.0.0.1')
 			->withPort($request->server['server_port']);
-		$host = $request->header['host'] ?? '127.0.0.1';
-		if (str_contains($host, ':')) {
-			[$host, $port] = explode(':', $host);
-			$uri->withHost($host)->withPort((int)$port);
-		} else {
-			$uri->withHost($host);
-		}
 		if (isset($request->server['https']) && $request->server['https'] !== 'off') {
 			$uri->withScheme('https');
 		} else {
