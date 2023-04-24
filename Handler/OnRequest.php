@@ -71,8 +71,7 @@ class OnRequest implements OnRequestInterface
 		}
 		$this->exception = $container->get($exception);
 		$this->router = $container->get(DataGrip::class)->get(ROUTER_TYPE_HTTP);
-
-		$this->emitter = Kiri::service()->get('response')->emmit;
+		$this->emitter = $this->response->emmit;
 	}
 
 	/**
