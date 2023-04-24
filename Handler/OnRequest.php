@@ -46,7 +46,7 @@ class OnRequest implements OnRequestInterface
 		/** @var ConstrictRequest $PsrRequest */
 		$PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
 
-		$this->onRequest->onServerRequest($PsrRequest, $request);
+		$this->onRequest->onServerRequest($PsrRequest, $response);
 	}
 
 
