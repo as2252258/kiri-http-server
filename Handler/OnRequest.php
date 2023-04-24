@@ -5,36 +5,75 @@ namespace Kiri\Server\Handler;
 use Exception;
 use Kiri;
 use Kiri\Di\Context;
+use Kiri\Di\Interface\ResponseEmitterInterface;
+use Kiri\Router\Base\ExceptionHandlerDispatcher;
+use Kiri\Router\Base\Middleware as MiddlewareManager;
 use Kiri\Router\Constrict\ConstrictRequest;
 use Kiri\Router\Constrict\ConstrictResponse;
 use Kiri\Router\Constrict\Uri;
+use Kiri\Router\DataGrip;
+use Kiri\Router\HttpRequestHandler;
+use Kiri\Router\Interface\ExceptionHandlerInterface;
 use Kiri\Router\Interface\OnRequestInterface;
+use Kiri\Router\RouterCollector;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Kiri\Di\Inject\Service;
-use Kiri\Router\ServerRequest as KrServer;
-use Kiri\Router\Response as Psr7Response;
-use Kiri\Di\Inject\Container;
+use const Kiri\Router\ROUTER_TYPE_HTTP;
 
 class OnRequest implements OnRequestInterface
 {
 
 	/**
-	 * @var KrServer
+	 * @var RouterCollector
 	 */
-	#[Container(KrServer::class)]
-	public KrServer $onRequest;
+	public RouterCollector $router;
 
 
 	/**
-	 * @var Psr7Response
+	 * @var ExceptionHandlerInterface
+	 */
+	public ExceptionHandlerInterface $exception;
+
+
+	/**
+	 * @var ResponseEmitterInterface
+	 */
+	public ResponseEmitterInterface $emitter;
+
+
+	/**
+	 * @var Kiri\Router\Request
+	 */
+	#[Service('request')]
+	public RequestInterface $request;
+
+
+	/**
+	 * @var ResponseInterface
 	 */
 	#[Service('response')]
-	public Psr7Response $response;
+	public ResponseInterface $response;
 
+
+	/**
+	 * @throws Exception
+	 */
+	public function init(): void
+	{
+		$container = Kiri::getDi();
+		$exception = $this->request->exception;
+		if (!in_array(ExceptionHandlerInterface::class, class_implements($exception))) {
+			$exception = ExceptionHandlerDispatcher::class;
+		}
+		$this->exception = $container->get($exception);
+		$this->router = $container->get(DataGrip::class)->get(ROUTER_TYPE_HTTP);
+
+		$this->emitter = Kiri::service()->get('response')->emmit;
+	}
 
 	/**
 	 * @param Request $request
@@ -43,10 +82,26 @@ class OnRequest implements OnRequestInterface
 	 */
 	public function onRequest(Request $request, Response $response): void
 	{
-		/** @var ConstrictRequest $PsrRequest */
-		$PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
+		try {
+			/** @var ConstrictRequest $PsrRequest */
+			$PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
 
-		$this->onRequest->onServerRequest($PsrRequest, $response);
+			$request_uri = $PsrRequest->getMethod() == 'OPTIONS' ? '/*' : $PsrRequest->getUri()->getPath();
+			$dispatcher = $this->router->query($request_uri, $PsrRequest->getMethod());
+
+			$middleware = [];
+			if (!($dispatcher instanceof Kiri\Router\Base\NotFoundController)) {
+				$middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
+
+				$middleware = $middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
+			}
+
+			$PsrResponse = (new HttpRequestHandler($middleware, $dispatcher))->handle($PsrRequest);
+		} catch (\Throwable $throwable) {
+			$PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
+		} finally {
+			$this->emitter->sender($PsrResponse, $response);
+		}
 	}
 
 
