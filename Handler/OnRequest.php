@@ -74,6 +74,7 @@ class OnRequest implements OnRequestInterface
 		$this->emitter = $this->response->emmit;
 	}
 
+
 	/**
 	 * @param Request $request
 	 * @param Response $response
