@@ -5,7 +5,6 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri;
-use Kiri\Abstracts\Config;
 use Kiri\Events\EventDispatch;
 use Kiri\Exception\ConfigException;
 use Kiri\Router\Router;
@@ -41,7 +40,7 @@ class Server
 	 */
 	public function __construct()
 	{
-		$this->class = Config::get('server.type', AsyncServer::class);
+		$this->class = \config('server.type', AsyncServer::class);
 	}
 
 
@@ -78,7 +77,7 @@ class Server
 		$manager->scan_build_route();
 
 		$manager = $this->manager();
-		$manager->initCoreServers(Config::get('server', [], true), $this->daemon);
+		$manager->initCoreServers(\config('server', [], true), $this->daemon);
 		$manager->start();
 	}
 
@@ -121,7 +120,7 @@ class Server
 	 */
 	public function shutdown(): void
 	{
-		$configs = Config::get('server', [], true);
+		$configs = \config('server', [], true);
 
 		$state = Kiri::getDi()->get(State::class);
 		foreach ($this->manager()->sortService($configs['ports'] ?? []) as $config) {

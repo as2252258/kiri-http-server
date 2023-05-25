@@ -4,7 +4,6 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri\Abstracts\Component;
-use Kiri\Abstracts\Config;
 use Kiri\Abstracts\Logger;
 use Kiri\Server\Abstracts\TraitServer;
 use Swoole\Process;
@@ -23,7 +22,7 @@ class State extends Component
 	 */
 	public function init(): void
 	{
-		$this->servers = Config::get('server.ports');
+		$this->servers = \config('server.ports');
 	}
 
 

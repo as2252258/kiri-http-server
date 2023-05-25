@@ -5,7 +5,6 @@ namespace Kiri\Server\Abstracts;
 use Closure;
 use Exception;
 use Kiri;
-use Kiri\Abstracts\Config;
 use Kiri\Abstracts\Component;
 use Kiri\Server\Contract\OnProcessInterface;
 use Psr\Container\ContainerExceptionInterface;
@@ -186,7 +185,7 @@ class ProcessManager extends Component
 	public function extracted(mixed $custom, Process $process): void
 	{
 		set_env('environmental', Kiri::PROCESS);
-		$system = sprintf('[%s].Custom Process', Config::get('id', 'system-service'));
+		$system = sprintf('[%s].Custom Process', \config('id', 'system-service'));
 		Kiri::getLogger()->alert($system . ' ' . $custom->getName() . ' start.');
 		if (Kiri::getPlatform()->isLinux()) {
 			$process->name($system . '[' . $process->pid . '].' . $custom->getName());

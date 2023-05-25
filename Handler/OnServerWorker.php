@@ -4,7 +4,6 @@ namespace Kiri\Server\Handler;
 
 use Exception;
 use Kiri;
-use Kiri\Abstracts\Config;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Server\Events\OnAfterWorkerStart;
@@ -108,7 +107,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	protected function system_mail($messageContent): void
 	{
 		try {
-			$email = Config::get('email', ['enable' => false]);
+			$email = \config('email', ['enable' => false]);
 			if (!empty($email) && ($email['enable'] ?? false)) {
 				Help::sendEmail($email, 'Service Error', $messageContent);
 			}

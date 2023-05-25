@@ -4,7 +4,6 @@ namespace Kiri\Server\Abstracts;
 
 use Exception;
 use Kiri;
-use Kiri\Abstracts\Config;
 use Kiri\Abstracts\Logger;
 use Kiri\Exception\ConfigException;
 use Kiri\Exception\NotFindClassException;
@@ -76,7 +75,7 @@ class AsyncServer implements ServerInterface
 	 */
 	private function initRpcListen(): void
 	{
-		$rpcService = Config::get('rpc', []);
+		$rpcService = \config('rpc', []);
 		if (!empty($rpcService)) {
 			$this->addListener(instance(SConfig::class, [], $rpcService));
 		}
@@ -123,7 +122,7 @@ class AsyncServer implements ServerInterface
 			throw new NotFindClassException('Unknown server type ' . $config->type);
 		}
 		$this->initServer($match, $config, $daemon);
-		$this->onEventListen($this->server, Config::get('server.events', []));
+		$this->onEventListen($this->server, \config('server.events', []));
 		$this->onEventListen($this->server, $config->events);
 		$this->onTaskListen();
 	}
@@ -175,7 +174,7 @@ class AsyncServer implements ServerInterface
 	 */
 	protected function systemConfig(SConfig $config, int $daemon): array
 	{
-		$settings = array_merge(Config::get('server.settings', []), $config->settings);
+		$settings = array_merge(\config('server.settings', []), $config->settings);
 		$settings[Constant::OPTION_DAEMONIZE] = (bool)$daemon;
 		$settings[Constant::OPTION_ENABLE_REUSE_PORT] = true;
 		$settings[Constant::OPTION_PID_FILE] = storage('.swoole.pid');
