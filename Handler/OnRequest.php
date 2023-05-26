@@ -22,7 +22,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
-use Kiri\Di\Inject\Service;
 use const Kiri\Router\ROUTER_TYPE_HTTP;
 
 class OnRequest implements OnRequestInterface
