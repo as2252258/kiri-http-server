@@ -4,6 +4,7 @@ namespace Kiri\Server\Handler;
 
 use Exception;
 use Kiri;
+use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
 use Kiri\Di\Interface\ResponseEmitterInterface;
 use Kiri\Router\Base\ExceptionHandlerDispatcher;
@@ -48,14 +49,14 @@ class OnRequest implements OnRequestInterface
 	/**
 	 * @var Kiri\Router\Request
 	 */
-	#[Service('request')]
+	#[Container(RequestInterface::class)]
 	public RequestInterface $request;
 
 
 	/**
 	 * @var ResponseInterface
 	 */
-	#[Service('response')]
+	#[Container(ResponseInterface::class)]
 	public ResponseInterface $response;
 
 
