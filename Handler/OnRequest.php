@@ -86,7 +86,7 @@ class OnRequest implements OnRequestInterface
 	public function onRequest(Request $request, Response $response): void
 	{
 		try {
-			/** @var ConstrictRequest $PsrRequest */
+            /** @var ConstrictRequest $PsrRequest */
 			$PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
 
 			$dispatcher = $this->router->query($PsrRequest->getUri()->getPath(), $PsrRequest->getMethod());
@@ -122,6 +122,7 @@ class OnRequest implements OnRequestInterface
 			->withUri(static::parse($request))
 			->withProtocolVersion($request->server['server_protocol'])
 			->withCookieParams($request->cookie ?? [])
+            ->withServerParams($request->server)
 			->withQueryParams($request->get ?? [])
 			->withUploadedFiles($request->files ?? [])
 			->withMethod($request->getMethod())
