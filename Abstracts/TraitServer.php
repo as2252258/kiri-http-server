@@ -116,7 +116,6 @@ trait TraitServer
     /**
      * @param array $ports
      * @return array<Config>
-     * @throws ReflectionException
      */
     public function genConfigService(array $ports): array
     {
@@ -133,11 +132,10 @@ trait TraitServer
      * @param array $array
      * @param $port
      * @return array
-     * @throws ReflectionException
      */
     private function sort(array $array, $port): array
     {
-        $config = created(Config::class, [], $port);
+        $config = instance(Config::class, [], $port);
         if ($port['type'] == Constant::SERVER_TYPE_WEBSOCKET) {
             array_unshift($array, $config);
         } else if ($port['type'] == Constant::SERVER_TYPE_HTTP) {
