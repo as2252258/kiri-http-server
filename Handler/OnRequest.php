@@ -86,8 +86,7 @@ class OnRequest implements OnRequestInterface
 			/** @var ConstrictRequest $PsrRequest */
 			$PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
 
-			$request_uri = $PsrRequest->getMethod() == 'OPTIONS' ? '/*' : $PsrRequest->getUri()->getPath();
-			$dispatcher = $this->router->query($request_uri, $PsrRequest->getMethod());
+			$dispatcher = $this->router->query($PsrRequest->getUri()->getPath(), $PsrRequest->getMethod());
 
 			$middleware = [];
 			if (!($dispatcher instanceof Kiri\Router\Base\NotFoundController)) {
