@@ -42,7 +42,6 @@ class WebSocket extends Component implements OnHandshakeInterface, OnMessageInte
         $this->collector = \Kiri::getDi()->get(DataGrip::class)->get('wss');
 
         $this->handler = $this->collector->query('/', 'GET');
-
         $config = \Kiri::getDi()->get(ConfigProvider::class);
         if ($this->handler->implement(OnHandshakeInterface::class)) {
             $config->modify('server.ports.events.' . Constant::HANDSHAKE, [$this->handler, 'onHandshake']);
