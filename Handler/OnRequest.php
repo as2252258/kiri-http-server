@@ -25,7 +25,7 @@ use Swoole\Http\Response;
 use const Kiri\Router\ROUTER_TYPE_HTTP;
 
 /**
- * OnRequest
+ * OnRequest event
  */
 class OnRequest implements OnRequestInterface
 {
