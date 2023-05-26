@@ -44,16 +44,16 @@ class WebSocket extends Component implements OnHandshakeInterface, OnMessageInte
         $this->handler = $this->collector->query('/', 'GET');
         $config = \Kiri::getDi()->get(ConfigProvider::class);
         if ($this->handler->implement(OnHandshakeInterface::class)) {
-            $config->modify('server.ports.events.' . Constant::HANDSHAKE, [$this->handler, 'onHandshake']);
+            $config->modify('server.ports.events.' . Constant::HANDSHAKE, [$this->handler->getClass(), 'onHandshake']);
         }
         if ($this->handler->implement(OnMessageInterface::class)) {
-            $config->modify('server.ports.events.' . Constant::MESSAGE, [$this->handler, 'onMessage']);
+            $config->modify('server.ports.events.' . Constant::MESSAGE, [$this->handler->getClass(), 'onMessage']);
         }
         if ($this->handler->implement(OnDisconnectInterface::class)) {
-            $config->modify('server.ports.events.' . Constant::DISCONNECT, [$this->handler, 'onDisconnect']);
+            $config->modify('server.ports.events.' . Constant::DISCONNECT, [$this->handler->getClass(), 'onDisconnect']);
         }
         if ($this->handler->implement(OnCloseInterface::class)) {
-            $config->modify('server.ports.events.' . Constant::CLOSE, [$this->handler, 'onClose']);
+            $config->modify('server.ports.events.' . Constant::CLOSE, [$this->handler->getClass(), 'onClose']);
         }
     }
 
