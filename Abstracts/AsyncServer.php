@@ -208,7 +208,6 @@ class AsyncServer implements ServerInterface
 	 * @param $no
 	 * @param array $signInfo
 	 * @return void
-	 * @throws ReflectionException
 	 */
 	public function onSigint($no, array $signInfo): void
 	{

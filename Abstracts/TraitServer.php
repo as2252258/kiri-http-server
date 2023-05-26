@@ -64,7 +64,7 @@ trait TraitServer
 	 */
 	public function onSignal(): void
 	{
-		$signal = \Kiri\Abstracts\\config('signal', []);
+		$signal = \config('signal', []);
 		$this->onPcntlSignal(SIGINT, [$this, 'onSigint']);
 		foreach ($signal as $sig => $value) {
 			if (is_array($value) && is_string($value[0])) {
