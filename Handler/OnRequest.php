@@ -89,9 +89,7 @@ class OnRequest implements OnRequestInterface
             /** @var ConstrictRequest $PsrRequest */
             $PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
 
-            $method = $PsrRequest->getUri()->getPath() == 'OPTIONS' ? '/*' : $PsrRequest->getUri()->getPath();
-            $dispatcher = $this->router->query($method, $PsrRequest->getMethod());
-
+            $dispatcher = $this->router->query($PsrRequest->getUri()->getPath(), $PsrRequest->getMethod());
             $middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
             $middleware = $middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
 
