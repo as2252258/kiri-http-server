@@ -4,6 +4,7 @@ namespace Kiri\Server\Task;
 
 
 use Kiri\Server\Constant;
+use Kiri\Server\ServerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -73,7 +74,7 @@ class Task implements TaskInterface
 	public function dispatch(array|string|object $handler, ?int $workerId = null): void
 	{
 		/** @var Server $server */
-		$server = \Kiri::service()->get('server');
+		$server = \Kiri::getDi()->get(ServerInterface::class);
 		if (is_null($workerId)) {
 			$workerId = rand(0, $server->setting[Constant::OPTION_TASK_WORKER_NUM] - 1);
 		}

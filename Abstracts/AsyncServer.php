@@ -134,8 +134,7 @@ class AsyncServer implements ServerInterface
 	 * @param $daemon
 	 * @return void
 	 * @throws ConfigException
-	 * @throws ReflectionException
-	 */
+     */
 	private function initServer($match, $config, $daemon): void
 	{
 		$this->server = new $match($config->host, $config->port, $config->mode, $config->socket);
@@ -145,7 +144,7 @@ class AsyncServer implements ServerInterface
 		if (!isset($config->events[Constant::SHUTDOWN])) {
 			$config->events[Constant::SHUTDOWN] = [OnServer::class, 'onShutdown'];
 		}
-		Kiri::service()->set('server', $this->server);
+		Kiri::getDi()->bind(ServerInterface::class, $this->server);
 	}
 
 

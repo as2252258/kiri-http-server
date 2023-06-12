@@ -9,6 +9,7 @@ use Kiri\Abstracts\Component;
 use Kiri\Server\Contract\OnProcessInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Process;
 use Psr\Container\ContainerInterface;
@@ -36,15 +37,14 @@ class ProcessManager extends Component
 	}
 
 
-	/**
-	 * @param OnServerBeforeStart $beforeStart
-	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface|Exception
-	 */
+    /**
+     * @param OnServerBeforeStart $beforeStart
+     * @return void
+     * @throws ReflectionException
+     */
 	public function OnServerBeforeStart(OnServerBeforeStart $beforeStart): void
 	{
-		$server = Kiri::service()->get('server');
+		$server = Kiri::getDi()->get(ServerInterface::class);
 		foreach ($this->_process as $custom) {
 			if (Kiri\Di\Context::inCoroutine()) {
 				Coroutine::create(function () use ($custom) {
@@ -180,7 +180,7 @@ class ProcessManager extends Component
 	 * @param Process $process
 	 * @return void
 	 * @throws Kiri\Exception\ConfigException
-	 * @throws \ReflectionException
+	 * @throws ReflectionException
 	 */
 	public function extracted(mixed $custom, Process $process): void
 	{

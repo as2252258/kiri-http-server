@@ -91,14 +91,10 @@ class OnRequest implements OnRequestInterface
 
 			$dispatcher = $this->router->query($PsrRequest->getUri()->getPath(), $PsrRequest->getMethod());
 
-			$middleware = [];
-			if (!($dispatcher instanceof Kiri\Router\Base\NotFoundController)) {
-				$middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
+            $middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
+            $middleware = $middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
 
-				$middleware = $middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
-			}
-
-			$PsrResponse = (new HttpRequestHandler($middleware, $dispatcher))->handle($PsrRequest);
+            $PsrResponse = (new HttpRequestHandler($middleware, $dispatcher))->handle($PsrRequest);
 		} catch (\Throwable $throwable) {
 			$PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
 		} finally {
