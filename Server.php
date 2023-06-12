@@ -28,8 +28,14 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
 class Server
 {
 
+    /**
+     * @var string|mixed
+     */
 	private string $class;
 
+    /**
+     * @var int
+     */
 	private int $daemon = 0;
 
 
