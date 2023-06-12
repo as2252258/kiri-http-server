@@ -44,7 +44,6 @@ class AsyncServer implements ServerInterface
 	public function initCoreServers(array $service, int $daemon = 0): void
 	{
 		$this->listener($service, $daemon);
-		$this->initRpcListen();
 		$this->initProcess();
 		$this->onSignal();
 	}
@@ -65,19 +64,6 @@ class AsyncServer implements ServerInterface
 			} else {
 				$this->addListener($value);
 			}
-		}
-	}
-
-
-	/**
-	 * @return void
-	 * @throws Exception
-	 */
-	private function initRpcListen(): void
-	{
-		$rpcService = \config('rpc', []);
-		if (!empty($rpcService)) {
-			$this->addListener(instance(SConfig::class, [], $rpcService));
 		}
 	}
 
