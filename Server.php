@@ -129,7 +129,7 @@ class Server
 
         $state = Kiri::getDi()->get(State::class);
         foreach ($this->manager()->sortService($configs['ports'] ?? []) as $config) {
-            $state->exit($config['port']);
+            $state->exit($config->port);
         }
 
         $manager = Kiri::getDi()->get(EventDispatch::class);
