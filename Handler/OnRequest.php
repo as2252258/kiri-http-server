@@ -90,10 +90,8 @@ class OnRequest implements OnRequestInterface
             $PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
 
             $dispatcher = $this->router->query($PsrRequest->getUri()->getPath(), $PsrRequest->getMethod());
-            $middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
-            $middleware = $middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
 
-            $PsrResponse = (new HttpRequestHandler($middleware, $dispatcher))->handle($PsrRequest);
+            $PsrResponse = $dispatcher->handle($PsrRequest);
         } catch (\Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
         } finally {
