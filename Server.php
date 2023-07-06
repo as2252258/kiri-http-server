@@ -78,12 +78,27 @@ class Server
         on(OnWorkerStart::class, [$this, 'setWorkerName']);
         on(OnTaskerStart::class, [$this, 'setTaskerName']);
 
-        $manager = Kiri::getDi()->get(Router::class);
-        $manager->scan_build_route();
+        if (\config('reload.hot') === false) {
+            $this->hotLoad();
+        } else {
+            on(OnWorkerStart::class, [$this, 'hotLoad']);
+            $this->addProcess(HotReload::class);
+        }
 
         $manager = $this->manager();
-        $manager->initCoreServers(\config('server', [], true), $this->daemon);
+        $manager->initCoreServers(\config('server', []), $this->daemon);
         $manager->start();
+    }
+
+
+    /**
+     * @return void
+     * @throws ReflectionException
+     */
+    public function hotLoad(): void
+    {
+        $manager = Kiri::getDi()->get(Router::class);
+        $manager->scan_build_route();
     }
 
 
@@ -125,10 +140,11 @@ class Server
      */
     public function shutdown(): void
     {
-        $configs = \config('server', [], true);
+        $configs = \config('server', []);
 
         $state = Kiri::getDi()->get(State::class);
-        foreach ($this->manager()->sortService($configs['ports'] ?? []) as $config) {
+        $instances = $this->manager()->sortService($configs['ports'] ?? []);
+        foreach ($instances as $config) {
             $state->exit($config->port);
         }
 
