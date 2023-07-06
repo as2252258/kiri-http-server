@@ -21,10 +21,13 @@ class HotReload extends BaseProcess
      */
     private array $watchFiles = [];
 
+
+    private array $md5Map = [];
+
     /**
      * @var array|string[]
      */
-    private array $dirs = [APP_PATH . 'app/', APP_PATH . 'config/', APP_PATH . 'routes/'];
+    private array $dirs = [APP_PATH . 'app', APP_PATH . 'routes'];
 
 
     /**
@@ -89,7 +92,7 @@ class HotReload extends BaseProcess
             if (!is_dir($dir)) {
                 continue;
             }
-            $this->watch($init, $dir);
+            $this->watch($init, rtrim($dir,'/'));
         }
         Event::add($init, fn() => $this->check($init));
         Event::cycle(function () use ($init) {
@@ -203,8 +206,7 @@ class HotReload extends BaseProcess
         if (!($events = inotify_read($inotify))) {
             return;
         }
-        $isReloading = Context::get('isReloading', false);
-        if ($isReloading) {
+        if (Context::exists('isReloading')) {
             return;
         }
 
@@ -224,7 +226,7 @@ class HotReload extends BaseProcess
             if ($fileType !== '.php') {
                 continue;
             }
-            if (Context::get('swoole_timer_after') !== -1) {
+            if (Context::exists('swoole_timer_after')) {
                 return;
             }
             $int = @swoole_timer_after(2000, fn() => $this->reload($inotify));
@@ -238,15 +240,14 @@ class HotReload extends BaseProcess
      */
     public function reload($inotify): void
     {
-        Context::set('isReloading', true);
         $this->trigger_reload();
 
         $this->clearWatch($inotify);
         foreach ($this->dirs as $root) {
             $this->watch($inotify, $root);
         }
-        Context::set('swoole_timer_after', -1);
-        Context::set('isReloading', false);
+        Context::remove('swoole_timer_after');
+        Context::remove('isReloading');
         $this->md5Map = [];
     }
 
@@ -328,6 +329,7 @@ class HotReload extends BaseProcess
             //递归目录
             if (is_dir($path)) {
                 $this->watch($inotify, $path);
+                continue;
             }
 
             //检测文件类型
