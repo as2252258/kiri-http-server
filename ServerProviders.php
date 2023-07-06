@@ -30,6 +30,5 @@ class ServerProviders extends Providers
 
 		$console = $this->container->get(Application::class);
 		$console->add($server);
-		$console->add(new HotReload());
 	}
 }
