@@ -16,6 +16,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+defined('ROUTER_TYPE_HTTP') or define('ROUTER_TYPE_HTTP','http');
+
 /**
  * Class Command
  * @package Http
