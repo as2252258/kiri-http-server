@@ -40,7 +40,7 @@ class ServerCommand extends Command
 		$this->setName('sw:server')
 			->setDescription('server start|stop|reload|restart')
 			->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
-			->addOption('daemon', 'd', InputOption::VALUE_OPTIONAL, 'is run daemonize');
+			->addOption('daemon', 'd', InputOption::VALUE_NONE, 'is run daemonize');
 	}
 
 
@@ -97,7 +97,7 @@ class ServerCommand extends Command
 	 */
 	protected function start(InputInterface $input): int
 	{
-		$this->server->setDaemon((int)!is_null($input->getOption('daemon')));
+		$this->server->setDaemon((int)($input->getOption('daemon')));
 		$this->server->start();
 		return 1;
 	}
