@@ -20,7 +20,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
-use const Kiri\Router\ROUTER_TYPE_HTTP;
 
 /**
  * OnRequest event
