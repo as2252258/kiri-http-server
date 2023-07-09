@@ -97,11 +97,12 @@ class HotReload extends BaseProcess
         Event::add($init, fn() => $this->check($init));
         Event::cycle(function () use ($init) {
             $pid = (int)file_get_contents(storage('.swoole.pid'));
+            var_dump($this->isStop());
             if ($pid <= 0 || !Process::kill($pid, 0) || $this->isStop()) {
                 Event::del($init);
             }
         }, true);
-//        Event::wait();
+        Event::wait();
     }
 
 
