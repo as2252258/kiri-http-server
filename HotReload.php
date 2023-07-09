@@ -101,7 +101,7 @@ class HotReload extends BaseProcess
                 Event::del($init);
             }
         }, true);
-        Event::wait();
+//        Event::wait();
     }
 
 
