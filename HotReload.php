@@ -48,7 +48,19 @@ class HotReload extends BaseProcess
         if (Context::inCoroutine()) {
             Coroutine::create(fn() => $this->onShutdown(Coroutine::waitSignal(SIGTERM | SIGINT)));
         } else {
-            Process::signal(SIGTERM | SIGINT, function ($data) {
+            Process::signal(SIGTERM, function ($data) {
+
+                var_dump('收到消息');
+
+                foreach ($this->watchFiles as $file) {
+                    @inotify_rm_watch($file, $this->inotify);
+                }
+                $this->onShutdown($data);
+            });
+            Process::signal(SIGINT, function ($data) {
+
+                var_dump('收到消息');
+
                 foreach ($this->watchFiles as $file) {
                     @inotify_rm_watch($file, $this->inotify);
                 }
