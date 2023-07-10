@@ -6,6 +6,7 @@ namespace Kiri\Server;
 use Exception;
 use Kiri\Di\Context;
 use Kiri\Server\Abstracts\BaseProcess;
+use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Event;
 use Swoole\Process;
@@ -48,45 +49,24 @@ class HotReload extends BaseProcess
         if (Context::inCoroutine()) {
             Coroutine::create(fn() => $this->onShutdown(Coroutine::waitSignal(SIGTERM | SIGINT)));
         } else {
-            Process::signal(SIGTERM, function ($data) {
-
-                var_dump('收到消息');
-
-                foreach ($this->watchFiles as $file) {
-                    @inotify_rm_watch($file, $this->inotify);
-                }
-                $this->onShutdown($data);
-            });
-            Process::signal(SIGINT, function ($data) {
-
-                var_dump('收到消息');
-
-                foreach ($this->watchFiles as $file) {
-                    @inotify_rm_watch($file, $this->inotify);
-                }
-                $this->onShutdown($data);
-            });
-
-            pcntl_signal(SIGTERM, function ($data) {
-
-                var_dump('收到消息');
-
-                foreach ($this->watchFiles as $file) {
-                    @inotify_rm_watch($file, $this->inotify);
-                }
-                $this->onShutdown($data);
-            });
-            pcntl_signal(SIGINT, function ($data) {
-
-                var_dump('收到消息');
-
-                foreach ($this->watchFiles as $file) {
-                    @inotify_rm_watch($file, $this->inotify);
-                }
-                $this->onShutdown($data);
-            });
+            pcntl_signal(SIGTERM, [$this, 'onStop']);
+            pcntl_signal(SIGINT, [$this, 'onStop']);
         }
         return $this;
+    }
+
+
+    /**
+     * @param $data
+     * @return void
+     * @throws ReflectionException
+     */
+    public function onStop($data): void
+    {
+        foreach ($this->watchFiles as $file) {
+            @inotify_rm_watch($file, $this->inotify);
+        }
+        $this->onShutdown($data);
     }
 
 
