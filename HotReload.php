@@ -66,6 +66,25 @@ class HotReload extends BaseProcess
                 }
                 $this->onShutdown($data);
             });
+
+            pcntl_signal(SIGTERM, function ($data) {
+
+                var_dump('收到消息');
+
+                foreach ($this->watchFiles as $file) {
+                    @inotify_rm_watch($file, $this->inotify);
+                }
+                $this->onShutdown($data);
+            });
+            pcntl_signal(SIGINT, function ($data) {
+
+                var_dump('收到消息');
+
+                foreach ($this->watchFiles as $file) {
+                    @inotify_rm_watch($file, $this->inotify);
+                }
+                $this->onShutdown($data);
+            });
         }
         return $this;
     }
