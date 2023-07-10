@@ -9,9 +9,6 @@ use Kiri\Server\Abstracts\BaseProcess;
 use Swoole\Coroutine;
 use Swoole\Event;
 use Swoole\Process;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class HotReload extends BaseProcess
 {
@@ -28,6 +25,9 @@ class HotReload extends BaseProcess
      * @var array|string[]
      */
     private array $dirs = [APP_PATH . 'app', APP_PATH . 'routes'];
+
+
+    protected mixed $inotify;
 
 
     /**
@@ -48,7 +48,12 @@ class HotReload extends BaseProcess
         if (Context::inCoroutine()) {
             Coroutine::create(fn() => $this->onShutdown(Coroutine::waitSignal(SIGTERM | SIGINT)));
         } else {
-            Process::signal(SIGTERM | SIGINT, fn($data) => $this->onShutdown($data));
+            Process::signal(SIGTERM | SIGINT, function ($data) {
+                foreach ($this->watchFiles as $file) {
+                    @inotify_rm_watch($file, $this->inotify);
+                }
+                $this->onShutdown($data);
+            });
         }
         return $this;
     }
@@ -87,19 +92,18 @@ class HotReload extends BaseProcess
      */
     private function onInotifyReload(): void
     {
-        $init = inotify_init();
+        $this->inotify = inotify_init();
         foreach ($this->dirs as $dir) {
             if (!is_dir($dir)) {
                 continue;
             }
-            $this->watch($init, rtrim($dir, '/'));
+            $this->watch(rtrim($dir, '/'));
         }
-        Event::add($init, fn() => $this->check($init));
-        Event::cycle(function () use ($init) {
+        Event::add($this->inotify, fn() => $this->check());
+        Event::cycle(function () {
             $pid = (int)file_get_contents(storage('.swoole.pid'));
-            var_dump($this->isStop());
             if ($pid <= 0 || !Process::kill($pid, 0) || $this->isStop()) {
-                Event::del($init);
+                Event::del($this->inotify);
             }
         }, true);
         Event::wait();
@@ -202,9 +206,9 @@ class HotReload extends BaseProcess
     /**
      * 开始监听
      */
-    public function check($inotify): void
+    public function check(): void
     {
-        if (!($events = inotify_read($inotify))) {
+        if (!($events = inotify_read($this->inotify))) {
             return;
         }
         if (Context::exists('isReloading')) {
@@ -230,7 +234,7 @@ class HotReload extends BaseProcess
             if (Context::exists('swoole_timer_after')) {
                 return;
             }
-            $int = @swoole_timer_after(2000, fn() => $this->reload($inotify));
+            $int = @swoole_timer_after(2000, fn() => $this->reload());
             Context::set('swoole_timer_after', $int);
             Context::set('isReloading', true);
         }
@@ -239,13 +243,13 @@ class HotReload extends BaseProcess
     /**
      * @throws Exception
      */
-    public function reload($inotify): void
+    public function reload(): void
     {
         $this->trigger_reload();
 
-        $this->clearWatch($inotify);
+        $this->clearWatch();
         foreach ($this->dirs as $root) {
-            $this->watch($inotify, $root);
+            $this->watch($root);
         }
         Context::remove('swoole_timer_after');
         Context::remove('isReloading');
@@ -284,11 +288,11 @@ class HotReload extends BaseProcess
     /**
      * @throws Exception
      */
-    public function clearWatch($inotify): void
+    public function clearWatch(): void
     {
         foreach ($this->watchFiles as $wd) {
             try {
-                inotify_rm_watch($inotify, $wd);
+                inotify_rm_watch($this->inotify, $wd);
             } catch (\Throwable $exception) {
                 logger()->addError($exception, 'throwable');
             }
@@ -298,12 +302,11 @@ class HotReload extends BaseProcess
 
 
     /**
-     * @param $inotify
      * @param $dir
      * @return bool
      * @throws Exception
      */
-    public function watch($inotify, $dir): bool
+    public function watch($dir): bool
     {
         //目录不存在
         if (!is_dir($dir)) {
@@ -318,7 +321,7 @@ class HotReload extends BaseProcess
             return FALSE;
         }
 
-        $wd = @inotify_add_watch($inotify, $dir, IN_MODIFY | IN_DELETE | IN_CREATE | IN_MOVE);
+        $wd = @inotify_add_watch($this->inotify, $dir, IN_MODIFY | IN_DELETE | IN_CREATE | IN_MOVE);
         $this->watchFiles[$dir] = $wd;
 
         $files = scandir($dir);
@@ -329,13 +332,13 @@ class HotReload extends BaseProcess
             $path = $dir . '/' . $f;
             //递归目录
             if (is_dir($path)) {
-                $this->watch($inotify, $path);
+                $this->watch($path);
                 continue;
             }
 
             //检测文件类型
             if (strstr($f, '.') == '.php') {
-                $wd = @inotify_add_watch($inotify, $path, IN_MODIFY | IN_DELETE | IN_CREATE | IN_MOVE);
+                $wd = @inotify_add_watch($this->inotify, $path, IN_MODIFY | IN_DELETE | IN_CREATE | IN_MOVE);
                 $this->watchFiles[$path] = $wd;
             }
         }
