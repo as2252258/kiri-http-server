@@ -62,6 +62,11 @@ class OnRequest implements OnRequestInterface
 
 
     /**
+     * @var MiddlewareManager
+     */
+    public MiddlewareManager $middlewareManager;
+
+    /**
      * @throws Exception
      */
     public function init(): void
@@ -74,6 +79,8 @@ class OnRequest implements OnRequestInterface
         $this->exception = $container->get($exception);
         $this->router = $container->get(DataGrip::class)->get(ROUTER_TYPE_HTTP);
         $this->emitter = $this->response->emmit;
+
+        $this->middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
     }
 
 
@@ -89,11 +96,7 @@ class OnRequest implements OnRequestInterface
             $PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
             $dispatcher = $this->router->query($request->server['path_info'], $request->getMethod());
 
-            $middleware = [];
-            if ($dispatcher->getClass() !== Kiri\Router\Base\NotFoundController::class) {
-                $middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
-                $middleware = $middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
-            }
+            $middleware = $this->middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
 
             $PsrResponse = (new HttpRequestHandler($middleware, $dispatcher))->handle($PsrRequest);
         } catch (\Throwable $throwable) {
