@@ -12,6 +12,7 @@ use Kiri\Router\Constrict\ConstrictRequest;
 use Kiri\Router\Constrict\ConstrictResponse;
 use Kiri\Router\Constrict\Uri;
 use Kiri\Router\DataGrip;
+use Kiri\Router\HttpRequestHandler;
 use Kiri\Router\Interface\ExceptionHandlerInterface;
 use Kiri\Router\Interface\OnRequestInterface;
 use Kiri\Router\RouterCollector;
@@ -20,6 +21,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Kiri\Router\Base\Middleware as MiddlewareManager;
 
 /**
  * OnRequest event
@@ -85,10 +87,15 @@ class OnRequest implements OnRequestInterface
         try {
             /** @var ConstrictRequest $PsrRequest */
             $PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
-
             $dispatcher = $this->router->query($request->server['path_info'], $request->getMethod());
 
-            $PsrResponse = $dispatcher->handle($PsrRequest);
+            $middleware = [];
+            if ($dispatcher->getClass() !== Kiri\Router\Base\NotFoundController::class) {
+                $middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
+                $middleware = $middlewareManager->get($dispatcher->getClass(), $dispatcher->getMethod());
+            }
+
+            $PsrResponse = (new HttpRequestHandler($middleware, $dispatcher))->handle($PsrRequest);
         } catch (\Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
         } finally {
