@@ -11,7 +11,7 @@ use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Events\OnTaskerStart;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnWorkerStop;
-use Kiri\Server\Abstracts\AsyncServer;
+use Kiri\Server\Abstracts\CoroutineServer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -45,14 +45,14 @@ class Server
      */
     public function __construct()
     {
-        $this->class = \config('server.type', AsyncServer::class);
+        $this->class = \config('server.type', CoroutineServer::class);
     }
 
 
     /**
      * @throws ReflectionException
      */
-    private function manager(): AsyncServer
+    private function manager(): CoroutineServer
     {
         return Kiri::getDi()->get($this->class);
     }
