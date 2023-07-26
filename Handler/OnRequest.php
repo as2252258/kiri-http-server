@@ -121,7 +121,7 @@ class OnRequest implements OnRequestInterface
         $PsrResponse->withContentType($this->response->contentType);
 
         $serverRequest = (new ConstrictRequest())->withDataHeaders($request->getData())
-            ->withUri(new Uri($request->server))
+            ->withUri(new Uri($request))
             ->withProtocolVersion($request->server['server_protocol'])
             ->withCookieParams($request->cookie ?? [])
             ->withServerParams($request->server)
