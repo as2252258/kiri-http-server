@@ -85,7 +85,7 @@ trait TraitServer
      */
     private function onPcntlSignal($signal, $callback): void
     {
-        pcntl_signal(SIGINT, [$this, 'onSigint']);
+        pcntl_signal($signal, $callback);
     }
 
 
@@ -101,7 +101,6 @@ trait TraitServer
     /**
      * @param array $ports
      * @return array
-     * @throws ReflectionException
      */
     public function sortService(array $ports): array
     {
