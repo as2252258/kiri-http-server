@@ -119,7 +119,7 @@ class OnRequest implements OnRequestInterface
         $PsrResponse->withContentType($this->response->contentType);
 
         $serverRequest = (new ConstrictRequest())->withDataHeaders($request->getData())
-            ->withUri(static::parse($request))
+            ->withUri(new Uri($request->server))
             ->withProtocolVersion($request->server['server_protocol'])
             ->withCookieParams($request->cookie ?? [])
             ->withServerParams($request->server)
@@ -130,26 +130,6 @@ class OnRequest implements OnRequestInterface
 
         /** @var ConstrictRequest $PsrRequest */
         return Context::set(RequestInterface::class, $serverRequest);
-    }
-
-
-    /**
-     * @param Request $request
-     * @return UriInterface
-     */
-    public static function parse(Request $request): UriInterface
-    {
-        $uri = new Uri();
-        $uri->withQuery($request->server['query_string'] ?? '')
-            ->withPath($request->server['path_info'])
-            ->withHost($request->header['host'] ?? '127.0.0.1')
-            ->withPort($request->server['server_port']);
-        if (isset($request->server['https']) && $request->server['https'] !== 'off') {
-            $uri->withScheme('https');
-        } else {
-            $uri->withScheme('http');
-        }
-        return $uri;
     }
 
 
