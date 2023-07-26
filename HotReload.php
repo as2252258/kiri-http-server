@@ -65,7 +65,9 @@ class HotReload extends BaseProcess
     {
         $this->clearWatch();
 
-        Event::del($this->inotify);
+        if (is_resource($this->inotify)) {
+            Event::del($this->inotify);
+        }
 
         $this->onShutdown($data);
     }
