@@ -28,7 +28,7 @@ class HotReload extends BaseProcess
     private array $dirs = [APP_PATH . 'app', APP_PATH . 'routes'];
 
 
-    protected mixed $inotify;
+    protected mixed $inotify = null;
 
 
     /**
@@ -50,7 +50,6 @@ class HotReload extends BaseProcess
             Coroutine::create(fn() => $this->onShutdown(Coroutine::waitSignal(SIGTERM | SIGINT)));
         } else {
             pcntl_signal(SIGTERM, [$this, 'onStop']);
-//            pcntl_signal(SIGINT, [$this, 'onStop']);
         }
         return $this;
     }
