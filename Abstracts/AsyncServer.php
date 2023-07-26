@@ -197,7 +197,6 @@ class AsyncServer implements ServerInterface
 	public function onSigint($no, array $signInfo): void
 	{
 		try {
-            Logger::_alert("");
 			Logger::_alert('Pid ' . getmypid() . ' get signo ' . $no);
 			$this->shutdown();
 		} catch (\Throwable $exception) {
