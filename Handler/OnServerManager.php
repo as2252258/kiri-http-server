@@ -3,13 +3,10 @@
 namespace Kiri\Server\Handler;
 
 use Kiri;
-use Kiri\Di\Inject\Container;
-use Kiri\Events\EventDispatch;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Kiri\Server\Abstracts\Server;
-use Kiri\Exception\ConfigException;
 use Kiri\Server\Events\OnManagerStart;
 use Kiri\Server\Events\OnManagerStop;
 
