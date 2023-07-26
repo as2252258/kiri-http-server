@@ -50,7 +50,7 @@ class HotReload extends BaseProcess
             Coroutine::create(fn() => $this->onShutdown(Coroutine::waitSignal(SIGTERM | SIGINT)));
         } else {
             pcntl_signal(SIGTERM, [$this, 'onStop']);
-            pcntl_signal(SIGINT, [$this, 'onStop']);
+//            pcntl_signal(SIGINT, [$this, 'onStop']);
         }
         return $this;
     }
@@ -59,13 +59,14 @@ class HotReload extends BaseProcess
     /**
      * @param $data
      * @return void
-     * @throws ReflectionException
+     * @throws Exception
      */
     public function onStop($data): void
     {
-        foreach ($this->watchFiles as $file) {
-            @inotify_rm_watch($file, $this->inotify);
-        }
+        $this->clearWatch();
+
+        Event::del($this->inotify);
+
         $this->onShutdown($data);
     }
 
@@ -83,6 +84,7 @@ class HotReload extends BaseProcess
         } else {
             $this->onCrontabReload();
         }
+        $process->exit(0);
     }
 
 
@@ -111,11 +113,8 @@ class HotReload extends BaseProcess
             $this->watch(rtrim($dir, '/'));
         }
         Event::add($this->inotify, fn() => $this->check());
-        Event::cycle(function () {
-            $pid = (int)file_get_contents(storage('.swoole.pid'));
-            if ($pid <= 0 || !Process::kill($pid, 0) || $this->isStop()) {
-                Event::del($this->inotify);
-            }
+        Event::cycle(fn() => function() {
+            Event::dispatch();
         }, true);
         Event::wait();
     }
