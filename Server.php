@@ -72,7 +72,7 @@ class Server
         if (\config('reload.hot') === false) {
             $this->router->scan_build_route();
         } else {
-            on(OnWorkerStart::class, [$this, 'hotLoad']);
+            on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
             $this->addProcess(HotReload::class);
         }
 
