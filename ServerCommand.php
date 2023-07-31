@@ -26,9 +26,6 @@ class ServerCommand extends Command
 {
 
 
-	const ACTIONS = ['start', 'stop', 'restart'];
-
-
 	private Server $server;
 
 

@@ -87,8 +87,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 	 */
 	public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
 	{
-		$dispatch = \Kiri::getDi()->get(EventDispatch::class);
-		$dispatch->dispatch(new OnWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal));
+		event(new OnWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal));
 
 		$message = sprintf('Worker#%d::%d error stop. signal %d, exit_code %d, msg %s',
 			$worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), 9)

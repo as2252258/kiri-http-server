@@ -3,6 +3,7 @@
 namespace Kiri\Server\Task;
 
 
+use Kiri;
 use Kiri\Server\Constant;
 use Kiri\Server\ServerInterface;
 use Psr\Container\ContainerExceptionInterface;
@@ -13,8 +14,15 @@ use Swoole\Server;
 class Task implements TaskInterface
 {
 
+    /**
+     * @param ServerInterface $server
+     */
+    public function __construct(public ServerInterface $server)
+    {
+    }
 
-	/**
+
+    /**
 	 * @param Server $server
 	 * @return void
 	 */
@@ -60,7 +68,7 @@ class Task implements TaskInterface
 		if (is_null($data)) {
 			return null;
 		}
-		$data[0] = \Kiri::getDi()->get($data[0]);
+		$data[0] = Kiri::getDi()->get($data[0]);
 		return call_user_func($data, $task_id, $src_worker_id);
 	}
 
@@ -73,20 +81,18 @@ class Task implements TaskInterface
 	 */
 	public function dispatch(array|string|object $handler, ?int $workerId = null): void
 	{
-		/** @var Server $server */
-		$server = \Kiri::getDi()->get(ServerInterface::class);
 		if (is_null($workerId)) {
-			$workerId = rand(0, $server->setting[Constant::OPTION_TASK_WORKER_NUM] - 1);
+			$workerId = rand(0, $this->server->setting[Constant::OPTION_TASK_WORKER_NUM] - 1);
 		}
 		if (is_string($handler)) {
-			$server->task(serialize([di($handler), 'handle']), $workerId);
+            $this->server->task(serialize([di($handler), 'handle']), $workerId);
 		} else if (is_array($handler)) {
 			if (is_string($handler[0])) {
 				$handler[0] = di($handler[0]);
 			}
-			$server->task(serialize($handler), $workerId);
+            $this->server->task(serialize($handler), $workerId);
 		} else {
-			$server->task(serialize([$handler, 'handle']), $workerId);
+            $this->server->task(serialize([$handler, 'handle']), $workerId);
 		}
 	}
 

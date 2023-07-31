@@ -28,11 +28,6 @@ defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
 class Server
 {
 
-    /**
-     * @var string|mixed
-     */
-    private string $class;
-
 
     /**
      * @var int
@@ -41,20 +36,16 @@ class Server
 
 
     /**
-     *
+     * @param AsyncServer $manager
+     * @param State $state
+     * @param EventDispatch $dispatch
+     * @param Router $router
      */
-    public function __construct()
+    public function __construct(public AsyncServer   $manager,
+                                public State         $state,
+                                public EventDispatch $dispatch,
+                                public Router        $router)
     {
-        $this->class = \config('server.type', AsyncServer::class);
-    }
-
-
-    /**
-     * @throws ReflectionException
-     */
-    private function manager(): AsyncServer
-    {
-        return Kiri::getDi()->get($this->class);
     }
 
 
@@ -64,7 +55,7 @@ class Server
      */
     public function addProcess($process): void
     {
-        $this->manager()->addProcess($process);
+        $this->manager->addProcess($process);
     }
 
 
@@ -79,26 +70,14 @@ class Server
         on(OnTaskerStart::class, [$this, 'setTaskerName']);
 
         if (\config('reload.hot') === false) {
-            $this->hotLoad();
+            $this->router->scan_build_route();
         } else {
             on(OnWorkerStart::class, [$this, 'hotLoad']);
             $this->addProcess(HotReload::class);
         }
 
-        $manager = $this->manager();
-        $manager->initCoreServers(\config('server', []), $this->daemon);
-        $manager->start();
-    }
-
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     */
-    public function hotLoad(): void
-    {
-        $manager = Kiri::getDi()->get(Router::class);
-        $manager->scan_build_route();
+        $this->manager->initCoreServers(\config('server', []), $this->daemon);
+        $this->manager->start();
     }
 
 
@@ -141,15 +120,11 @@ class Server
     public function shutdown(): void
     {
         $configs = \config('server', []);
-
-        $state = Kiri::getDi()->get(State::class);
-        $instances = $this->manager()->sortService($configs['ports'] ?? []);
+        $instances = $this->manager->sortService($configs['ports'] ?? []);
         foreach ($instances as $config) {
-            $state->exit($config->port);
+            $this->state->exit($config->port);
         }
-
-        $manager = Kiri::getDi()->get(EventDispatch::class);
-        $manager->dispatch(new OnShutdown());
+        $this->dispatch->dispatch(new OnShutdown());
     }
 
 
@@ -159,8 +134,7 @@ class Server
      */
     public function isRunner(): bool
     {
-        $state = Kiri::getDi()->get(State::class);
-        return $state->isRunner();
+        return $this->state->isRunner();
     }
 
 

@@ -27,7 +27,6 @@ class OnServer extends Server
 
 	/**
 	 * @param SServer $server
-	 * @throws ConfigException
 	 * @throws ReflectionException
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface

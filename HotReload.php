@@ -305,7 +305,7 @@ class HotReload extends BaseProcess
             try {
                 inotify_rm_watch($this->inotify, $wd);
             } catch (\Throwable $exception) {
-                logger()->addError($exception, 'throwable');
+                trigger_print_error($exception, 'throwable');
             }
         }
         $this->watchFiles = [];
@@ -321,7 +321,7 @@ class HotReload extends BaseProcess
     {
         //目录不存在
         if (!is_dir($dir)) {
-            return logger()->addError("[$dir] is not a directory.");
+            return trigger_print_error("[$dir] is not a directory.");
         }
         //避免重复监听
         if (isset($this->watchFiles[$dir])) {

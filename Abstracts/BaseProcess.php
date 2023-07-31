@@ -3,6 +3,7 @@
 namespace Kiri\Server\Abstracts;
 
 
+use Kiri\Abstracts\Logger;
 use Kiri\Di\Context;
 use Kiri\Server\Contract\OnProcessInterface;
 use Swoole\Coroutine;
@@ -88,17 +89,15 @@ abstract class BaseProcess implements OnProcessInterface
 	abstract public function onSigterm(): static;
 
 
-	/**
-	 * @param $data
-	 * @throws \ReflectionException
-	 */
+    /**
+     * @param $data
+     * @return void
+     */
 	protected function onShutdown($data): void
 	{
 		$this->isStop = true;
 		$value = Context::get('waite:process:message');
-
-		\Kiri::getLogger()->alert('Process ' . $this->getName() . ' stop');
-
+		Logger::_alert('Process ' . $this->getName() . ' stop');
 		if (!is_null($value) && Coroutine::exists((int)$value)) {
 			Coroutine::cancel((int)$value);
 		}

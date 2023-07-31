@@ -6,8 +6,6 @@ namespace Kiri\Server\Abstracts;
 
 use Exception;
 use Kiri;
-use Psr\Log\LoggerInterface;
-use Kiri\Di\Inject\Container;
 
 
 /**

@@ -7,15 +7,10 @@ use Exception;
 use Kiri;
 use Kiri\Abstracts\Component;
 use Kiri\Server\Contract\OnProcessInterface;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
-use Swoole\Coroutine;
 use Swoole\Process;
-use Psr\Container\ContainerInterface;
-use Kiri\Events\EventProvider;
+use Kiri\Abstracts\Logger;
 use Kiri\Server\ServerInterface;
-use Kiri\Di\Inject\Container;
 use Kiri\Server\Events\OnServerBeforeStart;
 
 class ProcessManager extends Component
@@ -32,8 +27,7 @@ class ProcessManager extends Component
 	 */
 	public function init(): void
 	{
-		$provider = Kiri::getDi()->get(EventProvider::class);
-		$provider->on(OnServerBeforeStart::class, [$this, 'OnServerBeforeStart']);
+		on(OnServerBeforeStart::class, [$this, 'OnServerBeforeStart']);
 	}
 
 
@@ -46,19 +40,13 @@ class ProcessManager extends Component
 	{
 		$server = Kiri::getDi()->get(ServerInterface::class);
 		foreach ($this->_process as $custom) {
-			if (Kiri\Di\Context::inCoroutine()) {
-				Coroutine::create(function () use ($custom) {
-					$custom->onSigterm()->process(null);
-				});
-			} else {
-				$server->addProcess(new Process(function (Process $process) use ($custom) {
-					$this->extracted($custom, $process);
-				},
-					$custom->getRedirectStdinAndStdout(),
-					$custom->getPipeType(),
-					$custom->isEnableCoroutine()
-				));
-			}
+            $server->addProcess(new Process(function (Process $process) use ($custom) {
+                $this->extracted($custom, $process);
+            },
+                $custom->getRedirectStdinAndStdout(),
+                $custom->getPipeType(),
+                $custom->isEnableCoroutine()
+            ));
 		}
 	}
 
@@ -95,9 +83,9 @@ class ProcessManager extends Component
 	 */
 	public function shutdown(): void
 	{
-//		foreach ($this->_process as $process) {
-//			Process::kill($process->pid, 0) && Process::kill($process->pid, 15);
-//		}
+		foreach ($this->_process as $process) {
+			Process::kill($process->pid, 0) && Process::kill($process->pid, 15);
+		}
 	}
 
 
@@ -120,16 +108,16 @@ class ProcessManager extends Component
 	 */
 	public function get(?string $name = null, string $tag = 'default'): array|Process|null
 	{
-//		$process = $this->_process[$tag] ?? null;
-//		if (empty($process)) {
-//			return null;
-//		}
-//		if (!empty($name)) {
-//			if (!isset($process[$name])) {
-//				return null;
-//			}
-//			return $process[$name];
-//		}
+		$process = $this->_process[$tag] ?? null;
+		if (empty($process)) {
+			return null;
+		}
+		if (!empty($name)) {
+			if (!isset($process[$name])) {
+				return null;
+			}
+			return $process[$name];
+		}
 		return null;
 	}
 
@@ -139,9 +127,9 @@ class ProcessManager extends Component
 	 */
 	public function stop(): void
 	{
-//		foreach ($this->_process as $process) {
-//			Process::kill($process->pid, 0) && Process::kill($process->pid, 15);
-//		}
+		foreach ($this->_process as $process) {
+			Process::kill($process->pid, 0) && Process::kill($process->pid, 15);
+		}
 	}
 
 
@@ -168,11 +156,11 @@ class ProcessManager extends Component
 	 */
 	public function push(string $name, string $message): void
 	{
-//		if (!isset($this->_process[$name])) {
-//			return;
-//		}
-//		$process = $this->_process[$name];
-//		$process->write($message);
+		if (!isset($this->_process[$name])) {
+			return;
+		}
+		$process = $this->_process[$name];
+		$process->write($message);
 	}
 
 	/**
@@ -186,7 +174,7 @@ class ProcessManager extends Component
 	{
 		set_env('environmental', Kiri::PROCESS);
 		$system = sprintf('[%s].Custom Process', \config('id', 'system-service'));
-		Kiri::getLogger()->alert($system . ' ' . $custom->getName() . ' start.');
+		Logger::_alert($system . ' ' . $custom->getName() . ' start.');
 		if (Kiri::getPlatform()->isLinux()) {
 			$process->name($system . '[' . $process->pid . '].' . $custom->getName());
 		}
