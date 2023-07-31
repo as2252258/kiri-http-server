@@ -15,11 +15,9 @@ class Task implements TaskInterface
 {
 
     /**
-     * @param ServerInterface $server
+     * @var ServerInterface
      */
-    public function __construct(public ServerInterface $server)
-    {
-    }
+    public ServerInterface $server;
 
 
     /**
