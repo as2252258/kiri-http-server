@@ -45,7 +45,6 @@ class Server
                                 public EventDispatch $dispatch,
                                 public Router        $router)
     {
-        on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
     }
 
 
@@ -65,6 +64,7 @@ class Server
      */
     public function start(): void
     {
+        on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
         if (\config('reload.hot', false) === true) {
             $this->manager->addProcess(HotReload::class);
         } else {
