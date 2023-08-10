@@ -5,7 +5,9 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri\Di\Context;
+use Kiri\Router\Router;
 use Kiri\Server\Abstracts\BaseProcess;
+use Kiri\Server\Events\OnWorkerStart;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Event;
@@ -30,6 +32,14 @@ class HotReload extends BaseProcess
 
     protected mixed $inotify = null;
 
+
+    /**
+     * @param Router $router
+     */
+    public function __construct(public Router $router)
+    {
+        on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
+    }
 
     /**
      * @return string

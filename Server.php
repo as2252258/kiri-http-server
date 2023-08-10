@@ -14,7 +14,7 @@ use Kiri\Server\Events\OnWorkerStop;
 use Kiri\Server\Abstracts\AsyncServer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use ReflectionException;
+use Kiri\Server\Events\OnServerBeforeStart;
 use Swoole\Timer;
 
 
@@ -50,12 +50,13 @@ class Server
 
 
     /**
-     * @param $process
-     * @throws Exception
+     * @return void
      */
-    public function addProcess($process): void
+    public function init(): void
     {
-        $this->manager->addProcess($process);
+        on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
+        on(OnWorkerStart::class, [$this, 'setWorkerName']);
+        on(OnTaskerStart::class, [$this, 'setTaskerName']);
     }
 
 
@@ -65,16 +66,11 @@ class Server
      */
     public function start(): void
     {
-        on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
-        on(OnWorkerStart::class, [$this, 'setWorkerName']);
-        on(OnTaskerStart::class, [$this, 'setTaskerName']);
-        if (\config('reload.hot') === false) {
-            $this->router->scan_build_route();
+        if (\config('reload.hot', false) === true) {
+            $this->manager->addProcess(HotReload::class);
         } else {
-            on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
-            $this->addProcess(HotReload::class);
+            $this->router->scan_build_route();
         }
-
         $this->manager->initCoreServers(\config('server', []), $this->daemon);
         $this->manager->start();
     }
