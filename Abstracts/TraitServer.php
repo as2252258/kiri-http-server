@@ -4,6 +4,7 @@ namespace Kiri\Server\Abstracts;
 
 use Exception;
 use Kiri;
+use Kiri\Abstracts\Logger;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Http\Server as HServer;
@@ -74,6 +75,22 @@ trait TraitServer
                 throw new Exception('Register signal callback must can exec.');
             }
             $this->onPcntlSignal($sig, $value);
+        }
+    }
+
+
+    /**
+     * @param $no
+     * @param array $signInfo
+     * @return void
+     */
+    public function onSigint($no, array $signInfo): void
+    {
+        try {
+            Logger::_alert('Pid ' . getmypid() . ' get signo ' . $no);
+            $this->shutdown();
+        } catch (\Throwable $exception) {
+            error($exception);
         }
     }
 

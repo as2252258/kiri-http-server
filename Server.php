@@ -68,7 +68,6 @@ class Server
         on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
         on(OnWorkerStart::class, [$this, 'setWorkerName']);
         on(OnTaskerStart::class, [$this, 'setTaskerName']);
-
         if (\config('reload.hot') === false) {
             $this->router->scan_build_route();
         } else {
