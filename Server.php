@@ -8,13 +8,9 @@ use Kiri;
 use Kiri\Events\EventDispatch;
 use Kiri\Router\Router;
 use Kiri\Server\Events\OnShutdown;
-use Kiri\Server\Events\OnTaskerStart;
-use Kiri\Server\Events\OnWorkerStart;
-use Kiri\Server\Events\OnWorkerStop;
 use Kiri\Server\Abstracts\AsyncServer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Swoole\Timer;
 
 
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -50,21 +46,10 @@ class Server
 
     /**
      * @return void
-     */
-    public function init(): void
-    {
-        on(OnWorkerStart::class, [$this, 'onWorkerName']);
-        on(OnTaskerStart::class, [$this, 'onTaskerName']);
-    }
-
-
-    /**
-     * @return void
      * @throws Exception
      */
     public function start(): void
     {
-        on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
         if (\config('reload.hot', false) === true) {
             $this->manager->addProcess(HotReload::class);
         } else {
@@ -72,36 +57,6 @@ class Server
         }
         $this->manager->initCoreServers(\config('server', []), $this->daemon);
         $this->manager->start();
-    }
-
-
-    /**
-     * @param OnWorkerStart $onWorkerStart
-     */
-    public function onWorkerName(OnWorkerStart $onWorkerStart): void
-    {
-        if (!property_exists($onWorkerStart->server, 'worker_pid')) {
-            return;
-        }
-        $prefix = sprintf('Worker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
-        set_env('environmental', Kiri::WORKER);
-
-        Kiri::setProcessName($prefix);
-    }
-
-
-    /**
-     * @param OnTaskerStart $onWorkerStart
-     */
-    public function onTaskerName(OnTaskerStart $onWorkerStart): void
-    {
-        if (!property_exists($onWorkerStart->server, 'worker_pid')) {
-            return;
-        }
-        $prefix = sprintf('Tasker Process[%d].%d', $onWorkerStart->server->worker_pid, $onWorkerStart->workerId);
-        set_env('environmental', Kiri::TASK);
-
-        Kiri::setProcessName($prefix);
     }
 
 
