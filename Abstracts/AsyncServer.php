@@ -104,8 +104,6 @@ class AsyncServer implements ServerInterface
     {
         $this->server = new $match($config->host, $config->port, $config->mode, $config->socket);
         $this->server->set($this->systemConfig($config, $daemon));
-
-        Logger::_alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
         if (!isset($config->events[Constant::SHUTDOWN])) {
             $config->events[Constant::SHUTDOWN] = [OnServer::class, 'onShutdown'];
         }
@@ -160,8 +158,6 @@ class AsyncServer implements ServerInterface
         if ($port === false) {
             throw new Exception('Listen port fail.' . swoole_last_error());
         }
-
-        Logger::_alert('Listen ' . $config->type . ' address ' . $config->host . '::' . $config->port);
 
         $port->set($this->resetSettings($config->type, $config->settings));
 
