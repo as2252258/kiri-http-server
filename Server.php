@@ -14,7 +14,6 @@ use Kiri\Server\Events\OnWorkerStop;
 use Kiri\Server\Abstracts\AsyncServer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Kiri\Server\Events\OnServerBeforeStart;
 use Swoole\Timer;
 
 
@@ -46,6 +45,7 @@ class Server
                                 public EventDispatch $dispatch,
                                 public Router        $router)
     {
+        on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
     }
 
 
@@ -54,9 +54,8 @@ class Server
      */
     public function init(): void
     {
-        on(OnWorkerStop::class, [Timer::class, 'clearAll'], 9999);
-        on(OnWorkerStart::class, [$this, 'setWorkerName']);
-        on(OnTaskerStart::class, [$this, 'setTaskerName']);
+        on(OnWorkerStart::class, [$this, 'onWorkerName']);
+        on(OnTaskerStart::class, [$this, 'onTaskerName']);
     }
 
 
@@ -79,7 +78,7 @@ class Server
     /**
      * @param OnWorkerStart $onWorkerStart
      */
-    public function setWorkerName(OnWorkerStart $onWorkerStart): void
+    public function onWorkerName(OnWorkerStart $onWorkerStart): void
     {
         if (!property_exists($onWorkerStart->server, 'worker_pid')) {
             return;
@@ -94,7 +93,7 @@ class Server
     /**
      * @param OnTaskerStart $onWorkerStart
      */
-    public function setTaskerName(OnTaskerStart $onWorkerStart): void
+    public function onTaskerName(OnTaskerStart $onWorkerStart): void
     {
         if (!property_exists($onWorkerStart->server, 'worker_pid')) {
             return;
