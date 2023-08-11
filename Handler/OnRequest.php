@@ -6,6 +6,7 @@ namespace Kiri\Server\Handler;
 
 use Exception;
 use Kiri;
+use Kiri\Core\Xml;
 use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
 use Kiri\Di\Interface\ResponseEmitterInterface;
@@ -127,9 +128,15 @@ class OnRequest implements OnRequestInterface
             ->withServerParams($request->server)
             ->withQueryParams($request->get ?? [])
             ->withUploadedFiles($request->files ?? [])
-            ->withMethod($request->getMethod())
-            ->withParsedBody($request->post ?? []);
-
+            ->withMethod($request->getMethod());
+        $contentType = $serverRequest->header('Content-Type');
+        if (str_contains($contentType, 'json')) {
+            $serverRequest->withParsedBody(json_decode($request->post, true));
+        } else if (str_contains($contentType, 'xml')) {
+            $serverRequest->withParsedBody(Xml::toArray($request->post));
+        } else {
+            $serverRequest->withParsedBody($request->post ?? []);
+        }
         /** @var ConstrictRequest $PsrRequest */
         return Context::set(RequestInterface::class, $serverRequest);
     }
