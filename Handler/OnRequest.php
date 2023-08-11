@@ -130,12 +130,13 @@ class OnRequest implements OnRequestInterface
             ->withUploadedFiles($request->files ?? [])
             ->withMethod($request->getMethod());
 
-        var_dump($request->header);
         $contentType = $request->header['content-type'] ?? 'application/json';
-        if (str_contains($contentType, 'json')) {
-            $serverRequest->withParsedBody(json_decode($request->post, true));
-        } else if (str_contains($contentType, 'xml')) {
-            $serverRequest->withParsedBody(Xml::toArray($request->post));
+        if ($request->getContent()) {
+            if (str_contains($contentType, 'json')) {
+                $serverRequest->withParsedBody(json_decode($request->getContent(), true));
+            } else if (str_contains($contentType, 'xml')) {
+                $serverRequest->withParsedBody(Xml::toArray($request->getContent()));
+            }
         } else {
             $serverRequest->withParsedBody($request->post ?? []);
         }
