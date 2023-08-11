@@ -7,6 +7,7 @@ namespace Kiri\Server\Handler;
 use Exception;
 use Kiri;
 use Kiri\Core\Xml;
+use Kiri\Core\Json;
 use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
 use Kiri\Di\Interface\ResponseEmitterInterface;
@@ -131,12 +132,10 @@ class OnRequest implements OnRequestInterface
             ->withMethod($request->getMethod());
 
         $contentType = $request->header['content-type'] ?? 'application/json';
-        if ($request->getContent()) {
-            if (str_contains($contentType, 'json')) {
-                $serverRequest->withParsedBody(json_decode($request->getContent(), true));
-            } else if (str_contains($contentType, 'xml')) {
-                $serverRequest->withParsedBody(Xml::toArray($request->getContent()));
-            }
+        if (str_contains($contentType, 'json')) {
+            $serverRequest->withParsedBody(Json::decode($request->getContent()));
+        } else if (str_contains($contentType, 'xml')) {
+            $serverRequest->withParsedBody(Xml::toArray($request->getContent()));
         } else {
             $serverRequest->withParsedBody($request->post ?? []);
         }
