@@ -301,7 +301,7 @@ class HotReload extends BaseProcess
      */
     public function trigger_reload(): void
     {
-        echo 'tigger server Reload' . PHP_EOL;
+        echo 'trigger server Reload' . PHP_EOL;
         di(ServerInterface::class)->reload(false);
     }
 
