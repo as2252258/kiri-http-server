@@ -3,7 +3,7 @@
 namespace Kiri\Server\Handler;
 
 use Kiri\Di\Inject\Container;
-use Monolog\Logger;
+use Kiri\Error\StdoutLogger;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -24,10 +24,10 @@ class OnServer extends Server
 
 
     /**
-     * @var Logger
+     * @var StdoutLogger
      */
     #[Container(LoggerInterface::class)]
-    public Logger $logger;
+    public StdoutLogger $logger;
 
 
     /**

@@ -5,13 +5,13 @@ namespace Kiri\Server\Abstracts;
 use Exception;
 use Kiri;
 use Kiri\Di\Inject\Container;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;
 use Kiri\Server\Constant;
 use Kiri\Server\Config;
+use Kiri\Error\StdoutLogger;
 use Swoole\WebSocket\Server as WServer;
 
 trait TraitServer
@@ -23,10 +23,10 @@ trait TraitServer
 
 
     /**
-     * @var Logger
+     * @var StdoutLogger
      */
     #[Container(LoggerInterface::class)]
-    public Logger $logger;
+    public StdoutLogger $logger;
 
 
     /**

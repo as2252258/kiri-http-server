@@ -7,8 +7,8 @@ use Exception;
 use Kiri;
 use Kiri\Abstracts\Component;
 use Kiri\Di\Inject\Container;
+use Kiri\Error\StdoutLogger;
 use Kiri\Server\Contract\OnProcessInterface;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Swoole\Process;
@@ -20,10 +20,10 @@ class ProcessManager extends Component
 
 
     /**
-     * @var Logger
+     * @var StdoutLogger
      */
     #[Container(LoggerInterface::class)]
-    public Logger $logger;
+    public StdoutLogger $logger;
 
 
 	/** @var array<string, BaseProcess> */
