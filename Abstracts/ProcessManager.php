@@ -6,15 +6,24 @@ use Closure;
 use Exception;
 use Kiri;
 use Kiri\Abstracts\Component;
+use Kiri\Di\Inject\Container;
 use Kiri\Server\Contract\OnProcessInterface;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Swoole\Process;
-use Kiri\Abstracts\Logger;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Events\OnServerBeforeStart;
 
 class ProcessManager extends Component
 {
+
+
+    /**
+     * @var Logger
+     */
+    #[Container(LoggerInterface::class)]
+    public Logger $logger;
 
 
 	/** @var array<string, BaseProcess> */
@@ -174,7 +183,7 @@ class ProcessManager extends Component
 	{
 		set_env('environmental', Kiri::PROCESS);
 		$system = sprintf('[%s].Custom Process', \config('id', 'system-service'));
-		Logger::_alert($system . ' ' . $custom->getName() . ' start.');
+		$this->logger->alert($system . ' ' . $custom->getName() . ' start.');
 		if (Kiri::getPlatform()->isLinux()) {
 			$process->name($system . '[' . $process->pid . '].' . $custom->getName());
 		}

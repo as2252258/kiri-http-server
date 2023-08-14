@@ -4,9 +4,9 @@ namespace Kiri\Server\Abstracts;
 
 use Exception;
 use Kiri;
-use Kiri\Abstracts\Logger;
-use ReflectionException;
-use Swoole\Coroutine;
+use Kiri\Di\Inject\Container;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Swoole\Http\Server as HServer;
 use Swoole\Process;
 use Swoole\Server;
@@ -19,6 +19,14 @@ trait TraitServer
 
 
     private array $_process = [];
+
+
+
+    /**
+     * @var Logger
+     */
+    #[Container(LoggerInterface::class)]
+    public Logger $logger;
 
 
     /**
@@ -87,7 +95,7 @@ trait TraitServer
     public function onSigint($no, array $signInfo): void
     {
         try {
-            Logger::_alert('Pid ' . getmypid() . ' get signo ' . $no);
+            $this->logger->alert('Pid ' . getmypid() . ' get signo ' . $no);
             $this->shutdown();
         } catch (\Throwable $exception) {
             error($exception);

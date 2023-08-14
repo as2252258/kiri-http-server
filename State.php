@@ -4,7 +4,6 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri\Abstracts\Component;
-use Kiri\Abstracts\Logger;
 use Kiri\Server\Abstracts\TraitServer;
 use Swoole\Process;
 

@@ -2,14 +2,11 @@
 
 namespace Kiri\Server\Handler;
 
-use Kiri\Abstracts\Logger;
 use Kiri\Di\Inject\Container;
-use Kiri\Events\EventDispatch;
-use Kiri\Exception\ConfigException;
-use Kiri\Server\Events\OnAfterReload;
-use Kiri\Server\Events\OnBeforeReload;
+use Monolog\Logger;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Kiri\Server\Abstracts\Server;
 use Kiri\Server\Events\OnBeforeShutdown;
@@ -27,6 +24,13 @@ class OnServer extends Server
 
 
     /**
+     * @var Logger
+     */
+    #[Container(LoggerInterface::class)]
+    public Logger $logger;
+
+
+    /**
      * @param SServer $server
      * @throws ReflectionException
      * @throws ContainerExceptionInterface
@@ -36,7 +40,7 @@ class OnServer extends Server
     {
         \Kiri::setProcessName(sprintf('start[%d].server', $server->master_pid));
         foreach (config('server.ports') as $value) {
-            Logger::_alert('Listen ' . $value['type'] . ' address ' . $value['host'] . '::' . $value['port']);
+            $this->logger->alert('Listen ' . $value['type'] . ' address ' . $value['host'] . '::' . $value['port']);
         }
         event(new OnStart($server));
     }

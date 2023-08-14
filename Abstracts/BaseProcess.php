@@ -3,9 +3,11 @@
 namespace Kiri\Server\Abstracts;
 
 
-use Kiri\Abstracts\Logger;
 use Kiri\Di\Context;
+use Kiri\Di\Inject\Container;
 use Kiri\Server\Contract\OnProcessInterface;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
 
 /**
@@ -24,6 +26,13 @@ abstract class BaseProcess implements OnProcessInterface
 
 
 	protected bool $enable_coroutine = false;
+
+
+    /**
+     * @var Logger
+     */
+    #[Container(LoggerInterface::class)]
+    public Logger $logger;
 
 
 	public string $name = '';
@@ -97,7 +106,7 @@ abstract class BaseProcess implements OnProcessInterface
 	{
 		$this->isStop = true;
 		$value = Context::get('waite:process:message');
-		Logger::_alert('Process ' . $this->getName() . ' stop');
+		$this->logger->alert('Process ' . $this->getName() . ' stop');
 		if (!is_null($value) && Coroutine::exists((int)$value)) {
 			Coroutine::cancel((int)$value);
 		}

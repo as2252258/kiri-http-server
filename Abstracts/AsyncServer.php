@@ -4,16 +4,13 @@ namespace Kiri\Server\Abstracts;
 
 use Exception;
 use Kiri;
-use Kiri\Abstracts\Logger;
 use Kiri\Exception\ConfigException;
 use Kiri\Exception\NotFindClassException;
 use Kiri\Server\Config as SConfig;
 use Kiri\Server\Constant;
 use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
-use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Handler\OnServer;
-use Kiri\Server\HotReload;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Task\TaskInterface;
 use Kiri\Server\Task\Task;
