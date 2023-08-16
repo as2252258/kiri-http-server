@@ -7,6 +7,7 @@ use Kiri\Di\Context;
 use Kiri\Di\Inject\Container;
 use Kiri\Error\StdoutLogger;
 use Kiri\Server\Contract\OnProcessInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
 
@@ -33,6 +34,13 @@ abstract class BaseProcess implements OnProcessInterface
      */
     #[Container(LoggerInterface::class)]
     public StdoutLogger $logger;
+
+
+    /**
+     * @var \Kiri\Di\Container
+     */
+    #[Container(ContainerInterface::class)]
+    public \Kiri\Di\Container $container;
 
 
 	public string $name = '';
