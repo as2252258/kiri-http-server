@@ -122,23 +122,25 @@ class OnRequest implements OnRequestInterface
         $PsrResponse = Context::set(ResponseInterface::class, new ConstrictResponse());
         $PsrResponse->withContentType($this->response->contentType);
 
-        $serverRequest = (new ConstrictRequest())->withDataHeaders($request->getData())
+        $serverRequest = (new ConstrictRequest())->withHeaders($request->header ?? [])
             ->withUri(new Uri($request))
             ->withProtocolVersion($request->server['server_protocol'])
             ->withCookieParams($request->cookie ?? [])
             ->withServerParams($request->server)
             ->withQueryParams($request->get ?? [])
+            ->withParsedBody(function () use ($request) {
+                $contentType = $request->header['content-type'] ?? 'application/json';
+                if (str_contains($contentType, 'json')) {
+                    return Json::decode($request->getContent());
+                } else if (str_contains($contentType, 'xml')) {
+                    return Xml::toArray($request->getContent());
+                } else {
+                    return $request->post ?? [];
+                }
+            })
             ->withUploadedFiles($request->files ?? [])
             ->withMethod($request->getMethod());
 
-        $contentType = $request->header['content-type'] ?? 'application/json';
-        if (str_contains($contentType, 'json')) {
-            $serverRequest->withParsedBody(Json::decode($request->getContent()));
-        } else if (str_contains($contentType, 'xml')) {
-            $serverRequest->withParsedBody(Xml::toArray($request->getContent()));
-        } else {
-            $serverRequest->withParsedBody($request->post ?? []);
-        }
         /** @var ConstrictRequest $PsrRequest */
         return Context::set(RequestInterface::class, $serverRequest);
     }
