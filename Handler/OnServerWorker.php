@@ -43,10 +43,10 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
         set_env('environmental_workerId', $workerId);
 
         if ($workerId < $server->setting['worker_num']) {
+            var_dump(new OnWorkerStart($server, $workerId));
+
             $this->processName($server, 'Worker');
             set_env('environmental', Kiri::WORKER);
-
-            var_dump(new OnWorkerStart($server, $workerId));
 
             $dispatch->dispatch(new OnWorkerStart($server, $workerId));
         } else {
