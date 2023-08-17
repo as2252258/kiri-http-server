@@ -118,9 +118,7 @@ class AsyncServer implements ServerInterface
             return;
         }
         $container = Kiri::getDi();
-        $task = $container->get(Task::class);
-        $container->bind(TaskInterface::class, $task);
-        $task->initTaskWorker($this->server);
+        $container->get(Task::class)->initTaskWorker($this->server);
     }
 
 

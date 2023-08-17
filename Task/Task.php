@@ -15,15 +15,8 @@ use Kiri\Di\Inject\Container;
 /**
  *
  */
-class Task implements TaskInterface
+class Task
 {
-
-    /**
-     * @var ServerInterface
-     */
-    #[Container(ServerInterface::class)]
-    public ServerInterface $server;
-
 
     /**
      * @param Server $server
@@ -73,40 +66,6 @@ class Task implements TaskInterface
         }
         $data[0] = Kiri::getDi()->get($data[0]);
         return call_user_func($data, $task_id, $src_worker_id);
-    }
-
-
-    /**
-     * @param mixed $data
-     * @param float $timeout
-     * @param int $dstWorkerId
-     * @return mixed
-     */
-    public function taskWait(mixed $data, float $timeout = 0.5, int $dstWorkerId = -1): mixed
-    {
-        return $this->server->taskwait($data, $timeout, $dstWorkerId);
-    }
-
-
-    /**
-     * @param array $tasks
-     * @param float $timeout
-     * @return false|array
-     */
-    public function taskCo(array $tasks, float $timeout = 0.5): false|array
-    {
-        return $this->server->taskCo($tasks, $timeout);
-    }
-
-
-    /**
-     * @param array $tasks
-     * @param float $timeout
-     * @return false|array
-     */
-    public function taskWaitMulti(array $tasks, float $timeout = 0.5): false|array
-    {
-        return $this->server->taskWaitMulti($tasks, $timeout);
     }
 
 
