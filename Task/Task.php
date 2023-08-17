@@ -10,7 +10,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
-
+use Kiri\Di\Inject\Container;
 
 /**
  *
@@ -21,17 +21,8 @@ class Task implements TaskInterface
     /**
      * @var ServerInterface
      */
+    #[Container(ServerInterface::class)]
     public ServerInterface $server;
-
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     */
-    public function init(): void
-    {
-        $this->server = Kiri::getDi()->get(ServerInterface::class);
-    }
 
 
     /**
