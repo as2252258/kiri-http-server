@@ -20,9 +20,11 @@ use Kiri\Router\HttpRequestHandler;
 use Kiri\Router\Interface\ExceptionHandlerInterface;
 use Kiri\Router\Interface\OnRequestInterface;
 use Kiri\Router\RouterCollector;
+use Monolog\Logger;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Kiri\Router\Base\Middleware as MiddlewareManager;
@@ -37,6 +39,13 @@ class OnRequest implements OnRequestInterface
      * @var RouterCollector
      */
     public RouterCollector $router;
+
+
+    /**
+     * @var Logger
+     */
+    #[Container(LoggerInterface::class)]
+    public Logger $logger;
 
 
     /**
@@ -104,6 +113,7 @@ class OnRequest implements OnRequestInterface
 
             $PsrResponse = (new HttpRequestHandler($middleware, $dispatcher))->handle($PsrRequest);
         } catch (\Throwable $throwable) {
+            $this->logger->failure($throwable);
             $PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
         } finally {
             $this->emitter->sender($PsrResponse, $response);
