@@ -6,7 +6,10 @@ namespace Kiri\Server;
 
 use Exception;
 use Kiri;
-use Kiri\Exception\ConfigException;
+use Kiri\Events\EventDispatch;
+use Kiri\Router\Router;
+use Kiri\Server\Abstracts\AsyncServer;
+use Kiri\Server\Events\OnShutdown;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -16,7 +19,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-defined('ROUTER_TYPE_HTTP') or define('ROUTER_TYPE_HTTP','http');
+defined('ROUTER_TYPE_HTTP') or define('ROUTER_TYPE_HTTP', 'http');
+defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
 
 /**
  * Class Command
@@ -26,79 +30,109 @@ class ServerCommand extends Command
 {
 
 
-	private Server $server;
+    public AsyncServer   $manager;
+    public State         $state;
+    public EventDispatch $dispatch;
+    public Router        $router;
 
 
-	/**
-	 * @return void
-	 * @throws ReflectionException
-	 */
-	protected function configure(): void
-	{
-		$this->server = Kiri::getDi()->get(Server::class);
-		$this->setName('sw:server')
-			->setDescription('server start|stop|reload|restart')
-			->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
-			->addOption('daemon', 'd', InputOption::VALUE_NONE, 'is run daemonize');
-	}
+    /**
+     * @param string|null $name
+     * @throws ReflectionException
+     */
+    public function __construct(string $name = null)
+    {
+        parent::__construct($name);
+        $container = Kiri::getDi();
+        $this->manager = $container->get(AsyncServer::class);
+        $this->state = $container->get(State::class);
+        $this->dispatch = $container->get(EventDispatch::class);
+        $this->router = $container->get(Router::class);
+    }
 
 
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return int
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 * @throws Exception
-	 */
-	public function execute(InputInterface $input, OutputInterface $output): int
-	{
-		return match ($input->getArgument('action')) {
-			'restart' => $this->restart($input),
-			'stop' => $this->stop(),
-			'start' => $this->start($input),
-			default =>
-			throw new Exception('I don\'t know what I want to do.')
-		};
-	}
+    /**
+     * @return void
+     */
+    protected function configure(): void
+    {
+        $this->setName('sw:server')
+            ->setDescription('server start|stop|reload|restart')
+            ->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
+            ->addOption('daemon', 'd', InputOption::VALUE_NONE, 'is run daemonize');
+    }
 
 
-	/**
-	 * @param InputInterface $input
-	 * @return int
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 */
-	protected function restart(InputInterface $input): int
-	{
-		$this->stop();
-		$this->start($input);
-		return 1;
-	}
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws Exception
+     */
+    public function execute(InputInterface $input, OutputInterface $output): int
+    {
+        return match ($input->getArgument('action')) {
+            'restart' => $this->restart($input),
+            'stop'    => $this->stop(),
+            'start'   => $this->start($input),
+            default   =>
+            throw new Exception('I don\'t know what I want to do.')
+        };
+    }
 
 
-	/**
-	 * @return int
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 */
-	protected function stop(): int
-	{
-		$this->server->shutdown();
-		return 1;
-	}
+    /**
+     * @param InputInterface $input
+     * @return int
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
+    protected function restart(InputInterface $input): int
+    {
+        $this->stop();
+        $this->start($input);
+        return 1;
+    }
 
 
-	/**
-	 * @param InputInterface $input
-	 * @return int
-	 * @throws
-	 */
-	protected function start(InputInterface $input): int
-	{
-		$this->server->setDaemon((int)($input->getOption('daemon')));
-		$this->server->start();
-		return 1;
-	}
+    /**
+     * @return int
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    protected function stop(): int
+    {
+        $configs = \config('server', []);
+        $instances = $this->manager->sortService($configs['ports'] ?? []);
+        foreach ($instances as $config) {
+            $this->state->exit($config->port);
+        }
+        $this->dispatch->dispatch(new OnShutdown());
+        return 1;
+    }
+
+
+    /**
+     * @param InputInterface $input
+     * @return int
+     * @throws
+     */
+    protected function start(InputInterface $input): int
+    {
+        $daemon = (int)$input->getOption('daemon');
+        if (\config('reload.hot', false) === true) {
+            $this->manager->addProcess(HotReload::class);
+        } else {
+            $this->router->scan_build_route();
+        }
+        $this->manager->initCoreServers(\config('server', []), $daemon);
+        $this->manager->start();
+        return 1;
+    }
 
 }
