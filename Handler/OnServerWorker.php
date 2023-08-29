@@ -109,7 +109,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 
         debug_print_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
         $message = sprintf('Worker#%d::%d error stop. signal %d, exit_code %d, msg %s',
-            $worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), 9)
+            $worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), $signal)
         );
 
         error($message);
