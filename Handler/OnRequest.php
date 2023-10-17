@@ -16,7 +16,6 @@ use Kiri\Router\Constrict\ConstrictRequest;
 use Kiri\Router\Constrict\ConstrictResponse;
 use Kiri\Router\Constrict\Uri;
 use Kiri\Router\DataGrip;
-use Kiri\Router\HttpRequestHandler;
 use Kiri\Router\Interface\ExceptionHandlerInterface;
 use Kiri\Router\Interface\OnRequestInterface;
 use Kiri\Router\RouterCollector;
@@ -98,8 +97,10 @@ class OnRequest implements OnRequestInterface
             /** @var ConstrictRequest $PsrRequest */
             $PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
 
+            /** @var $dispatcher */
             $dispatcher = $this->router->query($request->server['path_info'], $request->getMethod());
 
+            /** @var $PsrResponse */
             $PsrResponse = $dispatcher->run($PsrRequest);
         } catch (\Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
@@ -119,7 +120,6 @@ class OnRequest implements OnRequestInterface
         /** @var ConstrictResponse $PsrResponse */
         $PsrResponse = Context::set(ResponseInterface::class, new ConstrictResponse());
         $PsrResponse->withContentType($this->response->contentType);
-
         $serverRequest = (new ConstrictRequest())->withHeaders($request->header ?? [])
             ->withUri(new Uri($request))
             ->withProtocolVersion($request->server['server_protocol'])
