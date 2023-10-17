@@ -105,7 +105,7 @@ class OnRequest implements OnRequestInterface
         } catch (\Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
         } finally {
-            $this->emitter->sender($PsrResponse, $response);
+            $this->emitter->sender($PsrResponse, $response, $PsrRequest);
         }
     }
 
