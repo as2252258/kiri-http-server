@@ -97,9 +97,10 @@ class OnRequest implements OnRequestInterface
         try {
             /** @var ConstrictRequest $PsrRequest */
             $PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
+
             $dispatcher = $this->router->query($request->server['path_info'], $request->getMethod());
 
-            $PsrResponse = (new HttpRequestHandler($dispatcher->getMiddlewares(), $dispatcher))->handle($PsrRequest);
+            $PsrResponse = $dispatcher->run($PsrRequest);
         } catch (\Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
         } finally {
