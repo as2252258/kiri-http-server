@@ -85,8 +85,8 @@ class OnRequest implements OnRequestInterface
         $this->exception         = $container->get($exception);
         $this->router            = $container->get(DataGrip::class)->get(ROUTER_TYPE_HTTP);
         $this->emitter           = $this->response->emmit;
-        $this->constrictResponse = Kiri::getDi()->get(ConstrictResponse::class);
-        $this->middlewareManager = Kiri::getDi()->get(MiddlewareManager::class);
+        $this->constrictResponse = $container->get(ConstrictResponse::class);
+        $this->middlewareManager = $container->get(MiddlewareManager::class);
     }
 
 
