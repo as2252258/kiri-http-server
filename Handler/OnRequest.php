@@ -132,9 +132,9 @@ class OnRequest implements OnRequestInterface
                                        ->withQueryParams($request->get ?? [])
                                        ->withParsedBody(function () use ($request) {
                                            $contentType = $request->header['content-type'] ?? 'application/json';
-                                           if (str_contains($contentType, 'json')) {
-                                               return Json::decode($request->getContent());
-                                           } else if (str_contains($contentType, 'xml')) {
+                                           if (\str_contains($contentType, 'json')) {
+                                               return \json_decode($request->getContent(),true);
+                                           } else if (\str_contains($contentType, 'xml')) {
                                                return Xml::toArray($request->getContent());
                                            } else {
                                                return $request->post ?? [];
