@@ -24,6 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Kiri\Router\Base\Middleware as MiddlewareManager;
+use Throwable;
 
 /**
  * OnRequest event
@@ -68,6 +69,9 @@ class OnRequest implements OnRequestInterface
      */
     public MiddlewareManager $middlewareManager;
 
+
+    public ConstrictResponse $constrictResponse;
+
     /**
      * @throws Exception
      */
@@ -78,11 +82,11 @@ class OnRequest implements OnRequestInterface
         if (!in_array(ExceptionHandlerInterface::class, class_implements($exception))) {
             $exception = ExceptionHandlerDispatcher::class;
         }
-        $this->exception = $container->get($exception);
-        $this->router = $container->get(DataGrip::class)->get(ROUTER_TYPE_HTTP);
-        $this->emitter = $this->response->emmit;
-
-        $this->middlewareManager = \Kiri::getDi()->get(MiddlewareManager::class);
+        $this->exception         = $container->get($exception);
+        $this->router            = $container->get(DataGrip::class)->get(ROUTER_TYPE_HTTP);
+        $this->emitter           = $this->response->emmit;
+        $this->constrictResponse = Kiri::getDi()->get(ConstrictResponse::class);
+        $this->middlewareManager = Kiri::getDi()->get(MiddlewareManager::class);
     }
 
 
@@ -95,15 +99,19 @@ class OnRequest implements OnRequestInterface
     {
         try {
             /** @var ConstrictRequest $PsrRequest */
-            $PsrRequest = $this->initPsr7RequestAndPsr7Response($request);
+            $PsrRequest = Context::set(RequestInterface::class, $this->constrictRequest($request));
+
+            /** @var ConstrictResponse $PsrResponse */
+            $PsrResponse = Context::set(ResponseInterface::class, new ConstrictResponse());
+            $PsrResponse->withContentType($this->response->contentType);
 
             /** @var $dispatcher */
             $dispatcher = $this->router->query($request->server['path_info'], $request->getMethod());
 
             /** @var $PsrResponse */
             $PsrResponse = $dispatcher->run($PsrRequest);
-        } catch (\Throwable $throwable) {
-            $PsrResponse = $this->exception->emit($throwable, di(ConstrictResponse::class));
+        } catch (Throwable $throwable) {
+            $PsrResponse = $this->exception->emit($throwable, $this->constrictResponse);
         } finally {
             $this->emitter->sender($PsrResponse, $response, $PsrRequest);
         }
@@ -112,35 +120,28 @@ class OnRequest implements OnRequestInterface
 
     /**
      * @param Request $request
-     * @return RequestInterface
-     * @throws Exception
+     * @return ConstrictRequest
      */
-    private function initPsr7RequestAndPsr7Response(Request $request): RequestInterface
+    protected function constrictRequest(Request $request): ConstrictRequest
     {
-        /** @var ConstrictResponse $PsrResponse */
-        $PsrResponse = Context::set(ResponseInterface::class, new ConstrictResponse());
-        $PsrResponse->withContentType($this->response->contentType);
-        $serverRequest = (new ConstrictRequest())->withHeaders($request->header ?? [])
-            ->withUri(new Uri($request))
-            ->withProtocolVersion($request->server['server_protocol'])
-            ->withCookieParams($request->cookie ?? [])
-            ->withServerParams($request->server)
-            ->withQueryParams($request->get ?? [])
-            ->withParsedBody(function () use ($request) {
-                $contentType = $request->header['content-type'] ?? 'application/json';
-                if (str_contains($contentType, 'json')) {
-                    return Json::decode($request->getContent());
-                } else if (str_contains($contentType, 'xml')) {
-                    return Xml::toArray($request->getContent());
-                } else {
-                    return $request->post ?? [];
-                }
-            })
-            ->withUploadedFiles($request->files ?? [])
-            ->withMethod($request->getMethod());
-
-        /** @var ConstrictRequest $PsrRequest */
-        return Context::set(RequestInterface::class, $serverRequest);
+        return (new ConstrictRequest())->withHeaders($request->header ?? [])
+                                       ->withUri(new Uri($request))
+                                       ->withProtocolVersion($request->server['server_protocol'])
+                                       ->withCookieParams($request->cookie ?? [])
+                                       ->withServerParams($request->server)
+                                       ->withQueryParams($request->get ?? [])
+                                       ->withParsedBody(function () use ($request) {
+                                           $contentType = $request->header['content-type'] ?? 'application/json';
+                                           if (str_contains($contentType, 'json')) {
+                                               return Json::decode($request->getContent());
+                                           } else if (str_contains($contentType, 'xml')) {
+                                               return Xml::toArray($request->getContent());
+                                           } else {
+                                               return $request->post ?? [];
+                                           }
+                                       })
+                                       ->withUploadedFiles($request->files ?? [])
+                                       ->withMethod($request->getMethod());
     }
 
 
