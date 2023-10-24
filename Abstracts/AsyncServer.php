@@ -12,10 +12,7 @@ use Kiri\Server\Events\OnServerBeforeStart;
 use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Handler\OnServer;
 use Kiri\Server\ServerInterface;
-use Kiri\Server\Task\TaskInterface;
 use Kiri\Server\Task\Task;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
 
@@ -56,8 +53,7 @@ class AsyncServer implements ServerInterface
 
     /**
      * @return bool
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface|ReflectionException
+     * @throws ReflectionException
      */
     public function shutdown(): bool
     {
