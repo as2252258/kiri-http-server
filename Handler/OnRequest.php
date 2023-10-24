@@ -7,7 +7,6 @@ namespace Kiri\Server\Handler;
 use Exception;
 use Kiri;
 use Kiri\Core\Xml;
-use Kiri\Core\Json;
 use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
 use Kiri\Di\Interface\ResponseEmitterInterface;

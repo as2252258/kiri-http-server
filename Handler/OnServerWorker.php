@@ -32,8 +32,6 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      * @param Server $server
      * @param int $workerId
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws Exception
      */
     public function onWorkerStart(Server $server, int $workerId): void
@@ -71,8 +69,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
     /**
      * @param Server $server
      * @param int $workerId
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface|ReflectionException
+     * @throws ReflectionException
      */
     public function onWorkerStop(Server $server, int $workerId): void
     {
@@ -84,8 +81,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
     /**
      * @param Server $server
      * @param int $workerId
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface|ReflectionException
+     * @throws ReflectionException
      */
     public function onWorkerExit(Server $server, int $workerId): void
     {
@@ -99,8 +95,6 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      * @param int $worker_pid
      * @param int $exit_code
      * @param int $signal
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws Exception
      */
     public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void

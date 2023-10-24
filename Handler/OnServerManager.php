@@ -3,8 +3,6 @@
 namespace Kiri\Server\Handler;
 
 use Kiri;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Kiri\Server\Abstracts\Server;
 use Kiri\Server\Events\OnManagerStart;
@@ -21,8 +19,7 @@ class OnServerManager extends Server
 
 	/**
 	 * @param \Swoole\Server $server
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface|ReflectionException
+     * @throws ReflectionException
 	 */
 	public function onManagerStart(\Swoole\Server $server): void
 	{
@@ -35,8 +32,7 @@ class OnServerManager extends Server
 	/**
 	 * @param \Swoole\Server $server
 	 * @return void
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface|ReflectionException
+     * @throws ReflectionException
 	 */
 	public function onManagerStop(\Swoole\Server $server): void
 	{

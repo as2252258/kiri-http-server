@@ -10,8 +10,6 @@ use Kiri\Events\EventDispatch;
 use Kiri\Router\Router;
 use Kiri\Server\Abstracts\AsyncServer;
 use Kiri\Server\Events\OnShutdown;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -67,8 +65,6 @@ class ServerCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws Exception
      */
     public function execute(InputInterface $input, OutputInterface $output): int
@@ -86,8 +82,6 @@ class ServerCommand extends Command
     /**
      * @param InputInterface $input
      * @return int
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
     protected function restart(InputInterface $input): int
@@ -100,8 +94,6 @@ class ServerCommand extends Command
 
     /**
      * @return int
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws Exception
      */

@@ -5,12 +5,8 @@ namespace Kiri\Server\Task;
 
 use Kiri;
 use Kiri\Server\Constant;
-use Kiri\Server\ServerInterface;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
-use Kiri\Di\Inject\Container;
 
 /**
  *
@@ -40,8 +36,6 @@ class Task
      * @param int $task_id
      * @param mixed $data
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
     public function onFinish(Server $server, int $task_id, mixed $data): void

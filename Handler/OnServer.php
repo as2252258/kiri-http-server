@@ -33,8 +33,6 @@ class OnServer extends Server
     /**
      * @param SServer $server
      * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function onStart(SServer $server): void
     {
@@ -48,8 +46,6 @@ class OnServer extends Server
 
     /**
      * @param SServer $server
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
     public function onBeforeShutdown(SServer $server): void

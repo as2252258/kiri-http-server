@@ -8,7 +8,6 @@ use Kiri\Di\Context;
 use Kiri\Router\Router;
 use Kiri\Server\Abstracts\BaseProcess;
 use Kiri\Server\Events\OnWorkerStart;
-use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Event;
 use Swoole\Process;
