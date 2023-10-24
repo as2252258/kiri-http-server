@@ -124,24 +124,27 @@ class OnRequest implements OnRequestInterface
      */
     protected function constrictRequest(Request $request): ConstrictRequest
     {
-        return (new ConstrictRequest())->withHeaders($request->header ?? [])
-                                       ->withUri(new Uri($request))
-                                       ->withProtocolVersion($request->server['server_protocol'])
-                                       ->withCookieParams($request->cookie ?? [])
-                                       ->withServerParams($request->server)
-                                       ->withQueryParams($request->get ?? [])
-                                       ->withParsedBody(function () use ($request) {
-                                           $contentType = $request->header['content-type'] ?? 'application/json';
-                                           if (\str_contains($contentType, 'json')) {
-                                               return \json_decode($request->getContent(),true);
-                                           } else if (\str_contains($contentType, 'xml')) {
-                                               return Xml::toArray($request->getContent());
-                                           } else {
-                                               return $request->post ?? [];
-                                           }
-                                       })
-                                       ->withUploadedFiles($request->files ?? [])
-                                       ->withMethod($request->getMethod());
+        $parsedBody       = function () use ($request) {
+            $contentType = $request->header['content-type'] ?? 'application/json';
+            if (\str_contains($contentType, 'json')) {
+                return \json_decode($request->getContent(), true);
+            } else if (\str_contains($contentType, 'xml')) {
+                return Xml::toArray($request->getContent());
+            } else {
+                return $request->post ?? [];
+            }
+        };
+        $constrictRequest = new ConstrictRequest();
+        $constrictRequest->withHeaders($request->header ?? [])
+                         ->withUri(new Uri($request))
+                         ->withProtocolVersion($request->server['server_protocol'])
+                         ->withCookieParams($request->cookie ?? [])
+                         ->withServerParams($request->server)
+                         ->withQueryParams($request->get ?? [])
+                         ->withParsedBody($parsedBody)
+                         ->withUploadedFiles($request->files ?? [])
+                         ->withMethod($request->getMethod());
+        return $constrictRequest;
     }
 
 
