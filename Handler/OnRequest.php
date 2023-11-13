@@ -6,6 +6,7 @@ namespace Kiri\Server\Handler;
 
 use Exception;
 use Kiri;
+use Kiri\Router\Constrict\Stream;
 use Kiri\Core\Xml;
 use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
@@ -125,16 +126,8 @@ class OnRequest implements OnRequestInterface
                                        ->withCookieParams($request->cookie ?? [])
                                        ->withServerParams($request->server)
                                        ->withQueryParams($request->get ?? [])
-                                       ->withParsedBody(function () use ($request) {
-                                           $contentType = $request->header['content-type'] ?? 'application/json';
-                                           if (\str_contains($contentType, 'json')) {
-                                               return \json_decode($request->getContent(), true);
-                                           } else if (\str_contains($contentType, 'xml')) {
-                                               return Xml::toArray($request->getContent());
-                                           } else {
-                                               return $request->post ?? [];
-                                           }
-                                       })
+                                       ->withBody(new Stream($request->getContent()))
+                                       ->withParsedBody($request)
                                        ->withUploadedFiles($request->files ?? [])
                                        ->withMethod($request->getMethod());
     }
