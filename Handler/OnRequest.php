@@ -19,8 +19,12 @@ use Kiri\Router\DataGrip;
 use Kiri\Router\Interface\ExceptionHandlerInterface;
 use Kiri\Router\Interface\OnRequestInterface;
 use Kiri\Router\RouterCollector;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use ReflectionException;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Kiri\Router\Base\Middleware as MiddlewareManager;
@@ -65,28 +69,41 @@ class OnRequest implements OnRequestInterface
 
 
     /**
-     * @var MiddlewareManager
+     * @var DataGrip
      */
-    public MiddlewareManager $middlewareManager;
+    #[Container(DataGrip::class)]
+    public DataGrip $dataGrip;
 
-
-    public ConstrictResponse $constrictResponse;
 
     /**
-     * @throws Exception
+     * @var ContainerInterface
+     */
+    #[Container(ContainerInterface::class)]
+    public ContainerInterface $container;
+
+
+    /**
+     * @var ConstrictResponse
+     */
+    #[Container(ConstrictResponse::class)]
+    public ConstrictResponse $constrictResponse;
+
+
+    /**
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     public function init(): void
     {
-        $container = Kiri::getDi();
         $exception = $this->request->exception;
         if (!in_array(ExceptionHandlerInterface::class, class_implements($exception))) {
             $exception = ExceptionHandlerDispatcher::class;
         }
-        $this->exception         = $container->get($exception);
-        $this->router            = $container->get(DataGrip::class)->get(ROUTER_TYPE_HTTP);
-        $this->responseEmitter   = $this->response->emmit;
-        $this->constrictResponse = $container->get(ConstrictResponse::class);
-        $this->middlewareManager = $container->get(MiddlewareManager::class);
+        $this->exception       = $this->container->get($exception);
+        $this->router          = $this->dataGrip->get(ROUTER_TYPE_HTTP);
+        $this->responseEmitter = $this->response->emmit;
     }
 
 
