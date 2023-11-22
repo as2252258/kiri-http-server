@@ -119,14 +119,14 @@ class OnRequest implements OnRequestInterface
             $PsrRequest = Context::set(RequestInterface::class, $this->createConstrictRequest($request));
 
             /** @var ConstrictResponse $PsrResponse */
-            Context::set(ResponseInterface::class, new ConstrictResponse())->withContentType($this->response->contentType);
+            Context::set(ResponseInterface::class, new ConstrictResponse($this->response->contentType));
 
             /** @var $PsrResponse */
             $PsrResponse = $this->router->query($request->server['path_info'], $request->getMethod())->run($PsrRequest);
         } catch (Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, $this->constrictResponse);
         } finally {
-            $this->responseEmitter->xxxxxxxxxxxxxxxxxxxxxxxxxSender($PsrResponse, $response, $PsrRequest);
+            $this->responseEmitter->response($PsrResponse, $response, $PsrRequest);
         }
     }
 

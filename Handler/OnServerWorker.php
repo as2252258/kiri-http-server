@@ -8,15 +8,14 @@ use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
 use Kiri\Server\Events\OnAfterWorkerStart;
 use Kiri\Server\Events\OnBeforeWorkerStart;
-use Kiri\Server\Events\OnTaskerStart as OnTaskStart;
+use Kiri\Server\Events\OnTaskerStart as OnTaskerStart;
 use Kiri\Server\Events\OnWorkerError;
 use Kiri\Server\Events\OnWorkerExit;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnWorkerStop;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
+use Kiri\Di\Inject\Container;
 use Swoole\Timer;
 
 
@@ -29,6 +28,13 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 
 
     /**
+     * @var EventDispatch
+     */
+    #[Container(EventDispatch::class)]
+    public EventDispatch $dispatch;
+
+
+    /**
      * @param Server $server
      * @param int $workerId
      * @return void
@@ -36,21 +42,16 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      */
     public function onWorkerStart(Server $server, int $workerId): void
     {
-        $dispatch = \Kiri::getDi()->get(EventDispatch::class);
-        $dispatch->dispatch(new OnBeforeWorkerStart($workerId));
+        $this->dispatch->dispatch(new OnBeforeWorkerStart(workerId: $workerId));
+        $this->processName($server, $workerId < $server->setting['worker_num'] ? 'Worker' : 'Tasker');
         set_env('environmental_workerId', $workerId);
-
+        set_env('environmental', $workerId < $server->setting['worker_num'] ? Kiri::WORKER : Kiri::TASK);
         if ($workerId < $server->setting['worker_num']) {
-            $this->processName($server, 'Worker');
-            set_env('environmental', Kiri::WORKER);
-            $dispatch->dispatch(new OnWorkerStart($server, $workerId));
+            $this->dispatch->dispatch(new OnWorkerStart($server, $workerId));
         } else {
-            $this->processName($server, 'Tasker');
-            set_env('environmental', Kiri::TASK);;
-            $dispatch->dispatch(new OnTaskStart($server, $workerId));
+            $this->dispatch->dispatch(new OnTaskerStart($server, $workerId));
         }
-
-        $dispatch->dispatch(new OnAfterWorkerStart());
+        $this->dispatch->dispatch(new OnAfterWorkerStart(workerId: $workerId));
     }
 
 
@@ -61,8 +62,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      */
     protected function processName(Server $server, string $prefix): void
     {
-        $prefix = sprintf($prefix . ' Process[%d].%d', $server->worker_pid, $server->worker_id);
-        Kiri::setProcessName($prefix);
+        Kiri::setProcessName(sprintf($prefix . ' Process[%d].%d', $server->worker_pid, $server->worker_id));
     }
 
 
@@ -102,9 +102,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
         event(new OnWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal));
 
         debug_print_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
-        $message = sprintf('Worker#%d::%d error stop. signal %d, exit_code %d, msg %s',
-            $worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), $signal)
-        );
+        $message = sprintf('Worker#%d::%d error stop. signal %d, exit_code %d, msg %s', $worker_id, $worker_pid, $signal, $exit_code, swoole_strerror(swoole_last_error(), $signal));
 
         error($message);
 
