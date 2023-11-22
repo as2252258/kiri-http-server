@@ -63,18 +63,17 @@ class OnRequest implements OnRequestInterface
 
     /**
      * @param ResponseInterface $response
-     * @param RequestInterface $request
      * @param ContainerInterface $container
      * @param DataGrip $dataGrip
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    public function __construct(public ResponseInterface $response, public RequestInterface $request, public ContainerInterface $container,
+    public function __construct(public ResponseInterface $response, public ContainerInterface $container,
                                 public DataGrip          $dataGrip)
     {
         $this->responseEmitter = $this->response->emmit;
-        $exception             = $this->request->exception;
+        $exception             = \config('components.request.exception');
         if (!in_array(ExceptionHandlerInterface::class, class_implements($exception))) {
             $exception = ExceptionHandlerDispatcher::class;
         }
