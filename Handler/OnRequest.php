@@ -55,34 +55,6 @@ class OnRequest implements OnRequestInterface
 
 
     /**
-     * @var Kiri\Router\Request
-     */
-    #[Container(RequestInterface::class)]
-    public RequestInterface $request;
-
-
-    /**
-     * @var ResponseInterface
-     */
-    #[Container(ResponseInterface::class)]
-    public ResponseInterface $response;
-
-
-    /**
-     * @var DataGrip
-     */
-    #[Container(DataGrip::class)]
-    public DataGrip $dataGrip;
-
-
-    /**
-     * @var ContainerInterface
-     */
-    #[Container(ContainerInterface::class)]
-    public ContainerInterface $container;
-
-
-    /**
      * @var ConstrictResponse
      */
     #[Container(ConstrictResponse::class)]
@@ -90,20 +62,24 @@ class OnRequest implements OnRequestInterface
 
 
     /**
-     * @return void
+     * @param ResponseInterface $response
+     * @param RequestInterface $request
+     * @param ContainerInterface $container
+     * @param DataGrip $dataGrip
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    public function init(): void
+    public function __construct(public ResponseInterface $response, public RequestInterface $request, public ContainerInterface $container,
+                                public DataGrip          $dataGrip)
     {
-        $exception = $this->request->exception;
+        $this->responseEmitter = $this->response->emmit;
+        $exception             = $this->request->exception;
         if (!in_array(ExceptionHandlerInterface::class, class_implements($exception))) {
             $exception = ExceptionHandlerDispatcher::class;
         }
-        $this->exception       = $this->container->get($exception);
-        $this->router          = $this->dataGrip->get(ROUTER_TYPE_HTTP);
-        $this->responseEmitter = $this->response->emmit;
+        $this->exception = $this->container->get($exception);
+        $this->router    = $this->dataGrip->get(ROUTER_TYPE_HTTP);
     }
 
 
