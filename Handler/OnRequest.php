@@ -126,9 +126,6 @@ class OnRequest implements OnRequestInterface
         } catch (Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, $this->constrictResponse);
         } finally {
-            if ($request->getMethod() === 'HEAD') {
-                $PsrResponse->getBody()->write('');
-            }
             $this->responseEmitter->response($PsrResponse, $response, $PsrRequest);
         }
     }
