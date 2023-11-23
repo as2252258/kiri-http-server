@@ -73,7 +73,7 @@ class OnRequest implements OnRequestInterface
                                 public DataGrip          $dataGrip)
     {
         $this->responseEmitter = $this->response->emmit;
-        $exception             = \config('components.request.exception');
+        $exception             = \config('request.exception');
         if (!in_array(ExceptionHandlerInterface::class, class_implements($exception))) {
             $exception = ExceptionHandlerDispatcher::class;
         }
