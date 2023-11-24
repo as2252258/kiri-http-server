@@ -7,7 +7,6 @@ namespace Kiri\Server\Handler;
 use Exception;
 use Kiri;
 use Kiri\Router\Constrict\Stream;
-use Kiri\Core\Xml;
 use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
 use Kiri\Di\Interface\ResponseEmitterInterface;
@@ -27,7 +26,6 @@ use Psr\Http\Message\ResponseInterface;
 use ReflectionException;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
-use Kiri\Router\Base\Middleware as MiddlewareManager;
 use Throwable;
 
 /**
