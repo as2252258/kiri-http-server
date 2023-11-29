@@ -15,6 +15,7 @@ use Kiri\Server\ServerInterface;
 use Kiri\Server\Task\Task;
 use ReflectionException;
 use Swoole\Server;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  *
@@ -149,14 +150,15 @@ class AsyncServer implements ServerInterface
         if ($port === false) {
             throw new Exception('Listen port fail.' . swoole_last_error());
         }
+        $writeln = Kiri::getDi()->get(OutputInterface::class);
         if ($config->type == Constant::SERVER_TYPE_HTTP) {
-            file_put_contents('php://output', 'Add http port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            $writeln->writeln('Add http port listen ' . $config->host . '::' . $config->port);
         } else if ($config->type == Constant::SERVER_TYPE_WEBSOCKET) {
-            file_put_contents('php://output', 'Add wss  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            $writeln->writeln('Add wss  port listen ' . $config->host . '::' . $config->port);
         } else if ($config->type == Constant::SERVER_TYPE_UDP) {
-            file_put_contents('php://output', 'Add udp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            $writeln->writeln('Add udp  port listen ' . $config->host . '::' . $config->port);
         } else {
-            file_put_contents('php://output', 'Add tcp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            $writeln->writeln('Add tcp  port listen ' . $config->host . '::' . $config->port);
         }
         $port->set($this->resetSettings($config->type, $config->settings));
 
