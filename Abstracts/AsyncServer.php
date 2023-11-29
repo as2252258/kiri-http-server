@@ -150,13 +150,13 @@ class AsyncServer implements ServerInterface
             throw new Exception('Listen port fail.' . swoole_last_error());
         }
         if ($config->type == Constant::SERVER_TYPE_HTTP) {
-            file_put_contents('php://input', 'Add http port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            file_put_contents('php://output', 'Add http port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
         } else if ($config->type == Constant::SERVER_TYPE_WEBSOCKET) {
-            file_put_contents('php://input', 'Add wss  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            file_put_contents('php://output', 'Add wss  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
         } else if ($config->type == Constant::SERVER_TYPE_UDP) {
-            file_put_contents('php://input', 'Add udp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            file_put_contents('php://output', 'Add udp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
         } else {
-            file_put_contents('php://input', 'Add tcp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+            file_put_contents('php://output', 'Add tcp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
         }
         $port->set($this->resetSettings($config->type, $config->settings));
 
