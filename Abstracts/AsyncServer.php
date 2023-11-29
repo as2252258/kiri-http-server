@@ -13,6 +13,10 @@ use Kiri\Server\Events\OnShutdown;
 use Kiri\Server\Handler\OnServer;
 use Kiri\Server\ServerInterface;
 use Kiri\Server\Task\Task;
+use Kiri\Di\Inject\Container;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Swoole\Server;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,10 +37,20 @@ class AsyncServer implements ServerInterface
 
 
     /**
+     * @var ContainerInterface
+     */
+    #[Container(ContainerInterface::class)]
+    public ContainerInterface $container;
+
+
+    /**
      * @param array $service
      * @param int $daemon
      * @return void
-     * @throws Exception
+     * @throws ConfigException
+     * @throws ContainerExceptionInterface
+     * @throws NotFindClassException
+     * @throws NotFoundExceptionInterface
      */
     public function initCoreServers(array $service, int $daemon = 0): void
     {
@@ -71,8 +85,9 @@ class AsyncServer implements ServerInterface
      * @param int $daemon
      * @return void
      * @throws ConfigException
+     * @throws ContainerExceptionInterface
      * @throws NotFindClassException
-     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
      */
     private function createBaseServer(SConfig $config, int $daemon = 0): void
     {
@@ -93,6 +108,8 @@ class AsyncServer implements ServerInterface
      * @param $daemon
      * @return void
      * @throws ConfigException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function initServer($match, $config, $daemon): void
     {
@@ -101,7 +118,8 @@ class AsyncServer implements ServerInterface
         if (!isset($config->events[Constant::SHUTDOWN])) {
             $config->events[Constant::SHUTDOWN] = [OnServer::class, 'onShutdown'];
         }
-        Kiri::getDi()->bind(ServerInterface::class, $this->server);
+        $this->_listenDump($config);
+        $this->container->bind(ServerInterface::class, $this->server);
     }
 
 
@@ -114,8 +132,7 @@ class AsyncServer implements ServerInterface
         if (!isset($this->server->setting[Constant::OPTION_TASK_WORKER_NUM])) {
             return;
         }
-        $container = Kiri::getDi();
-        $container->get(Task::class)->initTaskWorker($this->server);
+        $this->container->get(Task::class)->initTaskWorker($this->server);
     }
 
 
@@ -142,6 +159,8 @@ class AsyncServer implements ServerInterface
     /**
      * @param SConfig $config
      * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws Exception
      */
     public function addListener(SConfig $config): void
@@ -150,7 +169,21 @@ class AsyncServer implements ServerInterface
         if ($port === false) {
             throw new Exception('Listen port fail.' . swoole_last_error());
         }
-        $writeln = Kiri::getDi()->get(OutputInterface::class);
+        $this->_listenDump($config);
+        $port->set($this->resetSettings($config->type, $config->settings));
+        $this->onEventListen($port, $config->getEvents());
+    }
+
+
+    /**
+     * @param SConfig $config
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function _listenDump(SConfig $config): void
+    {
+        $writeln = $this->container->get(OutputInterface::class);
         if ($config->type == Constant::SERVER_TYPE_HTTP) {
             $writeln->writeln('Add http port listen ' . $config->host . '::' . $config->port . PHP_EOL);
         } else if ($config->type == Constant::SERVER_TYPE_WEBSOCKET) {
@@ -160,9 +193,6 @@ class AsyncServer implements ServerInterface
         } else {
             $writeln->writeln('Add tcp  port listen ' . $config->host . '::' . $config->port . PHP_EOL);
         }
-        $port->set($this->resetSettings($config->type, $config->settings));
-
-        $this->onEventListen($port, $config->getEvents());
     }
 
 
@@ -191,13 +221,14 @@ class AsyncServer implements ServerInterface
      * @param Server\Port|Server $base
      * @param array $events
      * @return void
-     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function onEventListen(Server\Port|Server $base, array $events): void
     {
         foreach ($events as $name => $event) {
             if (is_array($event) && is_string($event[0])) {
-                $event[0] = Kiri::getDi()->get($event[0]);
+                $event[0] = $this->container->get($event[0]);
             }
             $base->on($name, $event);
         }

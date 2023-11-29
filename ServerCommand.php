@@ -36,16 +36,16 @@ class ServerCommand extends Command
 
     /**
      * @param string|null $name
-     * @throws ReflectionException
+     * @throws Exception
      */
     public function __construct(string $name = null)
     {
         parent::__construct($name);
-        $container = Kiri::getDi();
-        $this->manager = $container->get(AsyncServer::class);
-        $this->state = $container->get(State::class);
+        $container      = Kiri::getDi();
+        $this->manager  = $container->get(AsyncServer::class);
+        $this->state    = $container->get(State::class);
         $this->dispatch = $container->get(EventDispatch::class);
-        $this->router = $container->get(Router::class);
+        $this->router   = $container->get(Router::class);
     }
 
 
@@ -55,9 +55,9 @@ class ServerCommand extends Command
     protected function configure(): void
     {
         $this->setName('sw:server')
-            ->setDescription('server start|stop|reload|restart')
-            ->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
-            ->addOption('daemon', 'd', InputOption::VALUE_NONE, 'is run daemonize');
+             ->setDescription('server start|stop|reload|restart')
+             ->addArgument('action', InputArgument::OPTIONAL, 'run action', 'start')
+             ->addOption('daemon', 'd', InputOption::VALUE_NONE, 'is run daemonize');
     }
 
 
@@ -99,7 +99,7 @@ class ServerCommand extends Command
      */
     protected function stop(): int
     {
-        $configs = \config('server', []);
+        $configs   = \config('server', []);
         $instances = $this->manager->sortService($configs['ports'] ?? []);
         foreach ($instances as $config) {
             $this->state->exit($config->port);
