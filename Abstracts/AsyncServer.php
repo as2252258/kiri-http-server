@@ -149,7 +149,15 @@ class AsyncServer implements ServerInterface
         if ($port === false) {
             throw new Exception('Listen port fail.' . swoole_last_error());
         }
-        println('Add port listen ' . $config->host . '::' . $config->port);
+        if ($config->type == Constant::SERVER_TYPE_HTTP) {
+            file_put_contents('php://input', 'Add http port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+        } else if ($config->type == Constant::SERVER_TYPE_WEBSOCKET) {
+            file_put_contents('php://input', 'Add wss  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+        } else if ($config->type == Constant::SERVER_TYPE_UDP) {
+            file_put_contents('php://input', 'Add udp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+        } else {
+            file_put_contents('php://input', 'Add tcp  port listen ' . $config->host . '::' . $config->port, FILE_APPEND);
+        }
         $port->set($this->resetSettings($config->type, $config->settings));
 
         $this->onEventListen($port, $config->getEvents());
