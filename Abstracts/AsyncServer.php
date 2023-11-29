@@ -152,13 +152,13 @@ class AsyncServer implements ServerInterface
         }
         $writeln = Kiri::getDi()->get(OutputInterface::class);
         if ($config->type == Constant::SERVER_TYPE_HTTP) {
-            $writeln->writeln('Add http port listen ' . $config->host . '::' . $config->port);
+            $writeln->writeln('Add http port listen ' . $config->host . '::' . $config->port . PHP_EOL);
         } else if ($config->type == Constant::SERVER_TYPE_WEBSOCKET) {
-            $writeln->writeln('Add wss  port listen ' . $config->host . '::' . $config->port);
+            $writeln->writeln('Add wss  port listen ' . $config->host . '::' . $config->port . PHP_EOL);
         } else if ($config->type == Constant::SERVER_TYPE_UDP) {
-            $writeln->writeln('Add udp  port listen ' . $config->host . '::' . $config->port);
+            $writeln->writeln('Add udp  port listen ' . $config->host . '::' . $config->port . PHP_EOL);
         } else {
-            $writeln->writeln('Add tcp  port listen ' . $config->host . '::' . $config->port);
+            $writeln->writeln('Add tcp  port listen ' . $config->host . '::' . $config->port . PHP_EOL);
         }
         $port->set($this->resetSettings($config->type, $config->settings));
 
