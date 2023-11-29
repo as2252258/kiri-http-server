@@ -185,13 +185,13 @@ class AsyncServer implements ServerInterface
     {
         $writeln = $this->container->get(OutputInterface::class);
         if ($config->type == Constant::SERVER_TYPE_HTTP) {
-            $writeln->writeln('Add http port listen ' . $config->host . '::' . $config->port . PHP_EOL);
+            $writeln->writeln('Add http port listen ' . $config->host . '::' . $config->port);
         } else if ($config->type == Constant::SERVER_TYPE_WEBSOCKET) {
-            $writeln->writeln('Add wss  port listen ' . $config->host . '::' . $config->port . PHP_EOL);
+            $writeln->writeln('Add wss  port listen ' . $config->host . '::' . $config->port);
         } else if ($config->type == Constant::SERVER_TYPE_UDP) {
-            $writeln->writeln('Add udp  port listen ' . $config->host . '::' . $config->port . PHP_EOL);
+            $writeln->writeln('Add udp  port listen ' . $config->host . '::' . $config->port);
         } else {
-            $writeln->writeln('Add tcp  port listen ' . $config->host . '::' . $config->port . PHP_EOL);
+            $writeln->writeln('Add tcp  port listen ' . $config->host . '::' . $config->port);
         }
     }
 
