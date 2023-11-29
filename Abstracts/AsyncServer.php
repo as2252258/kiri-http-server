@@ -127,10 +127,10 @@ class AsyncServer implements ServerInterface
      */
     protected function systemConfig(SConfig $config, int $daemon): array
     {
-        $settings = array_merge(\config('server.settings', []), $config->settings);
-        $settings[Constant::OPTION_DAEMONIZE] = (bool)$daemon;
+        $settings                                     = array_merge(\config('server.settings', []), $config->settings);
+        $settings[Constant::OPTION_DAEMONIZE]         = (bool)$daemon;
         $settings[Constant::OPTION_ENABLE_REUSE_PORT] = true;
-        $settings[Constant::OPTION_PID_FILE] = storage('.swoole.pid');
+        $settings[Constant::OPTION_PID_FILE]          = storage('.swoole.pid');
         if (!isset($settings[Constant::OPTION_PID_FILE])) {
             $settings[Constant::OPTION_LOG_FILE] = storage('system.log');
         }
@@ -149,7 +149,7 @@ class AsyncServer implements ServerInterface
         if ($port === false) {
             throw new Exception('Listen port fail.' . swoole_last_error());
         }
-
+        println('Add port listen ' . $config->host . '::' . $config->port);
         $port->set($this->resetSettings($config->type, $config->settings));
 
         $this->onEventListen($port, $config->getEvents());
