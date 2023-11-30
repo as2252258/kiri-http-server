@@ -5,7 +5,6 @@ namespace Kiri\Server;
 
 
 use Kiri\Abstracts\Providers;
-use Kiri\Di\LocalService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Application;
@@ -20,11 +19,10 @@ class ServerProviders extends Providers
 
 
 	/**
-	 * @param LocalService $application
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function onImport(LocalService $application): void
+	public function onImport(): void
 	{
 		$server = $this->container->get(ServerCommand::class);
 
