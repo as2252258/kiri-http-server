@@ -6,14 +6,12 @@ namespace Kiri\Server\Handler;
 
 use Exception;
 use Kiri;
-use Kiri\Router\Constrict\Stream;
 use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
 use Kiri\Di\Interface\ResponseEmitterInterface;
 use Kiri\Router\Base\ExceptionHandlerDispatcher;
-use Kiri\Router\Constrict\ConstrictRequest;
+use Kiri\Router\Constrict\ConstrictRequest as CQ;
 use Kiri\Router\Constrict\ConstrictResponse;
-use Kiri\Router\Constrict\Uri;
 use Kiri\Router\DataGrip;
 use Kiri\Router\Interface\ExceptionHandlerInterface;
 use Kiri\Router\Interface\OnRequestInterface;
@@ -23,6 +21,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
@@ -87,15 +86,12 @@ class OnRequest implements OnRequestInterface
      */
     public function onRequest(Request $request, Response $response): void
     {
+        /** @var CQ $PsrRequest */
         try {
-            /** @var ConstrictRequest $PsrRequest */
-            $PsrRequest = Context::set(RequestInterface::class, $this->createConstrictRequest($request));
+            $PsrRequest = $this->initRequestAndResponse($request);
 
-            /** @var ConstrictResponse $PsrResponse */
-            Context::set(ResponseInterface::class, new ConstrictResponse($this->response->contentType));
-
-            /** @var $PsrResponse */
-            $PsrResponse = $this->router->query($request->server['path_info'], $request->getMethod())->run($PsrRequest);
+            $PsrResponse = $this->router->query($request->server['path_info'], $request->getMethod())
+                                        ->run($PsrRequest);
         } catch (Throwable $throwable) {
             $PsrResponse = $this->exception->emit($throwable, $this->constrictResponse);
         } finally {
@@ -106,21 +102,15 @@ class OnRequest implements OnRequestInterface
 
     /**
      * @param Request $request
-     * @return ConstrictRequest
+     * @return ServerRequestInterface
      */
-    protected function createConstrictRequest(Request $request): ConstrictRequest
+    public function initRequestAndResponse(Request $request): ServerRequestInterface
     {
-        return (new ConstrictRequest())->withHeaders($request->header ?? [])
-                                       ->withUri(new Uri($request))
-                                       ->withProtocolVersion($request->server['server_protocol'])
-                                       ->withCookieParams($request->cookie ?? [])
-                                       ->withServerParams($request->server)
-                                       ->withQueryParams($request->get ?? [])
-                                       ->withBody(new Stream($request->getContent()))
-                                       ->withParsedBody($request)
-                                       ->withUploadedFiles($request->files ?? [])
-                                       ->withMethod($request->getMethod());
-    }
+        $response = new ConstrictResponse($this->response->contentType);
 
+        Context::set(ResponseInterface::class, $response);
+
+        return Context::set(RequestInterface::class, CQ::builder($request));
+    }
 
 }
