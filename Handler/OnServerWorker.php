@@ -35,6 +35,32 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 
 
     /**
+     * @return void
+     */
+    public function init(): void
+    {
+        on(OnBeforeWorkerStart::class, [$this, 'onWorkerNameAlias']);
+    }
+
+
+    /**
+     * @param OnBeforeWorkerStart $workerStart
+     * @return void
+     */
+    public function onWorkerNameAlias(OnBeforeWorkerStart $workerStart): void
+    {
+        set_env('environmental_workerId', $workerStart->workerId);
+        if ($workerStart->workerId < $workerStart->server->setting['worker_num']) {
+            $this->processName($workerStart->server, 'Worker');
+            set_env('environmental', Kiri::WORKER);
+        } else {
+            $this->processName($workerStart->server, 'Tasker');
+            set_env('environmental', Kiri::TASK);
+        }
+    }
+
+
+    /**
      * @param Server $server
      * @param int $workerId
      * @return void
@@ -42,10 +68,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      */
     public function onWorkerStart(Server $server, int $workerId): void
     {
-        $this->dispatch->dispatch(new OnBeforeWorkerStart(workerId: $workerId));
-        $this->processName($server, $workerId < $server->setting['worker_num'] ? 'Worker' : 'Tasker');
-        set_env('environmental_workerId', $workerId);
-        set_env('environmental', $workerId < $server->setting['worker_num'] ? Kiri::WORKER : Kiri::TASK);
+        $this->dispatch->dispatch(new OnBeforeWorkerStart(server: $server, workerId: $workerId));
         if ($workerId < $server->setting['worker_num']) {
             $this->dispatch->dispatch(new OnWorkerStart($server, $workerId));
         } else {
