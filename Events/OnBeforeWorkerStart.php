@@ -2,10 +2,16 @@
 
 namespace Kiri\Server\Events;
 
+use Swoole\Server;
+
 class OnBeforeWorkerStart
 {
 
-    public function __construct(public int $workerId)
+    /**
+     * @param Server $server
+     * @param int $workerId
+     */
+    public function __construct(public Server $server,public int $workerId)
     {
     }
 

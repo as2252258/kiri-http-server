@@ -68,13 +68,13 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      */
     public function onWorkerStart(Server $server, int $workerId): void
     {
-        $this->dispatch->dispatch(new OnBeforeWorkerStart(server: $server, workerId: $workerId));
+        $this->dispatch->dispatch(new OnBeforeWorkerStart($server, $workerId));
         if ($workerId < $server->setting['worker_num']) {
             $this->dispatch->dispatch(new OnWorkerStart($server, $workerId));
         } else {
             $this->dispatch->dispatch(new OnTaskerStart($server, $workerId));
         }
-        $this->dispatch->dispatch(new OnAfterWorkerStart(workerId: $workerId));
+        $this->dispatch->dispatch(new OnAfterWorkerStart($server, $workerId));
     }
 
 
