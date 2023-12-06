@@ -122,6 +122,7 @@ class ServerCommand extends Command
         } else {
             $this->router->scan_build_route();
         }
+        $this->manager->addProcess(config('processes', []));
         $this->manager->initCoreServers(\config('server', []), $daemon);
         $this->manager->start();
         return 1;
