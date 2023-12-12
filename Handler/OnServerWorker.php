@@ -2,7 +2,6 @@
 
 namespace Kiri\Server\Handler;
 
-use Exception;
 use Kiri;
 use Kiri\Core\Help;
 use Kiri\Events\EventDispatch;
@@ -13,17 +12,18 @@ use Kiri\Server\Events\OnWorkerError;
 use Kiri\Server\Events\OnWorkerExit;
 use Kiri\Server\Events\OnWorkerStart;
 use Kiri\Server\Events\OnWorkerStop;
-use ReflectionException;
 use Swoole\Server;
 use Kiri\Di\Inject\Container;
 use Swoole\Timer;
+use Throwable;
+use function config;
 
 
 /**
  * Class OnServerWorker
  * @package Server\Worker
  */
-class OnServerWorker extends \Kiri\Server\Abstracts\Server
+class OnServerWorker extends Kiri\Server\Abstracts\Server
 {
 
 
@@ -140,11 +140,11 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
     protected function system_mail($messageContent): void
     {
         try {
-            $email = \config('email', ['enable' => false]);
+            $email = config('email', ['enable' => false]);
             if (!empty($email) && ($email['enable'] ?? false)) {
                 Help::sendEmail($email, 'Service Error', $messageContent);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             error($e, ['email']);
         }
     }
