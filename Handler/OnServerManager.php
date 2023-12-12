@@ -17,27 +17,27 @@ class OnServerManager extends Server
 {
 
 
-	/**
-	 * @param \Swoole\Server $server
-     * @throws ReflectionException
-	 */
-	public function onManagerStart(\Swoole\Server $server): void
-	{
-		Kiri::setProcessName(sprintf('manger process[%d]', $server->manager_pid));
+    /**
+     * @param \Swoole\Server $server
+     * @throws
+     */
+    public function onManagerStart(\Swoole\Server $server): void
+    {
+        Kiri::setProcessName(sprintf('manger process[%d]', $server->manager_pid));
 
-		event(new OnManagerStart($server));
-	}
+        event(new OnManagerStart($server));
+    }
 
 
-	/**
-	 * @param \Swoole\Server $server
-	 * @return void
-     * @throws ReflectionException
-	 */
-	public function onManagerStop(\Swoole\Server $server): void
-	{
-		event(new OnManagerStop($server));
-	}
+    /**
+     * @param \Swoole\Server $server
+     * @return void
+     * @throws
+     */
+    public function onManagerStop(\Swoole\Server $server): void
+    {
+        event(new OnManagerStop($server));
+    }
 
 
 }

@@ -66,7 +66,7 @@ class ServerCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws Exception
+     * @throws
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -83,7 +83,7 @@ class ServerCommand extends Command
     /**
      * @param InputInterface $input
      * @return int
-     * @throws ReflectionException
+     * @throws
      */
     protected function restart(InputInterface $input): int
     {
@@ -95,8 +95,7 @@ class ServerCommand extends Command
 
     /**
      * @return int
-     * @throws ReflectionException
-     * @throws Exception
+     * @throws
      */
     protected function stop(): int
     {

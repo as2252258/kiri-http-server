@@ -3,10 +3,8 @@
 namespace Kiri\Server\Task;
 
 
-use Exception;
 use Kiri;
 use Kiri\Server\Constant;
-use ReflectionException;
 use Swoole\Server;
 
 /**
@@ -37,7 +35,7 @@ class Task
      * @param int $task_id
      * @param mixed $data
      * @return void
-     * @throws ReflectionException
+     * @throws
      */
     public function onFinish(Server $server, int $task_id, mixed $data): void
     {
@@ -51,7 +49,7 @@ class Task
      * @param int $src_worker_id
      * @param mixed $data
      * @return mixed
-     * @throws ReflectionException|Exception
+     * @throws
      */
     public function onTask(Server $server, int $task_id, int $src_worker_id, mixed $data): mixed
     {

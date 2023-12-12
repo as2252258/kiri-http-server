@@ -31,7 +31,7 @@ class OnServer extends Server
 
     /**
      * @param SServer $server
-     * @throws ReflectionException
+     * @throws
      */
     public function onStart(SServer $server): void
     {
@@ -45,7 +45,7 @@ class OnServer extends Server
 
     /**
      * @param SServer $server
-     * @throws ReflectionException
+     * @throws
      */
     public function onBeforeShutdown(SServer $server): void
     {

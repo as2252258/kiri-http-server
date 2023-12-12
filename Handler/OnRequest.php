@@ -61,9 +61,7 @@ class OnRequest implements OnRequestInterface
      * @param ResponseInterface $response
      * @param ContainerInterface $container
      * @param DataGrip $dataGrip
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws ReflectionException
+     * @throws
      */
     public function __construct(public ResponseInterface $response, public ContainerInterface $container,
                                 public DataGrip          $dataGrip)
@@ -81,7 +79,7 @@ class OnRequest implements OnRequestInterface
     /**
      * @param Request $request
      * @param Response $response
-     * @throws Exception
+     * @throws
      */
     public function onRequest(Request $request, Response $response): void
     {

@@ -46,10 +46,7 @@ class AsyncServer implements ServerInterface
      * @param array $service
      * @param int $daemon
      * @return void
-     * @throws ConfigException
-     * @throws ContainerExceptionInterface
-     * @throws NotFindClassException
-     * @throws NotFoundExceptionInterface
+     * @throws
      */
     public function initCoreServers(array $service, int $daemon = 0): void
     {
@@ -67,7 +64,7 @@ class AsyncServer implements ServerInterface
 
     /**
      * @return bool
-     * @throws ReflectionException
+     * @throws
      */
     public function shutdown(): bool
     {
@@ -83,10 +80,7 @@ class AsyncServer implements ServerInterface
      * @param SConfig $config
      * @param int $daemon
      * @return void
-     * @throws ConfigException
-     * @throws ContainerExceptionInterface
-     * @throws NotFindClassException
-     * @throws NotFoundExceptionInterface
+     * @throws
      */
     private function createBaseServer(SConfig $config, int $daemon = 0): void
     {
@@ -106,9 +100,7 @@ class AsyncServer implements ServerInterface
      * @param $config
      * @param $daemon
      * @return void
-     * @throws ConfigException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws
      */
     private function initServer($match, $config, $daemon): void
     {
@@ -139,8 +131,7 @@ class AsyncServer implements ServerInterface
      * @param SConfig $config
      * @param int $daemon
      * @return array
-     * @throws Exception
-     * @throws ConfigException
+     * @throws
      */
     protected function systemConfig(SConfig $config, int $daemon): array
     {
@@ -158,9 +149,7 @@ class AsyncServer implements ServerInterface
     /**
      * @param SConfig $config
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws Exception
+     * @throws
      */
     public function addListener(SConfig $config): void
     {
@@ -177,8 +166,7 @@ class AsyncServer implements ServerInterface
     /**
      * @param SConfig $config
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws
      */
     protected function _listenDump(SConfig $config): void
     {
@@ -220,8 +208,7 @@ class AsyncServer implements ServerInterface
      * @param Server\Port|Server $base
      * @param array $events
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws
      */
     private function onEventListen(Server\Port|Server $base, array $events): void
     {

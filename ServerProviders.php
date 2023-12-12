@@ -5,8 +5,6 @@ namespace Kiri\Server;
 
 
 use Kiri\Abstracts\Providers;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Application;
 
 /**
@@ -17,15 +15,14 @@ class ServerProviders extends Providers
 {
 
 
-	/**
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
-	 */
-	public function onImport(): void
-	{
-		$server = $this->container->get(ServerCommand::class);
+    /**
+     * @throws
+     */
+    public function onImport(): void
+    {
+        $server = $this->container->get(ServerCommand::class);
 
-		$console = $this->container->get(Application::class);
-		$console->add($server);
-	}
+        $console = $this->container->get(Application::class);
+        $console->add($server);
+    }
 }

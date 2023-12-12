@@ -64,7 +64,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      * @param Server $server
      * @param int $workerId
      * @return void
-     * @throws Exception
+     * @throws
      */
     public function onWorkerStart(Server $server, int $workerId): void
     {
@@ -92,7 +92,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
     /**
      * @param Server $server
      * @param int $workerId
-     * @throws ReflectionException
+     * @throws
      */
     public function onWorkerStop(Server $server, int $workerId): void
     {
@@ -104,7 +104,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
     /**
      * @param Server $server
      * @param int $workerId
-     * @throws ReflectionException
+     * @throws
      */
     public function onWorkerExit(Server $server, int $workerId): void
     {
@@ -118,7 +118,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
      * @param int $worker_pid
      * @param int $exit_code
      * @param int $signal
-     * @throws Exception
+     * @throws
      */
     public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
     {
@@ -135,7 +135,7 @@ class OnServerWorker extends \Kiri\Server\Abstracts\Server
 
     /**
      * @param $messageContent
-     * @throws Exception
+     * @throws
      */
     protected function system_mail($messageContent): void
     {

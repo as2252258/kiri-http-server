@@ -21,7 +21,6 @@ trait TraitServer
     private array $_process = [];
 
 
-
     /**
      * @var StdoutLogger
      */
@@ -32,7 +31,7 @@ trait TraitServer
     /**
      * @param string|array|BaseProcess $class
      * @return void
-     * @throws Exception
+     * @throws
      */
     public function addProcess(string|array|BaseProcess $class): void
     {
@@ -69,7 +68,7 @@ trait TraitServer
 
     /**
      * @return void
-     * @throws Exception
+     * @throws
      */
     public function onSignal(): void
     {

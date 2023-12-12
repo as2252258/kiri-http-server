@@ -68,7 +68,7 @@ class HotReload extends BaseProcess
     /**
      * @param $data
      * @return void
-     * @throws Exception
+     * @throws
      */
     public function onStop($data): void
     {
@@ -85,7 +85,7 @@ class HotReload extends BaseProcess
     /**
      * @param Process|null $process
      * @return void
-     * @throws Exception
+     * @throws
      */
     public function process(?Process $process): void
     {
@@ -101,7 +101,7 @@ class HotReload extends BaseProcess
 
     /**
      * @return void
-     * @throws Exception
+     * @throws
      */
     private function onCrontabReload(): void
     {
@@ -112,7 +112,7 @@ class HotReload extends BaseProcess
 
     /**
      * @return void
-     * @throws Exception
+     * @throws
      */
     private function onInotifyReload(): void
     {
@@ -133,7 +133,7 @@ class HotReload extends BaseProcess
 
     /**
      * @param bool $isReload
-     * @throws Exception
+     * @throws
      */
     private function loadDirs(bool $isReload = false): void
     {
@@ -150,7 +150,7 @@ class HotReload extends BaseProcess
 
 
     /**
-     * @throws Exception
+     * @throws
      */
     public function tick(): void
     {
@@ -176,7 +176,7 @@ class HotReload extends BaseProcess
      * @param $path
      * @param bool $isReload
      * @return void
-     * @throws Exception
+     * @throws
      */
     private function loadByDir($path, bool $isReload = false): void
     {
@@ -262,7 +262,7 @@ class HotReload extends BaseProcess
     }
 
     /**
-     * @throws Exception
+     * @throws
      */
     public function reload(): void
     {
@@ -278,7 +278,7 @@ class HotReload extends BaseProcess
     }
 
     /**
-     * @throws Exception
+     * @throws
      */
     public function timerReload(): void
     {
@@ -297,7 +297,7 @@ class HotReload extends BaseProcess
 
     /**
      * 重启
-     * @throws Exception
+     * @throws
      */
     public function trigger_reload(): void
     {
@@ -307,7 +307,7 @@ class HotReload extends BaseProcess
 
 
     /**
-     * @throws Exception
+     * @throws
      */
     public function clearWatch(): void
     {
@@ -325,7 +325,7 @@ class HotReload extends BaseProcess
     /**
      * @param $dir
      * @return bool
-     * @throws Exception
+     * @throws
      */
     public function watch($dir): bool
     {
