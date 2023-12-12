@@ -8,7 +8,6 @@ use Kiri\Abstracts\Providers;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Application;
-use Kiri;
 
 /**
  * Class DatabasesProviders

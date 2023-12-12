@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kiri\Server\Handler;
 
 use Exception;
-use Kiri;
 use Kiri\Di\Inject\Container;
 use Kiri\Di\Context;
 use Kiri\Di\Interface\ResponseEmitterInterface;

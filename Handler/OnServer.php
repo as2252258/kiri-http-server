@@ -2,10 +2,9 @@
 
 namespace Kiri\Server\Handler;
 
+use Kiri;
 use Kiri\Di\Inject\Container;
 use Kiri\Error\StdoutLogger;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Kiri\Server\Abstracts\Server;
@@ -36,7 +35,7 @@ class OnServer extends Server
      */
     public function onStart(SServer $server): void
     {
-        \Kiri::setProcessName(sprintf('start[%d].server', $server->master_pid));
+        Kiri::setProcessName(sprintf('start[%d].server', $server->master_pid));
         foreach (config('server.ports') as $value) {
             $this->logger->alert('Listen ' . $value['type'] . ' address ' . $value['host'] . '::' . $value['port']);
         }

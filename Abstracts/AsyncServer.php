@@ -3,7 +3,6 @@
 namespace Kiri\Server\Abstracts;
 
 use Exception;
-use Kiri;
 use Kiri\Exception\ConfigException;
 use Kiri\Exception\NotFindClassException;
 use Kiri\Server\Config as SConfig;

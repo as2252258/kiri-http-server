@@ -6,6 +6,7 @@ use Exception;
 use Kiri\Abstracts\Component;
 use Kiri\Server\Abstracts\TraitServer;
 use Swoole\Process;
+use function config;
 
 class State extends Component
 {
@@ -21,7 +22,7 @@ class State extends Component
 	 */
 	public function init(): void
 	{
-		$this->servers = \config('server.ports');
+		$this->servers = config('server.ports');
 	}
 
 

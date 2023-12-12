@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function config;
 
 defined('ROUTER_TYPE_HTTP') or define('ROUTER_TYPE_HTTP', 'http');
 defined('PID_PATH') or define('PID_PATH', APP_PATH . 'storage/server.pid');
@@ -99,7 +100,7 @@ class ServerCommand extends Command
      */
     protected function stop(): int
     {
-        $configs   = \config('server', []);
+        $configs   = config('server', []);
         $instances = $this->manager->sortService($configs['ports'] ?? []);
         foreach ($instances as $config) {
             $this->state->exit($config->port);
@@ -117,13 +118,13 @@ class ServerCommand extends Command
     protected function start(InputInterface $input): int
     {
         $daemon = (int)$input->getOption('daemon');
-        if (\config('reload.hot', false) === true) {
+        if (config('reload.hot', false) === true) {
             $this->manager->addProcess(HotReload::class);
         } else {
             $this->router->scan_build_route();
         }
         $this->manager->addProcess(config('processes', []));
-        $this->manager->initCoreServers(\config('server', []), $daemon);
+        $this->manager->initCoreServers(config('server', []), $daemon);
         $this->manager->start();
         return 1;
     }

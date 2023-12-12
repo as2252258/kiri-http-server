@@ -3,6 +3,7 @@
 namespace Kiri\Server\Task;
 
 
+use Exception;
 use Kiri;
 use Kiri\Server\Constant;
 use ReflectionException;
@@ -50,7 +51,7 @@ class Task
      * @param int $src_worker_id
      * @param mixed $data
      * @return mixed
-     * @throws ReflectionException
+     * @throws ReflectionException|Exception
      */
     public function onTask(Server $server, int $task_id, int $src_worker_id, mixed $data): mixed
     {
