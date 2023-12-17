@@ -29,6 +29,9 @@ class HotReload extends BaseProcess
     private array $dirs = [APP_PATH . 'app', APP_PATH . 'routes'];
 
 
+    private bool $forceFile = false;
+
+
     protected mixed $inotify = null;
 
 
@@ -90,7 +93,7 @@ class HotReload extends BaseProcess
     public function process(?Process $process): void
     {
         // TODO: Implement process() method.
-        if (extension_loaded('inotify')) {
+        if (!$this->forceFile && extension_loaded('inotify')) {
             $this->onInotifyReload();
         } else {
             $this->onCrontabReload();
