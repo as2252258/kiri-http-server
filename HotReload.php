@@ -306,7 +306,7 @@ class HotReload extends BaseProcess
      */
     public function trigger_reload(): void
     {
-        $this->logger->failure('Wait trigger server Reload');
+        $this->logger->failure('Wait trigger server Reload' . PHP_EOL);
         di(ServerInterface::class)->reload(false);
     }
 
