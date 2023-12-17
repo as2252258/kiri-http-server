@@ -41,6 +41,8 @@ class HotReload extends BaseProcess
     public function __construct(public Router $router)
     {
         on(OnWorkerStart::class, [$this->router, 'scan_build_route']);
+
+        $this->forceFile = \config('reload.forceFile', false);
     }
 
     /**
