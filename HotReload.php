@@ -185,11 +185,14 @@ class HotReload extends BaseProcess
      */
     private function loadByDir($path, bool $isReload = false): void
     {
-        if (!is_string($path)) {
+        if (!is_string($path) || $this->isStop()) {
             return;
         }
         $path = rtrim($path, '/');
         foreach (glob(realpath($path) . '/*') as $value) {
+            if ($this->isStop()) {
+                break;
+            }
             if (is_dir($value)) {
                 $this->loadByDir($value, $isReload);
             }
